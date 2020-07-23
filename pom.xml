@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.sps</groupId>
+  <artifactId>portfolio</artifactId>
+  <version>1</version>
+  <packaging>war</packaging>
+
+  <properties>
+    <!-- This project uses Java 8 -->
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
+    <project.http.version>1.20.0</project.http.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- GSON -->
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.6</version>
+    </dependency>
+    <!-- JUnit unit testing -->
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- AppEngine API -->
+    <dependency>
+        <groupId>com.google.appengine</groupId>
+        <artifactId>appengine-api-1.0-sdk</artifactId>
+        <version>1.9.59</version>
+    </dependency>
+    <!-- Google Cloud language -->
+    <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-language</artifactId>
+         <version>1.55.0</version>
+    </dependency>
+    <!-- Google API Client -->
+   <dependency>
+     <groupId>com.google.api-client</groupId>
+     <artifactId>google-api-client</artifactId>
+     <version>1.30.9</version>
+   </dependency>
+   <!-- Google Jetty Client -->
+   <dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client-jetty</artifactId>
+    <version>1.12.0-beta</version>
+   </dependency>
+   <!-- Google HTTP Client -->
+   <dependency>
+    <groupId>com.google.http-client</groupId>
+    <artifactId>google-http-client-jackson2</artifactId>
+    <version>${project.http.version}</version>
+   </dependency>
+   <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-youtube -->
+   <dependency>
+    <groupId>com.google.apis</groupId>
+    <artifactId>google-api-services-youtube</artifactId>
+    <version>v3-rev222-1.25.0</version>
+   </dependency>
+   <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+   <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.11</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.12</version>
+</dependency>
+
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Provides `mvn package appengine:run` for local testing
+           and `mvn package appengine:deploy` for deploying. -->
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <version>2.2.0</version>
+        <configuration>
+          <!-- TODO: set project ID. -->
+          <deploy.projectId>step-intern-2020</deploy.projectId>
+          <deploy.version>1</deploy.version>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
