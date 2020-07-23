@@ -4,10 +4,12 @@
         <title>CRAM</title>
         <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
         <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
+        <script src="js/config.js"></script>
         <script src="js/script.js"></script>
     </head>
-    <body onload='init()'>
+    <body>
         <h1>CRAM</h1>
-        <button onclick='getCaptions()'>get captions</button>
+        <button onclick='authenticate().then(loadClient)'>authenticate</button>
+        <button onclick="execute()">execute</button>
     </body>
 </html>
