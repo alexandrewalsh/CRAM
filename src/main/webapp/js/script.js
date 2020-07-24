@@ -21,7 +21,7 @@ function epoch(timestamp) {
     return epochTime;
 }
 
-function parseCaptions(response){
+function parseCaptionsIntoJson(response){
     return new Promise((success, failure) => {
         var json = {
             url: 'dummy',
@@ -80,39 +80,56 @@ function parseCaptions(response){
          type: 'text/plain'
         }));
 
+    }).catch(function(error) {
+        // stop processing lines, rethrow error
+        throw error;
     });
 }
 
+/*
+    returns the json string of captions
+*/
+function getCaptions(trackId){
+    return new Promise((success, failure) => {
+        gapi.client.youtube.captions.download({
+            "id": trackId,
+            "tlang": "en",
+            "tfmt": "sbv"
+        }).then(function(response){
+            parseCaptionsIntoJson(response).then(json => {
+                success(json);  
+            });
+        }, function(err) { 
+            console.error("errors getting captions", err); 
+            failure(err);
+        });
+    }).catch(function(error) {
+        // throw for top level handler to handle
+        throw error;   
+    });
+}
 
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute() {
-    gapi.client.youtube.captions.download({
-      "id": "VTGY74ABZGNwXQyjX50KfOz5Fm9xrJkzPbwNVQBbKVI=",
-      "tlang": "en",
-      "tfmt": "sbv"
-    }).then(function(response){
-        parseCaptions(response).then(json => {
-            console.log('recieved json', json);    
-        });
-    }, function(err) { 
+    return gapi.client.youtube.captions.list({
+      "videoId": "ovJcsL7vyrk",
+      "part": [
+        "id"
+      ]
+    }).then(function(response) {
+        if (response.result != null & response.result.items != null &
+            response.result.items.length > 0) {
+            const trackId = response.result.items[0].id;
+
+            getCaptions(trackId).then(json => {
+                // send to backend
+                console.log("final destination", json);
+            });
+        }
+    }, function(err) {
+        // top level error handler
         console.error("Execute error", err); 
     });
-
-    // return gapi.client.youtube.captions.list({
-    //   "videoId": "ovJcsL7vyrk",
-    //   "part": [
-    //     "id"
-    //   ]
-    // }).then(function(response) {
-    //     // Handle the results here (response.result has the parsed body).
-    //     // console.log("Response", response);
-    //     if (response.result != null & response.result.items != null &
-    //         response.result.items.length > 0) {
-    //         console.log("id: " + response.result.items[0].id);
-    //     }
-    // }, function(err) {
-    //     console.error("Execute error", err); 
-    // });
 }
   
 gapi.load("client:auth2", function() {
