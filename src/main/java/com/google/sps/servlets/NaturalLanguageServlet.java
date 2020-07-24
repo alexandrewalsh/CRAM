@@ -31,7 +31,7 @@ import java.util.*;
 
 
 /** Servlet that interacts with Google's NLP API */
-@WebServlet("/nlp")
+@WebServlet("/caption")
 public class NaturalLanguageServlet extends HttpServlet {
 
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
@@ -48,7 +48,7 @@ public class NaturalLanguageServlet extends HttpServlet {
 
         long startTime = System.nanoTime();
 
-        String json = (String) request.getParameter(REQUEST_TEXT_PARAM);
+        String json = (String) request.getParameter(REQUEST_JSON_PARAM);
         List<String> entities = new ArrayList<String>();
         Gson gson = new Gson();
 
@@ -69,12 +69,12 @@ public class NaturalLanguageServlet extends HttpServlet {
         long endTime = System.nanoTime();
         
         // Adds metadata to the result
-        sendToFrontEnd.put(METADATA_KEY, new ArrayList<TimeRange>());
-        sendToFrontEnd.get(METADATA_KEY).add(new TimeRange((long)numCaptions, (long)sendToFrontEnd.size()));
-        sendToFrontEnd.get(METADATA_KEY).add(new TimeRange(startTime, endTime));
+        resultMap.put(METADATA_KEY, new ArrayList<TimeRange>());
+        resultMap.get(METADATA_KEY).add(new TimeRange((long)numCaptions, (long)resultMap.size()));
+        resultMap.get(METADATA_KEY).add(new TimeRange(startTime, endTime));
 
         // Converts Java object to JSON and sends it back to the front end
         response.setContentType(RESPONSE_JSON_CONTENT);
-        response.getWriter().println(gson.toJson(sendToFrontEnd));
+        response.getWriter().println(gson.toJson(resultMap));
     }
 }
