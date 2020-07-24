@@ -1,3 +1,6 @@
+/**
+ * Initialize authentication and attempt to sign user in
+ */
 function authenticate() {
     return gapi.auth2.getAuthInstance()
         .signIn({scope: "https://www.googleapis.com/auth/youtube.force-ssl"})
@@ -5,6 +8,9 @@ function authenticate() {
               function(err) { console.error("Error signing in", err); });
 }
 
+/**
+ * Initialize the gApi client to make API requests
+ */
 function loadClient() {
     gapi.client.setApiKey(config.api_key);
     return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
@@ -12,6 +18,11 @@ function loadClient() {
               function(err) { console.error("Error loading GAPI client for API", err); });
 }
 
+/**
+ * Convert a string timestamp to an epoch long
+ * @param timestamp - a String in the format HH:MM:SS.FS
+ * @returns the number of seconds since the video started
+ */
 function epoch(timestamp) {
     const parts = timestamp.split(':');
     var hours = parseInt(parts[0]);
@@ -21,11 +32,19 @@ function epoch(timestamp) {
     return epochTime;
 }
 
-function parseCaptionsIntoJson(response){
+/**
+ * Parse and format the response to youtube.captions.download()
+ * @param response - a String in SBV format representing the captions
+ *                   and their respective timestamps
+ * @param url - the url of the YouTube video
+ * @returns a promise which upon success returns a JSON 
+ *         string encoding the captions and timestamps 
+ */
+function parseCaptionsIntoJson(response, url){
     return new Promise((success, failure) => {
         var json = {
-            url: 'dummy',
-            captions: []
+            url: url,
+            captions: []    
         };
 
         let reader = new FileReader();
@@ -44,7 +63,7 @@ function parseCaptionsIntoJson(response){
 
             lines.forEach(function(line) {
                 if (lineType == 0) {    // timestamp
-                    if (line === ""){ // likely eof
+                    if (line === ""){  // likely EOF
                         return;
                     }
                     const timestamps = line.split(',');
@@ -60,9 +79,7 @@ function parseCaptionsIntoJson(response){
                     caption["text"] = line;
                     json.captions.push(caption);
                     caption = {};
-                } else if (lineType == 2) {
-                    // do nothing 
-                }
+                } 
 
                 lineType += 1;
                 if (lineType > 2) {
@@ -70,14 +87,12 @@ function parseCaptionsIntoJson(response){
                 }
             });
                 
-            // send to backend
-            console.log("stringy", JSON.stringify(json));
+            // successfully parsed response
             success(JSON.stringify(json));
-            // return JSON.stringify(json);
         };
 
         reader.readAsText(new Blob([response.body], {
-         type: 'text/plain'
+            type: 'text/plain'
         }));
 
     }).catch(function(error) {
@@ -86,17 +101,21 @@ function parseCaptionsIntoJson(response){
     });
 }
 
-/*
-    returns the json string of captions
-*/
-function getCaptions(trackId){
+/** 
+ * Get the captions and timestamps for a video with a given `trackId`
+ * @param trackId - a String representing the track id for a caption
+ * @param url - the url of the YouTube video
+ * @returns a promise which upon success returns a JSON 
+ *         string encoding the captions and timestamps 
+ */
+function getCaptions(trackId, url){
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
             "tlang": "en",
             "tfmt": "sbv"
         }).then(function(response){
-            parseCaptionsIntoJson(response).then(json => {
+            parseCaptionsIntoJson(response, url).then(json => {
                 success(json);  
             });
         }, function(err) { 
@@ -112,9 +131,11 @@ function getCaptions(trackId){
     });
 }
 
-/*
-    Get the video id from a youtube url
-*/
+/**
+ * Gets the video id from a YouTube url
+ * @param url - a YouTube video url
+ * @returns - the `id` for a YouTube `url`
+ */
 function getIdFromUrl(url) {
     var video_id = url.split('v=')[1];
     var ampersandPosition = video_id.indexOf('&');
@@ -125,6 +146,12 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+/**
+ * Excecutes a request to download captions for a YouTube 
+ * video with a given `url`, and send data to the backend servlet
+ * @param url - a url for a YouTube video
+ * @requires - an authenticated user
+ */
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute(url) {
     // user inputs YouTube video URL
@@ -140,7 +167,7 @@ function execute(url) {
             response.result.items.length > 0) {
             const trackId = response.result.items[0].id;
 
-            getCaptions(trackId).then(json => {
+            getCaptions(trackId, url).then(json => {
                 // send to backend
                 console.log("final destination", json);
             });
@@ -151,6 +178,7 @@ function execute(url) {
     });
 }
   
+// Initialize authentication client
 gapi.load("client:auth2", function() {
     gapi.auth2.init({client_id: config.client_id});
 });
