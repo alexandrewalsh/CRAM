@@ -10,6 +10,8 @@
     <body>
         <h1>CRAM</h1>
         <button onclick='authenticate().then(loadClient)'>authenticate</button>
-        <button onclick="execute()">execute</button>
+        <input id="ytVideoSearch" type="text" />
+        <!--ovJcsL7vyrk-->
+        <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button>
     </body>
 </html>

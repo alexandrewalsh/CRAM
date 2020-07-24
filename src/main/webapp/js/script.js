@@ -101,6 +101,9 @@ function getCaptions(trackId){
             });
         }, function(err) { 
             console.error("errors getting captions", err); 
+            if (err.status == 403) {
+                console.error("Video has private captions!");
+            }
             failure(err);
         });
     }).catch(function(error) {
@@ -109,10 +112,26 @@ function getCaptions(trackId){
     });
 }
 
+/*
+    Get the video id from a youtube url
+*/
+function getIdFromUrl(url) {
+    var video_id = url.split('v=')[1];
+    var ampersandPosition = video_id.indexOf('&');
+    if(ampersandPosition != -1) {
+        video_id = video_id.substring(0, ampersandPosition);
+    }
+
+    return video_id;
+}
+
 // Make sure the client is loaded and sign-in is complete before calling this method.
-function execute() {
+function execute(url) {
+    // user inputs YouTube video URL
+    const videoId = getIdFromUrl(url);
+
     return gapi.client.youtube.captions.list({
-      "videoId": "ovJcsL7vyrk",
+      "videoId": videoId,
       "part": [
         "id"
       ]
