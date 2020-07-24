@@ -170,12 +170,34 @@ function execute(url) {
             getCaptions(trackId, url).then(json => {
                 // send to backend
                 console.log("final destination", json);
+                sendJsonForm(json);
             });
         }
     }, function(err) {
         // top level error handler
         console.error("Execute error", err); 
     });
+}
+
+/**
+ * Create and send a form with the captions JSON. May need 
+ * to authenticate users here too to prevent malicious requests.
+ * @param json - the JSON string representing the 
+ *               parsed captions response
+ */
+function sendJsonForm(json) {
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/caption';
+
+    var jsonInput = document.createElement('input');
+    jsonInput.type = 'hidden';
+    jsonInput.name = 'json';
+    jsonInput.value = json;
+    form.appendChild(jsonInput);
+
+    document.body.appendChild(form);
+    form.submit();
 }
   
 // Initialize authentication client
