@@ -38,6 +38,12 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String REQUEST_JSON_PARAM = "json";
     private static final String METADATA_KEY = "METADATA";
 
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType(RESPONSE_JSON_CONTENT);
+        response.getWriter().println("{\"test\": 1}");
+    }
+
     /**
      * Gets database data for comments
      * @param request The request object 

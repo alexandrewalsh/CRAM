@@ -186,6 +186,7 @@ function execute(url) {
  *               parsed captions response
  */
 function sendJsonForm(json) {
+    /** 
     var form = document.createElement('form');
     form.method = 'POST';
     form.action = '/caption';
@@ -198,6 +199,25 @@ function sendJsonForm(json) {
 
     document.body.appendChild(form);
     form.submit();
+    */
+    var params = new URLSearchParams();
+    params.append('json', json);
+    fetch('/caption', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.json()).then((json) => {
+            var output = '';
+            var numCap = 0;
+            var time = 0;
+            for (var key in json) {
+                output += key + ': ' + JSON.stringify(json[key]) + '<br>';
+            }
+            //$('#nlp-output').html(output);
+            alert(output);
+            numCap = json['METADATA'][0];
+            time = json['METADATA'][1];
+            //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
+        });
 }
   
 // Initialize authentication client
