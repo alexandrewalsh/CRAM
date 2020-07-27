@@ -22,6 +22,7 @@ import java.util.ArrayList;
 /** Postprocessing for outputs of the NLP API that maps a keyphrase to all mention times */
 public class NaturalLanguagePostprocessor {
     
+    // Mapping of String keyphrases to a list of Long timestamps where the keyphrase is detected
     private Map<String, List<Long>> entitiesMap;
 
     /** 
@@ -46,7 +47,7 @@ public class NaturalLanguagePostprocessor {
     }
 
     /**
-     * Gets the entites mapping that is currently built
+     * Gets the entities mapping that is currently built
      * @return The currently built entities mapping
      */
     public Map<String, List<Long>> getEntitiesMap() {
