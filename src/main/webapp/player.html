@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Player</title>
+         <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
+        <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
+        <script src="js/config.js"></script>
+        <script src="js/auth.js"></script>
+        <script>
+            checkLogin();
+        </script>
+        <script defer src="js/script.js"></script>
+      </head>
+    <body>
+        <button onclick="signOut()">Sign out</button>
+        <input id="ytVideoSearch" type="text" />
+        <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button> 
+    </body>
+</html>

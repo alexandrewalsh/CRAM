@@ -1,24 +1,4 @@
 /**
- * Initialize authentication and attempt to sign user in
- */
-function authenticate() {
-    return gapi.auth2.getAuthInstance()
-        .signIn({scope: "https://www.googleapis.com/auth/youtube.force-ssl"})
-        .then(function() { console.log("Sign-in successful"); },
-              function(err) { console.error("Error signing in", err); });
-}
-
-/**
- * Initialize the gApi client to make API requests
- */
-function loadClient() {
-    gapi.client.setApiKey(config.api_key);
-    return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-        .then(function() { console.log("GAPI client loaded for API"); },
-              function(err) { console.error("Error loading GAPI client for API", err); });
-}
-
-/**
  * Convert a string timestamp to an epoch long
  * @param timestamp - a String in the format HH:MM:SS.FS
  * @returns the number of seconds since the video started
@@ -186,20 +166,6 @@ function execute(url) {
  *               parsed captions response
  */
 function sendJsonForm(json) {
-    /** 
-    var form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/caption';
-
-    var jsonInput = document.createElement('input');
-    jsonInput.type = 'hidden';
-    jsonInput.name = 'json';
-    jsonInput.value = json;
-    form.appendChild(jsonInput);
-
-    document.body.appendChild(form);
-    form.submit();
-    */
     var params = new URLSearchParams();
     params.append('json', json);
     fetch('/caption', {
@@ -219,8 +185,3 @@ function sendJsonForm(json) {
             //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
         });
 }
-  
-// Initialize authentication client
-gapi.load("client:auth2", function() {
-    gapi.auth2.init({client_id: config.client_id});
-});

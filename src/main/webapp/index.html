@@ -5,13 +5,13 @@
         <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
         <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
         <script src="js/config.js"></script>
-        <script src="js/script.js"></script>
+        <script src="js/auth.js"></script>
+        <script>
+            checkLogin();
+        </script>
     </head>
     <body>
         <h1>CRAM</h1>
-        <button onclick='authenticate().then(loadClient)'>authenticate</button>
-        <input id="ytVideoSearch" type="text" />
-        <!--ovJcsL7vyrk-->
-        <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button>
+        <button onclick='authenticate()'>authenticate</button>
     </body>
 </html>
