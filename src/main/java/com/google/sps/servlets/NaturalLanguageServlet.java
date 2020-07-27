@@ -26,7 +26,6 @@ import com.google.sps.data.NaturalLanguageProcessor;
 import com.google.sps.data.NaturalLanguagePostprocessor;
 import com.google.sps.data.YoutubeCaptions;
 import com.google.sps.data.TimeRangedText;
-import com.google.sps.data.TimeRange;
 import java.util.*;
 
 
@@ -68,16 +67,16 @@ public class NaturalLanguageServlet extends HttpServlet {
         NaturalLanguageProcessor nlp = new NaturalLanguageProcessor();
         NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
         for (TimeRangedText text : preprocessedResults) {
-            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime(), text.getEndTime());
+            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
         }
-        Map<String, List<TimeRange>> resultMap = postprocessor.getEntitiesMap();
+        Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
         
         long endTime = System.nanoTime();
         
         // Adds metadata to the result
-        resultMap.put(METADATA_KEY, new ArrayList<TimeRange>());
-        resultMap.get(METADATA_KEY).add(new TimeRange((long)numCaptions, (long)resultMap.size()));
-        resultMap.get(METADATA_KEY).add(new TimeRange(startTime, endTime));
+        resultMap.put(METADATA_KEY, new ArrayList<Long>());
+        resultMap.get(METADATA_KEY).add((long)numCaptions);
+        resultMap.get(METADATA_KEY).add((long)(endTime - startTime));
 
         // Converts Java object to JSON and sends it back to the front end
         response.setContentType(RESPONSE_JSON_CONTENT);

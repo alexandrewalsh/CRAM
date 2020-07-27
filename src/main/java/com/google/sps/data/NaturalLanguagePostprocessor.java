@@ -18,12 +18,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import com.google.sps.data.TimeRange;
 
 /** Postprocessing for outputs of the NLP API that maps a keyphrase to all mention times */
 public class NaturalLanguagePostprocessor {
     
-    private Map<String, List<TimeRange>> entitiesMap;
+    private Map<String, List<Long>> entitiesMap;
 
     /** 
      * Constructor for the postprocessor object
@@ -36,15 +35,13 @@ public class NaturalLanguagePostprocessor {
      * Adds a list of entities with the time range for that list to the compiled map
      * @param entities The list of keyphrases of the current iteration of the NLP output
      * @param startTime The start time of the list of entities mentions
-     * @param endTime The end time of the list of entities mentions
      */
-    public void addEntities(List<String> entities, long startTime, long endTime) {
-        TimeRange currentTimeRange = new TimeRange(startTime, endTime);
+    public void addEntities(List<String> entities, long startTime) {
         for (String entity : entities) {
             if (!entitiesMap.containsKey(entity)) {
-                entitiesMap.put(entity, new ArrayList<TimeRange>());
+                entitiesMap.put(entity, new ArrayList<Long>());
             } 
-            entitiesMap.get(entity).add(currentTimeRange);
+            entitiesMap.get(entity).add(startTime);
         }
     }
 
@@ -52,7 +49,7 @@ public class NaturalLanguagePostprocessor {
      * Gets the entites mapping that is currently built
      * @return The currently built entities mapping
      */
-    public Map<String, List<TimeRange>> getEntitiesMap() {
+    public Map<String, List<Long>> getEntitiesMap() {
         return entitiesMap;
     }
 }
