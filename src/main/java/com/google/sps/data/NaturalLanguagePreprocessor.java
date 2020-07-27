@@ -21,6 +21,7 @@ import com.google.sps.data.TimeRangedText;
 /** Preprocesses captions by concatenating TimeRangedTexts to reach a time threshold */
 public class NaturalLanguagePreprocessor {
 
+    // The default time threshold in seconds to contatenate TimeRangedText objects
     private static final long DEFAULT_TIME_THRESHOLD = 20;
 
     private long timeThreshold;
