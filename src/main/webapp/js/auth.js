@@ -13,7 +13,9 @@ function authenticate() {
         .signIn(signInOptions)
         .then(function() { 
             console.log("Sign-in successful");
-            loadClient();
+            loadClient().then(function() {
+                checkLogin();
+            });
             },function(err) { 
                 console.error("Error signing in", err); 
                 // render error elements
@@ -28,7 +30,7 @@ function loadClient() {
     return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
         .then(function() {
             console.log("GAPI client loaded for API");
-            checkLogin(); 
+            // checkLogin(); 
             },
             function(err) { 
                 console.error("Error loading GAPI client for API", err);
@@ -45,8 +47,9 @@ function getAuth(){
 
     if (GoogleAuth == null) {
         GoogleAuth = gapi.auth2.init(signInOptions);
+        loadClient();
     }
-
+    
     return GoogleAuth;
 }
 

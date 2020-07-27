@@ -101,6 +101,10 @@ function getCaptions(trackId, url){
         }, function(err) { 
             console.error("errors getting captions", err); 
             if (err.status == 403) {
+                var errMsg = document.createElement('p');
+                errMsg.classList += 'error';
+                errMsg.innerText = "Video has private captions!";
+                document.body.appendChild(errMsg);
                 console.error("Video has private captions!");
             }
             failure(err);
