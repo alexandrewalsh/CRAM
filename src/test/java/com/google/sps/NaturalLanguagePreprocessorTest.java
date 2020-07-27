@@ -28,7 +28,7 @@ import com.google.sps.data.TimeRangedText;
 import com.google.sps.data.NaturalLanguagePreprocessor;
 
 
-/** */
+/** Tests for the NaturalLanguagePreprocessor class methods */
 @RunWith(JUnit4.class)
 public final class NaturalLanguagePreprocessorTest {
 
@@ -198,6 +198,5 @@ public final class NaturalLanguagePreprocessorTest {
 
         Assert.assertEquals(expected, actual);
     }
-
-
+    
 }
