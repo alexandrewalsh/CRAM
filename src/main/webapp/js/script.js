@@ -30,14 +30,44 @@ function parseCaptionsIntoJson(response, url){
         let reader = new FileReader();
 
         // read response line by line
-        reader.onloadend = function(evt){
-            lines = evt.target.result.split(/\r\n|\n|\r/);  
+        reader.onloadend = function(evt) {
+            
+            // Removes newlines and splits by empty line, which signifies a new caption
+            var result = evt.target.result.replace(/(\r\n|\n|\r)/gm,",");
+            var lines = result.split(',,');
+
+            // Loops through all captions, which should have the format:
+            //      startTime, endTime, text
+            for (var i = 0; i < lines.length; i++) {
+                var caption = {}
+                var data = lines[i].split(',');
+                if (data.length < 3) {
+                    continue;
+                }
+                caption['startTime'] = epoch(data[0]);
+                caption['endTime'] = epoch(data[1]);
+
+                // Builds text string with the consideration that commas could exist in text
+                var textBuilder = '';
+                for (var j = 2; j < data.length; j++) {
+                    textBuilder += data[j];
+                    if (j < data.length - 1) {
+                        textBuilder += ', ';
+                    }
+                }
+                caption['text'] = textBuilder;
+                json.captions.push(caption);
+            }   
+
+
+            //lines = evt.target.result.split(/\r\n|\n|\r/);  
 
             /* Line types
                 0: timestamp line
                 1: text line
                 2: empty line
             */
+            /*
             var lineType = 0;
             var caption = {};
 
@@ -66,7 +96,7 @@ function parseCaptionsIntoJson(response, url){
                     lineType = 0;
                 }
             });
-                
+              */  
             // successfully parsed response
             success(JSON.stringify(json));
         };
