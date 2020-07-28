@@ -180,11 +180,6 @@ function execute(url) {
         return;
     }
 
-// <<<<<<< HEAD
-//     gapi.client.youtube.captions.list({
-// =======
-    // creates YT Player that displays video
-    
     player = new YT.Player('player', {
         height: '390',
         width: '640',
