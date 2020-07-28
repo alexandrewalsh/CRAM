@@ -100,19 +100,49 @@ function getCaptions(trackId, url){
             });
         }, function(err) { 
             console.error("errors getting captions", err); 
-            if (err.status == 403) {
-                var errMsg = document.createElement('p');
-                errMsg.classList += 'error';
-                errMsg.innerText = "Video has private captions!";
-                document.body.appendChild(errMsg);
-                console.error("Video has private captions!");
-            }
+            renderError(err.status);
             failure(err);
         });
     }).catch(function(error) {
         // throw for top level handler to handle
         throw error;   
     });
+}
+
+/**
+ * Render an error message for a given error code
+ * @param error - an HTTP error code
+ */
+function renderError(error) {
+    var errorMsg = document.getElementById('errorMsg'); // could make these consts
+    if (!errorMsg) {
+        errorMsg = document.createElement('p');
+        errorMsg.setAttribute('id', 'errorMsg');
+        errorMsg.classList += 'error';
+        document.body.appendChild(errorMsg);
+    }
+
+    if (error == 403) {
+        errMsg.innerText = "Video has private captions!";
+    } else if (error == 404) {
+        errMsg.innerText = "404 don't know how to deal with this";
+    }
+}
+
+/**
+ * Render a generic error with a `message`
+ * @param message - the message to render
+ */
+function renderYtError(message) {
+    var errorMsg = document.getElementById('ytError');
+    if (!errorMsg) {
+        errorMsg.setAttribute('id', 'ytError');
+        errorMsg = document.createElement('p');
+        errorMsg.classList += 'error';
+        document.body.appendChild(errorMsg);
+    }
+
+    errorMsg.innerText = message;
 }
 
 /**
@@ -141,9 +171,15 @@ var player;
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute(url) {
     // user inputs YouTube video URL
-    const videoId = getIdFromUrl(url);
+    var videoId = "";
 
-    // creates YT Player that displays video
+    try {
+        videoId = getIdFromUrl(url);
+    } catch {
+        renderYtError("Invalid youtube url!");
+        return;
+    }
+
     player = new YT.Player('player', {
         height: '390',
         width: '640',
