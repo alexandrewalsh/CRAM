@@ -4,6 +4,15 @@ const signInOptions = {
     'cookie_policy': 'single_host_origin'
 }
 
+$(document).ready(function() {
+/** event handler for clicking login link */
+    $("#loginBtn").click(function(e) {
+        e.preventDefault();
+        authenticate();
+    });
+});
+
+
 /**
  * Initialize authentication and attempt to sign user in
  */
