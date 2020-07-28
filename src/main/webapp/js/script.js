@@ -160,6 +160,8 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+var player;
+
 /**
  * Excecutes a request to download captions for a YouTube 
  * video with a given `url`, and send data to the backend servlet
@@ -178,7 +180,19 @@ function execute(url) {
         return;
     }
 
-    gapi.client.youtube.captions.list({
+// <<<<<<< HEAD
+//     gapi.client.youtube.captions.list({
+// =======
+    // creates YT Player that displays video
+    
+    player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        videoId: videoId,
+        events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
+    });
+
+    return gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
         "id"
@@ -220,9 +234,42 @@ function sendJsonForm(json) {
                 output += key + ': ' + JSON.stringify(json[key]) + '<br>';
             }
             //$('#nlp-output').html(output);
+            document.getElementById('output').innerHTML = output;
             alert(output);
             numCap = json['METADATA'][0];
             time = json['METADATA'][1];
             //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
         });
+}
+
+/************************************************* */
+/*        JS for Video Player Manipulation         */
+/************************************************* */
+
+// This code loads the IFrame Player API code asynchronously.
+var tag = document.createElement('script');
+
+tag.src = 'https://www.youtube.com/iframe_api';
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+  event.target.playVideo();
+}
+
+// The API calls this function when the player's state changes.
+var done = false;
+function onPlayerStateChange(event) {
+  if (event.data == YT.PlayerState.PLAYING && !done) {
+    setTimeout(seekVideo, 6000);
+    done = true;
+  }
+}
+function stopVideo() {
+  player.stopVideo();
+}
+function seekVideo() {
+    player.playVideo();
+    player.seekTo(60, true);
 }
