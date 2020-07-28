@@ -2,7 +2,6 @@ const signInOptions = {
     'client_id': config.client_id,
     'scope': 'https://www.googleapis.com/auth/youtube.force-ssl',
     'cookie_policy': 'single_host_origin'
-    // 'redirect_uri': "https://step-intern-2020.appspot.com/player.html"
 }
 
 /**
@@ -18,6 +17,7 @@ function authenticate() {
             });
             },function(err) { 
                 console.error("Error signing in", err); 
+                renderError("Error signing in, please ty again.");
                 // render error elements
             });
 }
@@ -33,6 +33,7 @@ function loadClient() {
             // checkLogin(); 
             },
             function(err) { 
+                renderError("Error loading GAPI client");
                 console.error("Error loading GAPI client for API", err);
                 // render error elements
             });
@@ -85,4 +86,20 @@ function signOut() {
         GoogleAuth.signOut();
         window.location.replace("https://step-intern-2020.appspot.com");    // redirect back to login page
     });
+}
+
+/**
+ * Render a generic error with a `message`
+ * @param message - the message to render
+ */
+function renderError(message) {
+    var errorMsg = document.getElementById('error');
+    if (!errorMsg) {
+        errorMsg.setAttribute('id', 'error');
+        errorMsg = document.createElement('p');
+        errorMsg.classList += 'error';
+        document.body.appendChild(errorMsg);
+    }
+
+    errorMsg.innerText = message;
 }
