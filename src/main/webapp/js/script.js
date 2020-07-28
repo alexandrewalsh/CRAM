@@ -194,7 +194,6 @@ function sendJsonForm(json) {
             }
             //$('#nlp-output').html(output);
             document.getElementById('output').innerHTML = output;
-            alert(output);
             numCap = json['METADATA'][0];
             time = json['METADATA'][1];
             //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
@@ -221,7 +220,6 @@ function onPlayerReady(event) {
 var done = false;
 function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.PLAYING && !done) {
-    setTimeout(seekVideo, 6000);
     done = true;
   }
 }
