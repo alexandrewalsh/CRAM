@@ -1,3 +1,10 @@
+const MOCK_JSON_CAPTIONS = {
+    url: 'mock',
+    captions: [
+        {'startTime': 0, 'endTime': 20, 'text': 'Mitochondria are membrane-bound cell organelles (mitochondrion, singular) that generate most of the chemical energy needed to power the cells biochemical reactions. Chemical energy produced by the mitochondria is stored in a small molecule called adenosine triphosphate (ATP).'}
+    ]
+}
+
 /**
  * Convert a string timestamp to an epoch long
  * @param timestamp - a String in the format HH:MM:SS.FS
@@ -118,7 +125,7 @@ function parseCaptionsIntoJson(response, url){
  * @returns a promise which upon success returns a JSON 
  *         string encoding the captions and timestamps 
  */
-function getCaptions(trackId, url){
+function getCaptions(trackId, url) {
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
@@ -217,6 +224,11 @@ function execute(url) {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
 
+    if ($('#captionMockButton').text() == 'Mocking') {
+        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
+        return;
+    }
+
     return gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
@@ -296,3 +308,14 @@ function seekVideo() {
     player.playVideo();
     player.seekTo(60, true);
 }
+
+
+$(document).ready(() => {
+    $('#captionMockButton').click(() => {
+        if ($('#captionMockButton').text() == 'Click Me to Mock Captions') {
+            $('#captionMockButton').text('Mocking');
+        } else {
+            $('#captionMockButton').text('Click Me to Mock Captions');
+        }
+    });
+});
