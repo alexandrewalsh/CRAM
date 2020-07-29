@@ -321,6 +321,7 @@ function execute(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
+    $('#output').html('<p>Loading...</p>');
     fetch('/caption', {
             method: 'POST',
             body: params,
@@ -334,7 +335,6 @@ function sendJsonForm(json) {
                 output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
             }
             output += '</table>';
-            //$('#nlp-output').html(output);
             document.getElementById('output').innerHTML = output;
 
             // clickable timestamps
@@ -346,7 +346,6 @@ function sendJsonForm(json) {
 
             numCap = json['METADATA'][0];
             time = json['METADATA'][1];
-            //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
         });
 }
 
