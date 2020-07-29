@@ -331,7 +331,11 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                if (!(key == "METADATA")) {
+                // METADATA line sent to log, all others are sent to Caption Results section.
+                if (key == "METADATA") {
+                    console.log('<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>');   
+                }
+                else {
                     output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
                 }
             }
