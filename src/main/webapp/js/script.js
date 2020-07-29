@@ -12,11 +12,31 @@ const MOCK_JSON_CAPTIONS = {
  */
 function epoch(timestamp) {
     const parts = timestamp.split(':');
-    var hours = parseInt(parts[0]);
-    var minutes = parseInt(parts[1]);
-    var seconds = parseInt(parts[2]);
-    var epochTime = hours*3600 + minutes*60 + seconds;
-    return epochTime;
+    if (parts.length == 3) {
+        var hours = parseInt(parts[0]);
+        var minutes = parseInt(parts[1]);
+        var seconds = parseInt(parts[2]);
+        var epochTime = hours*3600 + minutes*60 + seconds;
+        return epochTime;
+    } else if (parts.length == 2) {
+        // only m:s
+        var minutes = parseInt(parts[0]);
+        var seconds = parseInt(parts[1]);
+        return minutes*60 + seconds;
+    }
+    return null;
+}
+
+function epochToTimestamp(secs) {
+    var sec_num = parseInt(secs, 10);
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor(sec_num / 60) % 60;
+    var seconds = sec_num % 60;
+
+    return [hours,minutes,seconds]
+        .map(v => v < 10 ? "0" + v : v)
+        .filter((v,i) => v !== "00" || i > 0)
+        .join(":");
 }
 
 /**
@@ -303,7 +323,7 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                output += '<div class="word">' + key + ':</div> ' + '<div class="timestamps">' + JSON.stringify(json[key]) + '</div><br>';
+                output += '<div class="word">' + key + ':</div> ' + '<div class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</div><br>';
             }
             //$('#nlp-output').html(output);
             document.getElementById('output').innerHTML = output;
@@ -366,6 +386,7 @@ $(document).ready(() => {
 // called when timestamp is clicked on
 var onTimeClick = function() {
     var text = this.innerText;
+    text = epoch(text).toString();
     var numPattern = /\d+/g;
     var time = text.match(numPattern);
     player.seekTo(time[0]);
