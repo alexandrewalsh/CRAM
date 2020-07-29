@@ -334,7 +334,9 @@ function sendJsonForm(json) {
             for (var key in json) {
                 // METADATA line sent to log, all others are sent to Caption Results section.
                 if (key == "METADATA") {
-                    console.log('<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>');   
+                    console.log('NLP Fetch Time: ' +  json[key][1]);
+                    console.log('Total Youtube Captions: ' + json[key][0]);
+                    console.log('Total Entities Found: ' + json[key][2]);
                 }
                 else {
                     output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
