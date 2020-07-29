@@ -8,6 +8,7 @@ const MOCK_JSON_CAPTIONS = {
     ]
 }
 
+
 /**
  * Convert a string timestamp to an epoch long
  * @param timestamp - a String in the format HH:MM:SS.FS
