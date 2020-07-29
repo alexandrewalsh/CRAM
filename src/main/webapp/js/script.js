@@ -197,6 +197,7 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+// global variable holding the Youtube Video
 var player;
 
 /**
@@ -268,10 +269,18 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                output += key + ': ' + JSON.stringify(json[key]) + '<br>';
+                output += '<div class="word">' + key + ':</div> ' + '<div class="timestamps">' + JSON.stringify(json[key]) + '</div><br>';
             }
             //$('#nlp-output').html(output);
             document.getElementById('output').innerHTML = output;
+
+            // clickable timestamps
+            var elements = document.getElementsByClassName("timestamps");
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('click', onTimeClick, false);
+            }
+
             numCap = json['METADATA'][0];
             time = json['METADATA'][1];
             //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
@@ -309,7 +318,7 @@ function seekVideo() {
     player.seekTo(60, true);
 }
 
-
+// display that mocking captions are now active
 $(document).ready(() => {
     $('#captionMockButton').click(() => {
         if ($('#captionMockButton').text() == 'Click Me to Mock Captions') {
@@ -319,3 +328,11 @@ $(document).ready(() => {
         }
     });
 });
+
+// called when timestamp is clicked on
+var onTimeClick = function() {
+    var text = this.innerText;
+    var numPattern = /\d+/g;
+    var time = text.match(numPattern);
+    player.seekTo(time[0]);
+};
