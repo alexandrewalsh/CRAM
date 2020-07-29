@@ -2,29 +2,60 @@
 <html>
     <head>
         <title>Player</title>
+        <script src="js/jquery-3.5.1.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
         <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
         <script src="js/config.js"></script>
         <script src="js/auth.js"></script>
+        <!-- <script src="js/search-bar.js"></script> -->
         <script>
             checkLogin();
         </script>
+        <link rel="stylesheet" 
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+            crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/search-bar.css">
         <script defer src="js/script.js"></script>
       </head>
     <body>
-        <button id="captionMockButton">Click Me to Mock Captions</button>
-        <button onclick="signOut()">Sign out</button>
-        <input id="ytVideoSearch" type="text" />
-        <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button>
-
-        <br>
-        <br>
-
-        <div id="player"></div>
-        <div id="output"></div>
-
+        <div class="container">
+            <div class="row header">
+                <h1>Lecture Buddy</h1>
+                <button id="captionMockButton" class="headerBtn">Click Me to Mock Captions</button>
+                <button class="headerBtn" onclick="signOut()">Sign out</button>
+            </div>
+        </div>
+        <div class="container top-10">
+            <div class="container-column"> <!--top level -->
+                <!-- search bar -->
+                <div> 
+                    <form onsubmit="submitFn(this, event);">
+                        <div id="yess" class="search-wrapper">
+                            <div class="input-holder">
+                                <input type="text" class="search-input" placeholder="Type to search" />
+                                <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
+                            </div>
+                            <span class="close" onclick="searchToggle(this, event);"></span>
+                            <div class="result-container"></div>
+                        </div>
+                    </form>
+                    <!-- <input id="ytVideoSearch" type="text" /> -->
+                    <!-- <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button> -->
+                </div>
+                <!-- player & output -->
+                <div class="container-row space-between top-10px">
+                    <div id="player"></div>
+                    <div class="container-column">
+                        <h1 class="text-left">Results</h1>
+                        <div id="output"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 

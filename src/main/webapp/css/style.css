@@ -21,6 +21,7 @@ body {
         opacity: 1;
     }
 }
+
 .wrapper {
     width: 50%;
     margin: 0 auto;
@@ -37,12 +38,57 @@ body {
     color: white;
 }
 
+
 h1, p {
     text-align: center;
 }
 
-.wrapper h1, p {
-    font-family: Arial, sans-serif;
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.header h1 {
+    display: inline-block;
+}
+
+.signOut {
+    position: relative;
+    float: right;
+    right: 0;
+}
+
+.container-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.top-10 {
+    margin-top: 10%;
+}
+
+.top-10px {
+    margin-top: 10px;
+}
+
+.container div, h1, p {
+    font-family: 'Raleway', sans-serif;
+    color: white;
+}
+
+.container-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.space-between {
+    justify-content: space-between;
 }
 
 .ground {
