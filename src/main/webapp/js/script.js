@@ -247,7 +247,7 @@ function searchToggle(obj, evt){
  * @param evt - the click event
  */
 function submitFn(obj, evt){
-    $("#yess").addClass('search-wrapper-active');
+    $("#search-wrapper").addClass('search-wrapper-active');
     $('#resultsHeader').style = "display: unset;"
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
@@ -332,7 +332,13 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                // METADATA line sent to log, all others are sent to Caption Results section.
+                if (key == "METADATA") {
+                    console.log('<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>');   
+                }
+                else {
+                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                }
             }
             output += '</table>';
             document.getElementById('output').innerHTML = output;

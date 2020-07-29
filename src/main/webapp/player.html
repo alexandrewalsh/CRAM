@@ -37,14 +37,16 @@
                 <!-- search bar -->
                 <div> 
                     <form onsubmit="submitFn(this, event);">
-                        <div id="yess" class="search-wrapper">
-                            <div class="input-holder">
-                                <input type="text" class="search-input" placeholder="Type to search" />
-                                <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
+                        <!-- <div> -->
+                            <div id="search-wrapper" class="search-wrapper container-row">
+                                <div class="input-holder">
+                                    <input type="text" class="search-input" placeholder="Type to search" />
+                                    <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
+                                </div>
+                                <span style="position: relative" class="close" onclick="searchToggle(this, event);"></span>
                             </div>
-                            <span class="close" onclick="searchToggle(this, event);"></span>
                             <div class="result-container"></div>
-                        </div>
+                        <!-- </div> -->
                     </form>
                     <!-- <input id="ytVideoSearch" type="text" /> -->
                     <!-- <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button> -->
