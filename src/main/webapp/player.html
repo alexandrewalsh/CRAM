@@ -8,7 +8,6 @@
         <script src="https://apis.google.com/js/client:plusone.js" type="application/javascript"></script>
         <script src="js/config.js"></script>
         <script src="js/auth.js"></script>
-        <!-- <script src="js/search-bar.js"></script> -->
         <script>
             checkLogin();
         </script>
@@ -33,11 +32,10 @@
             </div>
         </div>
         <div class="container top-10">
-            <div class="container-column"> <!--top level -->
+            <div class="container-column">
                 <!-- search bar -->
                 <div> 
                     <form onsubmit="submitFn(this, event);">
-                        <!-- <div> -->
                             <div id="search-wrapper" class="search-wrapper container-row">
                                 <div class="input-holder">
                                     <input type="text" class="search-input" placeholder="Type to search" />
@@ -46,10 +44,7 @@
                                 <span style="position: relative" class="close" onclick="searchToggle(this, event);"></span>
                             </div>
                             <div class="result-container"></div>
-                        <!-- </div> -->
                     </form>
-                    <!-- <input id="ytVideoSearch" type="text" /> -->
-                    <!-- <button onclick="execute(document.getElementById('ytVideoSearch').value)">get captions</button> -->
                 </div>
                 <!-- player & output -->
                 <div class="container-row space-between top-10px">

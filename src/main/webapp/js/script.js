@@ -11,26 +11,34 @@ const MOCK_JSON_CAPTIONS = {
 
 /**
  * Convert a string timestamp to an epoch long
- * @param timestamp - a String in the format HH:MM:SS.FS
- * @returns the number of seconds since the video started
+ * @param timestamp - a String in the format HH:MM:SS.MS if
+ *                    hours are included MM:SS.MS otherwise
+ * @returns the number of seconds since the video started,
+ *          returns null if the timestamp is improperly formatted
  */
 function epoch(timestamp) {
     const parts = timestamp.split(':');
+
     if (parts.length == 3) {
-        var hours = parseInt(parts[0]);
-        var minutes = parseInt(parts[1]);
-        var seconds = parseInt(parts[2]);
-        var epochTime = hours*3600 + minutes*60 + seconds;
-        return epochTime;
+        const hours = parseInt(parts[0]);
+        const minutes = parseInt(parts[1]);
+        const seconds = parseInt(parts[2]);
+        return hours*3600 + minutes*60 + seconds;
     } else if (parts.length == 2) {
         // only m:s
-        var minutes = parseInt(parts[0]);
-        var seconds = parseInt(parts[1]);
+        const minutes = parseInt(parts[0]);
+        const seconds = parseInt(parts[1]);
         return minutes*60 + seconds;
     }
     return null;
 }
 
+/**
+ * Convert epoch seconds to a timestamp
+ * in the format H:M:S.MS
+ * @param secs - seconds
+ * @return - a String timestamp 
+ */
 function epochToTimestamp(secs) {
     var sec_num = parseInt(secs, 10);
     var hours   = Math.floor(sec_num / 3600);
@@ -405,16 +413,10 @@ $(document).ready(() => {
 // called when timestamp is clicked on
 var onTimeClick = function() {
     var text = this.innerText;
+    
+    // convert the timestamp into seconds
     text = epoch(text).toString();
     var numPattern = /\d+/g;
     var time = text.match(numPattern);
     player.seekTo(time[0]);
-};
-
-Element.prototype.toggleClass = function ( className ) {
-    if( this.className.split( ' ' ).indexOf( className ) == -1 ) {
-        this.className = ( this.className + ' ' + className ).trim();
-    } else {
-        this.className = this.className.replace( new RegExp( '(\\s|^)' + className + '(\\s|$)' ), ' ' ).trim();
-    };
 };
