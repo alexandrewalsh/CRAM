@@ -245,6 +245,7 @@ function searchToggle(obj, evt){
  */
 function submitFn(obj, evt){
     $("#yess").addClass('search-wrapper-active');
+    $('#resultsHeader').style = "display: unset;"
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
     execute(value);
@@ -319,6 +320,8 @@ function sendJsonForm(json) {
             method: 'POST',
             body: params,
         }).then((response) => response.json()).then((json) => {
+            // display h1
+            document.getElementById("resultsHeader").style.display = "inline";
             var output = '';
             var numCap = 0;
             var time = 0;
@@ -364,9 +367,11 @@ function onPlayerStateChange(event) {
     done = true;
   }
 }
+
 function stopVideo() {
   player.stopVideo();
 }
+
 function seekVideo() {
     player.playVideo();
     player.seekTo(60, true);
@@ -390,4 +395,12 @@ var onTimeClick = function() {
     var numPattern = /\d+/g;
     var time = text.match(numPattern);
     player.seekTo(time[0]);
+};
+
+Element.prototype.toggleClass = function ( className ) {
+    if( this.className.split( ' ' ).indexOf( className ) == -1 ) {
+        this.className = ( this.className + ' ' + className ).trim();
+    } else {
+        this.className = this.className.replace( new RegExp( '(\\s|^)' + className + '(\\s|$)' ), ' ' ).trim();
+    };
 };
