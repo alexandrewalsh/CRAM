@@ -77,6 +77,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         resultMap.put(METADATA_KEY, new ArrayList<Long>());
         resultMap.get(METADATA_KEY).add((long)numCaptions);
         resultMap.get(METADATA_KEY).add((long)(endTime - startTime));
+        resultMap.get(METADATA_KEY).add((long)resultMap.size() - 1);
 
         // Converts Java object to JSON and sends it back to the front end
         response.setContentType(RESPONSE_JSON_CONTENT);

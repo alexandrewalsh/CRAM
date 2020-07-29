@@ -322,6 +322,7 @@ function execute(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
+    $('#output').html('<p>Loading...</p>');
     fetch('/caption', {
             method: 'POST',
             body: params,
@@ -332,10 +333,17 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                // METADATA line sent to log, all others are sent to Caption Results section.
+                if (key == "METADATA") {
+                    console.log('NLP Fetch Time: ' +  json[key][1]);
+                    console.log('Total Youtube Captions: ' + json[key][0]);
+                    console.log('Total Entities Found: ' + json[key][2]);
+                }
+                else {
+                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                }
             }
             output += '</table>';
-            //$('#nlp-output').html(output);
             document.getElementById('output').innerHTML = output;
 
             // clickable timestamps
@@ -347,7 +355,6 @@ function sendJsonForm(json) {
 
             numCap = json['METADATA'][0];
             time = json['METADATA'][1];
-            //alert('Number of Captions: ' + numCap + '\nExecution Time: ' + time);
         });
 }
 
