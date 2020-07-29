@@ -244,7 +244,7 @@ function searchToggle(obj, evt){
  * @param evt - the click event
  */
 function submitFn(obj, evt){
-    $("#yess").addClass('search-wrapper-active');
+    $("#search-wrapper").addClass('search-wrapper-active');
     $('#resultsHeader').style = "display: unset;"
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
