@@ -336,7 +336,7 @@ function sendJsonForm(json) {
                     console.log('<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>');   
                 }
                 else {
-                    output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
                 }
             }
             output += '</table>';
