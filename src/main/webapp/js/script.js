@@ -216,11 +216,13 @@ function execute(url) {
         renderYtError("Invalid youtube url!");
         return;
     }
-
+    var youtubeSourceBuilder = "https://www.youtube.com/embed/"
+    youtubeSourceBuilder += videoId
+    youtubeSourceBuilder += "?enablejsapi=1"
+    youtubeSourceBuilder += "&origin=" + location.origin;
+    console.log(youtubeSourceBuilder)
+    $('#player').attr('src', youtubeSourceBuilder);    
     player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        videoId: videoId,
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
 
@@ -308,7 +310,6 @@ function seekVideo() {
     player.playVideo();
     player.seekTo(60, true);
 }
-
 
 $(document).ready(() => {
     $('#captionMockButton').click(() => {
