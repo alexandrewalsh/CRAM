@@ -331,7 +331,9 @@ function sendJsonForm(json) {
             var numCap = 0;
             var time = 0;
             for (var key in json) {
-                output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                if (!(key == "METADATA")) {
+                    output += '<tr><td><span class="word">' + key + ':</span> ' + '<span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                }
             }
             output += '</table>';
             //$('#nlp-output').html(output);
