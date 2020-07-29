@@ -1,3 +1,10 @@
+const MOCK_JSON_CAPTIONS = {
+    url: 'mock',
+    captions: [
+        {'startTime': 0, 'endTime': 20, 'text': 'Mitochondria are membrane-bound cell organelles (mitochondrion, singular) that generate most of the chemical energy needed to power the cells biochemical reactions. Chemical energy produced by the mitochondria is stored in a small molecule called adenosine triphosphate (ATP).'}
+    ]
+}
+
 /**
  * Convert a string timestamp to an epoch long
  * @param timestamp - a String in the format HH:MM:SS.FS
@@ -30,14 +37,44 @@ function parseCaptionsIntoJson(response, url){
         let reader = new FileReader();
 
         // read response line by line
-        reader.onloadend = function(evt){
-            lines = evt.target.result.split(/\r\n|\n|\r/);  
+        reader.onloadend = function(evt) {
+            
+            // Removes newlines and splits by empty line, which signifies a new caption
+            var result = evt.target.result.replace(/(\r\n|\n|\r)/gm,",");
+            var lines = result.split(',,');
+
+            // Loops through all captions, which should have the format:
+            //      startTime, endTime, text
+            for (var i = 0; i < lines.length; i++) {
+                var caption = {}
+                var data = lines[i].split(',');
+                if (data.length < 3) {
+                    continue;
+                }
+                caption['startTime'] = epoch(data[0]);
+                caption['endTime'] = epoch(data[1]);
+
+                // Builds text string with the consideration that commas could exist in text
+                var textBuilder = '';
+                for (var j = 2; j < data.length; j++) {
+                    textBuilder += data[j];
+                    if (j < data.length - 1) {
+                        textBuilder += ', ';
+                    }
+                }
+                caption['text'] = textBuilder;
+                json.captions.push(caption);
+            }   
+
+
+            //lines = evt.target.result.split(/\r\n|\n|\r/);  
 
             /* Line types
                 0: timestamp line
                 1: text line
                 2: empty line
             */
+            /*
             var lineType = 0;
             var caption = {};
 
@@ -66,7 +103,7 @@ function parseCaptionsIntoJson(response, url){
                     lineType = 0;
                 }
             });
-                
+              */  
             // successfully parsed response
             success(JSON.stringify(json));
         };
@@ -88,7 +125,7 @@ function parseCaptionsIntoJson(response, url){
  * @returns a promise which upon success returns a JSON 
  *         string encoding the captions and timestamps 
  */
-function getCaptions(trackId, url){
+function getCaptions(trackId, url) {
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
@@ -187,6 +224,11 @@ function execute(url) {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
 
+    if ($('#captionMockButton').text() == 'Mocking') {
+        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
+        return;
+    }
+
     return gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
@@ -266,3 +308,14 @@ function seekVideo() {
     player.playVideo();
     player.seekTo(60, true);
 }
+
+
+$(document).ready(() => {
+    $('#captionMockButton').click(() => {
+        if ($('#captionMockButton').text() == 'Click Me to Mock Captions') {
+            $('#captionMockButton').text('Mocking');
+        } else {
+            $('#captionMockButton').text('Click Me to Mock Captions');
+        }
+    });
+});
