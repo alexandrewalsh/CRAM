@@ -1,49 +1,13 @@
 /**
- * Currently holds all the functionality of the site
- * Should be split into getting captions, video/player display, NLP fetching, and common utilities
+ * Currently holds:
+ * submitFn                 -- event handler for search bar query
+ * execute                  -- execute a request to download captions from Youtube API
+ * getCaptions
+ * parseCaptionsIntoJson
+ * getIdFromUrl
+ * sendJsonForm
+ * document.ready
  */
-
-/**
- * Convert a string timestamp to an epoch long
- * @param timestamp - a String in the format HH:MM:SS.MS if
- *                    hours are included MM:SS.MS otherwise
- * @returns the number of seconds since the video started,
- *          returns null if the timestamp is improperly formatted
- */
-function epoch(timestamp) {
-    const parts = timestamp.split(':');
-
-    if (parts.length == 3) {
-        const hours = parseInt(parts[0]);
-        const minutes = parseInt(parts[1]);
-        const seconds = parseInt(parts[2]);
-        return hours*3600 + minutes*60 + seconds;
-    } else if (parts.length == 2) {
-        // only m:s
-        const minutes = parseInt(parts[0]);
-        const seconds = parseInt(parts[1]);
-        return minutes*60 + seconds;
-    }
-    return null;
-}
-
-/**
- * Convert epoch seconds to a timestamp
- * in the format H:M:S.MS
- * @param secs - seconds
- * @return - a String timestamp 
- */
-function epochToTimestamp(secs) {
-    var sec_num = parseInt(secs, 10);
-    var hours   = Math.floor(sec_num / 3600);
-    var minutes = Math.floor(sec_num / 60) % 60;
-    var seconds = sec_num % 60;
-
-    return [hours,minutes,seconds]
-        .map(v => v < 10 ? "0" + v : v)
-        .filter((v,i) => v !== "00" || i > 0)
-        .join(":");
-}
 
 /**
  * Event handler for search bar query, entry point
@@ -178,8 +142,8 @@ function parseCaptionsIntoJson(response, url){
                 if (data.length < 3) {
                     continue;
                 }
-                caption['startTime'] = epoch(data[0]);
-                caption['endTime'] = epoch(data[1]);
+                caption['startTime'] = timestampToEpoch(data[0]);
+                caption['endTime'] = timestampToEpoch(data[1]);
 
                 // Builds text string with the consideration that commas could exist in text
                 var textBuilder = '';
@@ -208,42 +172,6 @@ function parseCaptionsIntoJson(response, url){
 }
 
 /**
- * Render an error message for a given error code (Doesn't work yet)
- * @param error - an HTTP error code
- */
-function renderError(error) {
-    var errorMsg = document.getElementById('errorMsg'); // could make these consts
-    if (!errorMsg) {
-        errorMsg = document.createElement('p');
-        errorMsg.setAttribute('id', 'errorMsg');
-        errorMsg.classList += 'error';
-        document.body.appendChild(errorMsg);
-    }
-
-    if (error == 403) {
-        errMsg.innerText = "Video has private captions!";
-    } else if (error == 404) {
-        errMsg.innerText = "404 don't know how to deal with this";
-    }
-}
-
-/**
- * Render a generic error with a `message`. (This also doesn't work yet)
- * @param message - the message to render
- */
-function renderYtError(message) {
-    var errorMsg = document.getElementById('ytError');
-    if (!errorMsg) {
-        errorMsg.setAttribute('id', 'ytError');
-        errorMsg = document.createElement('p');
-        errorMsg.classList += 'error';
-        document.body.appendChild(errorMsg);
-    }
-
-    errorMsg.innerText = message;
-}
-
-/**
  * Gets the video id from a YouTube url
  * @param url - a YouTube video url
  * @returns - the `id` for a YouTube `url`
@@ -256,27 +184,6 @@ function getIdFromUrl(url) {
     }
 
     return video_id;
-}
-
-/**
- * Toggle the search bar appearance based on event (To be moved to other file)
- * @param obj - the button invoking the click
- * @param evt - the click event
- */
-function searchToggle(obj, evt){
-    var container = $(obj).closest('.search-wrapper');
-
-    if(!container.hasClass('active')){
-        container.addClass('active');
-        evt.preventDefault();
-    }
-    else if (container.hasClass('active') && $(obj).closest('.input-holder').length == 0){
-        container.removeClass('active');
-        // clear input
-        container.find('.search-input').val('');
-        // clear and hide result container when we press close
-        container.find('.result-container').fadeOut(100, function(){$(this).empty();});
-    }
 }
 
 /**
@@ -322,18 +229,6 @@ function sendJsonForm(json) {
         });
 }
 
-// The API will call this function when the video player is ready.
-function onPlayerReady(event) {
-  event.target.playVideo();
-}
-
-// The API calls this function when the player's state changes.
-function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.PLAYING && !done) {
-    done = true;
-  }
-}
-
 // display that mocking captions are now active
 $(document).ready(() => {
     $('#captionMockButton').click(() => {
@@ -344,13 +239,3 @@ $(document).ready(() => {
         }
     });
 });
-
-// called when timestamp is clicked on
-var onTimeClick = function() {
-    var text = this.innerText;
-    // convert the timestamp into seconds
-    text = epoch(text).toString();
-    var numPattern = /\d+/g;
-    var time = text.match(numPattern);
-    player.seekTo(time[0]);
-};
