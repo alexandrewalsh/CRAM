@@ -8,7 +8,7 @@
         <script src="js/config.js"></script>
         <script src="js/auth.js"></script>
         <script>
-            checkLogin();
+            checkLogin();   // hacky solution @enriqueavina
         </script>
         <link rel="stylesheet" 
             href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
@@ -62,13 +62,14 @@
             -56 166 -188 389 -290 490 -118 118 -304 195 -540 224 -85 10 -268 12 -345 4z"/>
             </g>
         </svg>
+        <!-- Main text prompt -->
         <div class="wrapper">
             <div class="bg-container">
                 <h1>Lecture Buddy</h1>
                 <p>Transcribe all your lectures</p>
                 <div class="row">
                     <div class="mx-auto">
-                        <a id="loginBtn" class="btn btn-outline-dark" role="button">
+                        <a id="loginBtn" class="btn btn-outline-dark" role="button"> <!-- don't style inline @enriqueavina -->
                             <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
                             Login with Google
                         </a>
@@ -76,11 +77,5 @@
                 </div>
             </div>
         </div>
-        <!-- Minified CSS and JS -->
-
-        <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
-                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
-                crossorigin="anonymous">
-        </script> -->
     </body>
 </html>

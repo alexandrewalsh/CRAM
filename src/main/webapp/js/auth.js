@@ -1,3 +1,7 @@
+/**
+ * All authentication related scripts
+ */
+
 const signInOptions = {
     'client_id': config.client_id,
     'scope': 'https://www.googleapis.com/auth/youtube.force-ssl',
@@ -39,12 +43,10 @@ function loadClient() {
     return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
         .then(function() {
             console.log("GAPI client loaded for API");
-            // checkLogin(); 
             },
             function(err) { 
-                renderError("Error loading GAPI client");
+                renderError("Error loading GAPI client"); // these functions don't work yet @enriqueavina
                 console.error("Error loading GAPI client for API", err);
-                // render error elements
             });
 }
 
@@ -77,7 +79,7 @@ function checkLogin() {
                     window.location.replace("https://step-intern-2020.appspot.com/player.html");    // redirect to player
                 }
             } else {
-                if (!(window.location.href === "https://step-intern-2020.appspot.com/" || window.location.href === "https://step-intern-2020.appspot.com")) {
+                if (window.location.href !== "https://step-intern-2020.appspot.com/" && window.location.href !== "https://step-intern-2020.appspot.com") {
                     window.location.replace("https://step-intern-2020.appspot.com");    // redirect back to login page
                 }  
             }
@@ -98,7 +100,7 @@ function signOut() {
 }
 
 /**
- * Render a generic error with a `message`
+ * Render a generic error with a `message`. Currently does not work
  * @param message - the message to render
  */
 function renderError(message) {

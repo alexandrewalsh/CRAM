@@ -14,27 +14,27 @@
         <link rel="stylesheet" 
             href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-            crossorigin="anonymous">
+            crossorigin="anonymous"> <!-- maybe could remove this -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/search-bar.css">
         <link rel="stylesheet" href="css/player.css">
         <script defer src="js/script.js"></script>
-      </head>
+    </head>
     <body>
         <div class="container">
             <div>
                 <h1>Lecture Buddy</h1>
-                <div style="position: absolute; top: 10px; right: 10px;">
+                <div style="position: absolute; top: 10px; right: 10px;"> <!-- move to css -->
                     <a id="captionMockButton" class="headerBtn">Click Me to Mock Captions</a>
-                    <a class="headerBtn" onclick="signOut()">Sign out</a>
+                    <a class="headerBtn" onclick="signOut()">Sign out</a> <!-- change to actionHandlers -->
                 </div>
             </div>
         </div>
         <div class="container top-10">
             <div class="container-column">
                 <!-- search bar -->
-                <div> 
+                <div> <!-- unecessary div ? -->
                     <form onsubmit="submitFn(this, event);">
                             <div id="search-wrapper" class="search-wrapper container-row">
                                 <div class="input-holder">
@@ -48,7 +48,7 @@
                 </div>
                 <!-- player & output -->
                 <div class="container-row space-between top-10px">
-                    <iframe id="player" width="640" height="390" src="" frameborder="0"></iframe>        
+                    <iframe id="player" width="640" height="390" src="" frameborder="0"></iframe>  <!-- dynamic width/height -->      
                     <div class="container-column">
                         <h1 id="resultsHeader" class="text-left hide">Results</h1>
                         <div id="output"></div>
@@ -58,4 +58,3 @@
         </div>
     </body>
 </html>
-
