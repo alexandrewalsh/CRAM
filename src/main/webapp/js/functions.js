@@ -10,10 +10,11 @@
  * @returns the number of seconds since the video started,
  *          returns null if the timestamp is improperly formatted
  */
-function epoch(timestamp) {
+function timestampToEpoch(timestamp) {
     const parts = timestamp.split(':');
 
     if (parts.length == 3) {
+        // contains h:m:s
         const hours = parseInt(parts[0]);
         const minutes = parseInt(parts[1]);
         const seconds = parseInt(parts[2]);
@@ -178,8 +179,8 @@ function parseCaptionsIntoJson(response, url){
                 if (data.length < 3) {
                     continue;
                 }
-                caption['startTime'] = epoch(data[0]);
-                caption['endTime'] = epoch(data[1]);
+                caption['startTime'] = timestampToEpoch(data[0]);
+                caption['endTime'] = timestampToEpoch(data[1]);
 
                 // Builds text string with the consideration that commas could exist in text
                 var textBuilder = '';
@@ -322,17 +323,6 @@ function sendJsonForm(json) {
         });
 }
 
-// The API will call this function when the video player is ready.
-function onPlayerReady(event) {
-  event.target.playVideo();
-}
-
-// The API calls this function when the player's state changes.
-function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.PLAYING && !done) {
-    done = true;
-  }
-}
 
 // display that mocking captions are now active
 $(document).ready(() => {
@@ -349,7 +339,7 @@ $(document).ready(() => {
 var onTimeClick = function() {
     var text = this.innerText;
     // convert the timestamp into seconds
-    text = epoch(text).toString();
+    text = timestampToEpoch(text).toString();
     var numPattern = /\d+/g;
     var time = text.match(numPattern);
     player.seekTo(time[0]);

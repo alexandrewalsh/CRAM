@@ -7,17 +7,3 @@ const MOCK_JSON_CAPTIONS = {
         {'startTime': 0, 'endTime': 20, 'text': '51 Pegasi b (abbreviated 51 Peg b), unofficially dubbed Bellerophon, later formally named Dimidium, is an extrasolar planet approximately 50 light-years away in the constellation of Pegasus. It was the first exoplanet to be discovered orbiting a main-sequence star, the Sun-like 51 Pegasi, and marked a breakthrough in astronomical research.'}
     ]
 }
-
-// global variable holding the Youtube Video
-var player;
-
-// Todo: put these lines into standalone functions (probably in $document.ready)
-
-// This code loads the IFrame Player API code asynchronously.
-var tag = document.createElement('script');
-
-tag.src = 'https://www.youtube.com/iframe_api';
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-var done = false;
