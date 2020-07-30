@@ -18,26 +18,25 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import javax.annotation.*;
 
 /** Postprocessing for outputs of the NLP API that maps a keyphrase to all mention times */
 public class NaturalLanguagePostprocessor {
     
     // Mapping of String keyphrases to a list of Long timestamps where the keyphrase is detected
-    private Map<String, List<Long>> entitiesMap;
-
-    /** 
-     * Constructor for the postprocessor object
-     */
-    public NaturalLanguagePostprocessor() {
-        entitiesMap = new HashMap<>();
-    }
+    private Map<String, List<Long>> entitiesMap = new HashMap<>();
 
     /**
      * Adds a list of entities with the time range for that list to the compiled map
      * @param entities The list of keyphrases of the current iteration of the NLP output
      * @param startTime The start time of the list of entities mentions
      */
-    public void addEntities(List<String> entities, long startTime) {
+    public void addEntities(@Nonnull List<String> entities, long startTime) {
+        // Null check for entities list passed in
+        if (entities == null) {
+            return;
+        }
+        // Adds all entities to the hashmap
         for (String entity : entities) {
             if (!entitiesMap.containsKey(entity)) {
                 entitiesMap.put(entity, new ArrayList<Long>());
@@ -50,6 +49,7 @@ public class NaturalLanguagePostprocessor {
      * Gets the entities mapping that is currently built
      * @return The currently built entities mapping
      */
+    @Nonnull
     public Map<String, List<Long>> getEntitiesMap() {
         return entitiesMap;
     }
