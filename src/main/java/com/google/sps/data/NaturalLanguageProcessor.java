@@ -30,10 +30,15 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.lang.Exception;
 
 /** Picks entities from text using Google's NLP API */
 public class NaturalLanguageProcessor {
+
+    // Error strings for exceptions
+    private static final String CATEGORY_EXCEPTION = "Exception caught when trying to find the category of the input.";
+    private static final String ENTITIES_EXCEPTION = "Exception caught when trying to find the entities of the input.";
 
     private static final double DEFAULT_SALIENCE_THRESHOLD = 0.01;
     private static final double ACADEMIC_SALIENCE_THRESHOLD = 0.02;
@@ -100,7 +105,7 @@ public class NaturalLanguageProcessor {
                 hasAcademicCategory = checkAcademicCategory(language, doc);
             }
             
-            double salienceThreshold = (hasAcademicCategory) ? academicThreshold : defaultThreshold;
+            double salienceThreshold = hasAcademicCategory ? academicThreshold : defaultThreshold;
             
             // Builds request to find all entities in the text
             AnalyzeEntitiesRequest entitiesRequest = 
@@ -118,11 +123,12 @@ public class NaturalLanguageProcessor {
             }
 
         } catch (Exception e) {
+            System.out.println(ENTITIES_EXCEPTION);
             return null;
         }
 
-        // Converts set to array as the return object
-        return new ArrayList<String>(entities);
+        // Converts set to an unmodifiable list as the return object
+        return Collections.unmodifiableList(new ArrayList<String>(entities));
     }
 
     /**
@@ -147,6 +153,7 @@ public class NaturalLanguageProcessor {
                 }
             }
         } catch (Exception e) {
+            System.out.println(CATEGORY_EXCEPTION);
             return false;
         }
         return false;
