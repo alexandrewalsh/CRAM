@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import javax.annotation.*;
+
 /** The caption text in a defined time range */
 public final class TimeRangedText {
 
@@ -34,7 +36,7 @@ public final class TimeRangedText {
      * @param endTime The end time of the text
      * @param text The text spoken in the given time range
      */
-    public TimeRangedText(long startTime, long endTime, String text) {
+    public TimeRangedText(long startTime, long endTime, @Nonnull String text) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.text = text;

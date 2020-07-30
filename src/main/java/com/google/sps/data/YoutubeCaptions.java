@@ -14,12 +14,15 @@
 
 package com.google.sps.data;
 
-import java.util.List;
 import com.google.sps.data.TimeRangedText;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+import javax.annotation.*;
 
 /** The object that is parsed from JSON as the entire YouTube captions */
 public final class YoutubeCaptions {
 
+    @SerializedName("url")
     private String url;
     private List<TimeRangedText> captions;
 
