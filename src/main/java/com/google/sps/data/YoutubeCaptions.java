@@ -24,6 +24,7 @@ public final class YoutubeCaptions {
 
     @SerializedName("url")
     private String url;
+    @SerializedName("captions")
     private List<TimeRangedText> captions;
 
     /**

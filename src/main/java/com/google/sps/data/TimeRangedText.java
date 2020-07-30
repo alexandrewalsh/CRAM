@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import javax.annotation.*;
+import com.google.gson.annotations.SerializedName;
 
 /** The caption text in a defined time range */
 public final class TimeRangedText {
@@ -26,8 +27,11 @@ public final class TimeRangedText {
     private static final String END = "End Time: ";
     private static final String TEXT = "Text: ";
 
+    @SerializedName("startTime")
     private long startTime;
+    @SerializedName("endTime")
     private long endTime;
+    @SerializedName("text")
     private String text;
 
     /**
