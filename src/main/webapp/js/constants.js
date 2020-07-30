@@ -1,0 +1,1 @@
+export const SIGN_IN_AUTH = 'https://www.googleapis.com/auth/youtube.force-ssl';
