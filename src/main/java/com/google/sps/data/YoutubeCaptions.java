@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
 
 package com.google.sps.data;
 
-import java.util.List;
 import com.google.sps.data.TimeRangedText;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+import javax.annotation.*;
 
 /** The object that is parsed from JSON as the entire YouTube captions */
 public final class YoutubeCaptions {
 
+    @SerializedName("url")
     private String url;
+    @SerializedName("captions")
     private List<TimeRangedText> captions;
 
     /**

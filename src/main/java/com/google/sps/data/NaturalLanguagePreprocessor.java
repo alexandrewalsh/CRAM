@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ package com.google.sps.data;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.sps.data.TimeRangedText;
+import javax.annotation.*;
 
 /** Preprocesses captions by concatenating TimeRangedTexts to reach a time threshold */
 public class NaturalLanguagePreprocessor {
 
     // The default time threshold in seconds to contatenate TimeRangedText objects
     private static final long DEFAULT_TIME_THRESHOLD = 20;
+    // 
+    private static final long NO_TIME_ELAPSED = -1;
 
     private long timeThreshold;
 
@@ -46,19 +49,25 @@ public class NaturalLanguagePreprocessor {
      * @param texts The list of TimeRangedTexts with short durations
      * @return The list of TimeRangedTexts with durations at least as long as the time threshold
      */
-    public List<TimeRangedText> setTimeRanges(List<TimeRangedText> texts) {
+    @Nonnull
+    public List<TimeRangedText> setTimeRanges(@Nonnull List<TimeRangedText> texts) {
         List<TimeRangedText> mergedTexts = new ArrayList<>();
         int size = texts.size();
         long startTime = 0;
-        long timeElapsed = -1;
+        long timeElapsed = NO_TIME_ELAPSED;
         String textBuild = "";
+
+        // Returns empty list on a null input
+        if (texts == null) {
+            return mergedTexts;
+        }
 
         // Loops through all captions to determine where to build and split increments
         for (int i = 0; i < size; i++) {
             TimeRangedText currentTimeRangedText = texts.get(i);
 
-            // Sets start time when previous TimeRangedText added to the merged list (so timeElapsed is -1)
-            if (timeElapsed == -1) {
+            // Sets start time when previous TimeRangedText added to the merged list (so timeElapsed is NO_TIME_ELAPSED)
+            if (timeElapsed == NO_TIME_ELAPSED) {
                 startTime = currentTimeRangedText.getStartTime();
             }
 
@@ -71,12 +80,12 @@ public class NaturalLanguagePreprocessor {
                 TimeRangedText builtTimeRangedText = new TimeRangedText(startTime, currentTimeRangedText.getEndTime(), textBuild);
                 mergedTexts.add(builtTimeRangedText);
                 textBuild = "";
-                timeElapsed = -1;
+                timeElapsed = NO_TIME_ELAPSED;
             } 
         }
 
         // Adds the last TimeRangedTexts to the list, even if the threshold is not reached
-        if (timeElapsed != -1) {
+        if (timeElapsed != NO_TIME_ELAPSED) {
             TimeRangedText builtTimeRangedText = new TimeRangedText(startTime, texts.get(size - 1).getEndTime(), textBuild);
             mergedTexts.add(builtTimeRangedText);
         }
