@@ -26,6 +26,8 @@ import com.google.sps.data.NaturalLanguageProcessor;
 import com.google.sps.data.NaturalLanguagePostprocessor;
 import com.google.sps.data.YoutubeCaptions;
 import com.google.sps.data.TimeRangedText;
+import com.google.sps.data.INaturalLanguage;
+import com.google.sps.data.NaturalLanguageMock;
 import java.util.*;
 
 
@@ -35,6 +37,7 @@ public class NaturalLanguageServlet extends HttpServlet {
 
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
     private static final String REQUEST_JSON_PARAM = "json";
+    private static final String REQUEST_MOCK_PARAM = "mock";
     private static final String METADATA_KEY = "METADATA";
 
     /**
@@ -48,8 +51,17 @@ public class NaturalLanguageServlet extends HttpServlet {
         long startTime = System.nanoTime();
 
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
+        String mock = (String) request.getParameter(REQUEST_MOCK_PARAM);
         List<String> entities = new ArrayList<String>();
         Gson gson = new Gson();
+
+        // Creates the INaturalLanguage object
+        INaturalLanguage nlp;
+        if (mock != null && mock.equals(REQUEST_MOCK_PARAM)) {
+            nlp = new NaturalLanguageMock();
+        } else {
+            nlp = new NaturalLanguageProcessor();
+        }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
@@ -58,7 +70,6 @@ public class NaturalLanguageServlet extends HttpServlet {
         List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(youtubeCaptions.getCaptions());
         
         // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
-        NaturalLanguageProcessor nlp = new NaturalLanguageProcessor();
         NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
         for (TimeRangedText text : preprocessedResults) {
             postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());

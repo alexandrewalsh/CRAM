@@ -25,6 +25,7 @@ import com.google.cloud.language.v1.EncodingType;
 import com.google.cloud.language.v1.Entity;
 import com.google.cloud.language.v1.EntityMention;
 import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.sps.data.INaturalLanguage;
 import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ import java.util.Collections;
 import java.lang.Exception;
 
 /** Picks entities from text using Google's NLP API */
-public class NaturalLanguageProcessor {
+public class NaturalLanguageProcessor implements INaturalLanguage{
 
     // Error strings for exceptions
     private static final String CATEGORY_EXCEPTION = "Exception caught when trying to find the category of the input.";
@@ -133,8 +134,8 @@ public class NaturalLanguageProcessor {
 
     /**
      * Checks if the text in the document is in an academic category
-     * @param language The instance of the NLP API object
-     * @param doc The document object that contains the the text to be analyzed
+     * @param languageObject The instance of the NLP API object
+     * @param docObject The document object that contains the the text to be analyzed
      * @return Whether the text is in an academic category
      */
     public boolean checkAcademicCategory(LanguageServiceClient language, Document doc) {
