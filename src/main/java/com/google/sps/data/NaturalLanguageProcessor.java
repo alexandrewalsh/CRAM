@@ -135,8 +135,8 @@ public class NaturalLanguageProcessor implements INaturalLanguage{
 
     /**
      * Checks if the text in the document is in an academic category
-     * @param languageObject The instance of the NLP API object
-     * @param docObject The document object that contains the the text to be analyzed
+     * @param language The instance of the NLP API object
+     * @param doc The document object that contains the the text to be analyzed
      * @return Whether the text is in an academic category
      */
     public boolean checkAcademicCategory(LanguageServiceClient language, Document doc) {
