@@ -12,7 +12,6 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <failOnMissingWebXml>false</failOnMissingWebXml>
       <project.http.version>1.20.0</project.http.version>
-      <js-tests.skip>false</js-tests.skip>
    </properties>
    <!-- Some of these dependencies aren't in use -->
    <dependencies>
@@ -100,48 +99,6 @@
             <configuration>
                <deploy.projectId>step-intern-2020</deploy.projectId>
                <deploy.version>1</deploy.version>
-            </configuration>
-         </plugin>
-         <!-- Phantom JS -->
-         <plugin>
-            <groupId>com.github.klieber</groupId>
-            <artifactId>phantomjs-maven-plugin</artifactId>
-            <version>0.4</version>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>install</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <configuration>
-               <version>1.9.8</version>
-               <skip>${js-tests.skip}</skip>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>com.github.searls</groupId>
-            <artifactId>jasmine-maven-plugin</artifactId>
-            <version>1.3.1.5</version>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>test</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <configuration>
-               <skipJasmineTests>${js-tests.skip}</skipJasmineTests>
-               <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
-               <webDriverCapabilities>
-                  <capability>
-                     <name>phantomjs.binary.path</name>
-                     <value>${phantomjs.binary}</value>
-                  </capability>
-               </webDriverCapabilities>
-                <jsSrcDir>${basedir}/src/main/webapp/js</jsSrcDir>
-               <jsTestSrcDir>${basedir}/src/test/js</jsTestSrcDir>
-               <preloadSources />
             </configuration>
          </plugin>
       </plugins>
