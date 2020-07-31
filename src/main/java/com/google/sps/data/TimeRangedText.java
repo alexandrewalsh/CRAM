@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
 
 package com.google.sps.data;
 
+import javax.annotation.*;
+import com.google.gson.annotations.SerializedName;
+
 /** The caption text in a defined time range */
 public final class TimeRangedText {
 
@@ -24,8 +27,11 @@ public final class TimeRangedText {
     private static final String END = "End Time: ";
     private static final String TEXT = "Text: ";
 
+    @SerializedName("startTime")
     private long startTime;
+    @SerializedName("endTime")
     private long endTime;
+    @SerializedName("text")
     private String text;
 
     /**
@@ -34,7 +40,7 @@ public final class TimeRangedText {
      * @param endTime The end time of the text
      * @param text The text spoken in the given time range
      */
-    public TimeRangedText(long startTime, long endTime, String text) {
+    public TimeRangedText(long startTime, long endTime, @Nonnull String text) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.text = text;

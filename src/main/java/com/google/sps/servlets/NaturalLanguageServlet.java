@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,10 +68,11 @@ public class NaturalLanguageServlet extends HttpServlet {
         long endTime = System.nanoTime();
         
         // Adds metadata to the result
-        resultMap.put(METADATA_KEY, new ArrayList<Long>());
-        resultMap.get(METADATA_KEY).add((long)numCaptions);
-        resultMap.get(METADATA_KEY).add((long)(endTime - startTime));
-        resultMap.get(METADATA_KEY).add((long)resultMap.size() - 1);
+        List<Long> metadataList = new ArrayList<>();
+        metadataList.add((long)numCaptions); // Number of captions passed in by the request
+        metadataList.add((long)(endTime - startTime)); // Amount of time the NLP process takes (in ns)
+        metadataList.add((long)resultMap.size() - 1); // Number of entities found
+        resultMap.put(METADATA_KEY, metadataList);
 
         // Converts Java object to JSON and sends it back to the front end
         response.setContentType(RESPONSE_JSON_CONTENT);
