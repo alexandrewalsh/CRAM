@@ -91,6 +91,7 @@ public class NaturalLanguageProcessor implements INaturalLanguage{
      * @param text The string that contains the text to pull entities from
      * @return The list of entities
      */
+    @Override
     public List<String> getEntities(String text) {
         Set<String> entities = new HashSet<String>();
         int tokens = text.split(WORD_DELIMITER).length;

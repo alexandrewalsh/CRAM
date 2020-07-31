@@ -31,6 +31,7 @@ public class NaturalLanguageMock implements INaturalLanguage {
      * @param text The String text to extract entities from
      * @return The list of entities from the text
      */
+    @Override
     public List<String> getEntities(String text) {
         // Define objects to be used
         String[] components = text.split(MOCK_TEXT_DELIMITER);
