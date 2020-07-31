@@ -2,7 +2,7 @@
  * All authentication related scripts
  */
 
-const signInOptions = {
+const SIGN_IN_OPTIONS = {
     'client_id': config.client_id,
     'scope': 'https://www.googleapis.com/auth/youtube.force-ssl',
     'cookie_policy': 'single_host_origin'
@@ -22,7 +22,7 @@ $(document).ready(function() {
  */
 function authenticate() {
     return gapi.auth2.getAuthInstance()
-        .signIn(signInOptions)
+        .signIn(SIGN_IN_OPTIONS)
         .then(function() { 
             console.log("Sign-in successful");
             loadClient().then(function() {
@@ -40,7 +40,7 @@ function authenticate() {
  */
 function loadClient() {
     gapi.client.setApiKey(config.api_key);
-    return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+    return gapi.client.load(GAPI_CLIENT)
         .then(function() {
             console.log("GAPI client loaded for API");
             },
@@ -58,7 +58,7 @@ function getAuth(){
     var GoogleAuth = gapi.auth2.getAuthInstance();
 
     if (GoogleAuth == null) {
-        GoogleAuth = gapi.auth2.init(signInOptions);
+        GoogleAuth = gapi.auth2.init(SIGN_IN_OPTIONS);
         loadClient();
     }
     
@@ -75,12 +75,12 @@ function checkLogin() {
 
         GoogleAuth.then(function() {
             if (GoogleAuth.isSignedIn.get()) {
-                if (window.location.href !== "https://step-intern-2020.appspot.com/player.html") {
-                    window.location.replace("https://step-intern-2020.appspot.com/player.html");    // redirect to player
+                if (window.location.href !== PLAYER_URL) {
+                    window.location.replace(PLAYER_URL);    // redirect to player
                 }
             } else {
-                if (window.location.href !== "https://step-intern-2020.appspot.com/" && window.location.href !== "https://step-intern-2020.appspot.com") {
-                    window.location.replace("https://step-intern-2020.appspot.com");    // redirect back to login page
+                if (window.location.href !== LOGIN_URL_WITH_SLASH && window.location.href !== LOGIN_URL_WITHOUT_SLASH) {
+                    window.location.replace(LOGIN_URL_WITH_SLASH);    // redirect back to login page
                 }  
             }
         });
@@ -95,7 +95,7 @@ function signOut() {
 
     GoogleAuth.then(function() {
         GoogleAuth.signOut();
-        window.location.replace("https://step-intern-2020.appspot.com");    // redirect back to login page
+        window.location.replace(LOGIN_URL_WITHOUT_SLASH);    // redirect back to login page
     });
 }
 
