@@ -16,8 +16,14 @@ package com.google.sps.data;
 
 import java.util.List;
 
+/** Interface for NaturalLanguage processing objects */
 public interface INaturalLanguage {
 
+    /**
+     * Gets a list of entities from the text input
+     * @param text The string that contains the text to pull entities from
+     * @return The list of entities
+     */
     public List<String> getEntities(String text);
 
 }

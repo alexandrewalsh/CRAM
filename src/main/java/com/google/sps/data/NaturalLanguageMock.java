@@ -14,16 +14,33 @@
 
 package com.google.sps.data;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
+/** A mock object for Natural Language processing to avoid external API calls */
 public class NaturalLanguageMock implements INaturalLanguage {
 
+    // Delimiter that defines seperated entities from text input
     private static final String MOCK_TEXT_DELIMITER = ",";
 
+    /**
+     * Gets a list of entities by splitting them by the comma delimiter
+     * @param text The String text to extract entities from
+     * @return The list of entities from the text
+     */
     public List<String> getEntities(String text) {
+        // Define objects to be used
         String[] components = text.split(MOCK_TEXT_DELIMITER);
-        return Arrays.asList(components);
+        Set<String> uniqueComponenets = new HashSet<>();
+
+        // Trims strings and uses set to remove duplicates
+        for (String component : components) {
+            uniqueComponenets.add(component.trim());
+        }
+        return Collections.unmodifiableList(new ArrayList<String>(uniqueComponenets));
     }
 
 }
