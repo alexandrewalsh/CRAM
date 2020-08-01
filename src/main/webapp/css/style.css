@@ -97,11 +97,6 @@ a .headerBtn:hover {
     right: 0;
 }
 
-.container-row {
-    display: flex;
-    flex-direction: row;
-}
-
 .text-left {
     text-align: left;
 }
@@ -110,22 +105,9 @@ a .headerBtn:hover {
     margin-top: 10%;
 }
 
-.top-10px {
-    margin-top: 10px;
-}
-
 .container div, h1, p {
     font-family: 'Raleway', sans-serif;
     color: white;
-}
-
-.container-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.space-between {
-    justify-content: space-between;
 }
 
 .ground {

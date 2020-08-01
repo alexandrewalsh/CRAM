@@ -47,8 +47,12 @@ function execute(url) {
     youtubeSourceBuilder += "&origin=" + location.origin;
     console.log(youtubeSourceBuilder);
 
+    // display "Results" header
+    document.getElementById("resultsHeader").style.display = "inline";
+
     // set player source
-    $('#player').attr('src', youtubeSourceBuilder);    
+    $('#player').attr('src', youtubeSourceBuilder);  
+    resizeIFrame()  
     player = new YT.Player('player', {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
@@ -202,8 +206,6 @@ function sendJsonForm(json) {
             method: 'POST',
             body: params,
         }).then((response) => response.json()).then((json) => {
-            // display "Results" header
-            document.getElementById("resultsHeader").style.display = "inline";
             var output = '<table>';
 
             for (var key in json) {
@@ -229,6 +231,15 @@ function sendJsonForm(json) {
         });
 }
 
+function resizeIFrame() {
+    var width = $('#player').width();
+    var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + 30;
+    var totalAvailableHeight = $(window).height() - reservedHeight;
+    var videoHeightFromRatio = width / 1.33;
+    var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
+    $('#player').height(playerHeight);
+}
+
 // display that mocking captions are now active
 $(document).ready(() => {
     $('#captionMockButton').click(() => {
@@ -237,5 +248,10 @@ $(document).ready(() => {
         } else {
             $('#captionMockButton').text('Click Me to Mock Captions');
         }
+    });
+
+    resizeIFrame();
+    $(window).resize(() => {
+        resizeIFrame();
     });
 });

@@ -1,9 +1,45 @@
 /**
- * Styling for the player
+ * Styling for the player page
 */
 
 #output {
-    height: 340px;
-    width : 300px;
     overflow: scroll;
+}
+
+#player {
+    width: 100%;
+}
+
+.container-row {
+    display: flex;
+    flex-direction: row;
+}
+
+#flex-item-video {
+    width: 50%
+}
+
+#flex-item-output {
+    width: 40%;
+}
+
+.space-between {
+    justify-content: space-around;
+}
+
+.top-10px {
+    margin-top: 10px;
+}
+
+.container-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.hide {
+    display: none;
 }

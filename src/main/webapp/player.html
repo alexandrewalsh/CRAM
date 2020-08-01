@@ -27,7 +27,7 @@
         <script defer src="js/captions.js"></script>
     </head>
     <body>
-        <div class="container">
+        <div id="heading-div" class="container">
             <div>
                 <h1>Lecture Buddy</h1>
                 <div style="position: absolute; top: 10px; right: 10px;"> <!-- move to css -->
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div class="container top-10">
+        <div id="searchbar-div" class="container top-10">
             <div class="container-column">
                 <!-- search bar -->
                 <div> <!-- unecessary div ? -->
@@ -51,14 +51,16 @@
                             <div class="result-container"></div>
                     </form>
                 </div>
-                <!-- player & output -->
-                <div class="container-row space-between top-10px">
-                    <iframe id="player" width="640" height="390" src="" frameborder="0" allowfullscreen></iframe>  <!-- dynamic width/height -->      
-                    <div class="container-column">
-                        <h1 id="resultsHeader" class="text-left hide">Results</h1>
-                        <div id="output"></div>
-                    </div>
-                </div>
+            </div>
+        </div>
+        <!-- player & output -->
+        <div id="output-container" class="container-row space-between top-10px">
+            <div id="flex-item-video">                
+                <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+            </div>
+            <div id="flex-item-output">
+                <h1 id="resultsHeader" class="text-left hide">Results</h1>
+                <div id="output"></div>
             </div>
         </div>
     </body>
