@@ -238,6 +238,7 @@ function resizeIFrame() {
     var videoHeightFromRatio = width / 1.33;
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
+    $('#output').height(playerHeight - $('#resultsHeader').height());
 }
 
 // display that mocking captions are now active
