@@ -233,8 +233,9 @@ function sendJsonForm(json) {
 
 function resizeIFrame() {
     var width = $('#player').width();
-    var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + 30;
-    var totalAvailableHeight = $(window).height() - reservedHeight;
+    var windowHeight = $(window).height();
+    var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + windowHeight * 0.05;
+    var totalAvailableHeight = windowHeight - reservedHeight;
     var videoHeightFromRatio = width / 1.33;
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);

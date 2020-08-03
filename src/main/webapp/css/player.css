@@ -10,6 +10,10 @@
     width: 100%;
 }
 
+#heading-div {
+    padding-top: 3%;
+}
+
 .container-row {
     display: flex;
     flex-direction: row;
@@ -31,6 +35,10 @@
     margin-top: 10px;
 }
 
+.top-5 {
+    margin-top: 5%;
+}
+
 .container-column {
     display: flex;
     flex-direction: column;
@@ -40,6 +48,18 @@
     text-align: left;
 }
 
+.text-center {
+    text-align: center;
+}
+
 .hide {
     display: none;
+}
+
+.word {
+    color: #FFFFFF;
+}
+
+.timestamps {
+    color: #FFFFFF;
 }
