@@ -19,9 +19,11 @@
     flex-direction: row;
 }
 
+/*
 #flex-item-video {
     width: 50%
 }
+*/
 
 #flex-item-output {
     width: 40%;
@@ -62,4 +64,18 @@
 
 .timestamps {
     color: #FFFFFF;
+}
+
+.video {
+    width: 50%;
+}
+
+.theater {
+  width: 90%;
+  margin: auto;
+}
+
+.theater-toggle {
+  margin: auto;
+  display: none;
 }

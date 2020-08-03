@@ -18,6 +18,7 @@ var done = false;
 // The API will call this function when the video player is ready.
 function onPlayerReady(event) {
   event.target.playVideo();
+  document.getElementById("theater-button").style.display = "block";
 }
 
 // The API calls this function when the player's state changes.
@@ -26,3 +27,16 @@ function onPlayerStateChange(event) {
     done = true;
   }
 }
+
+var video = $(".video")
+var theaterToggle = $(".theater-toggle")
+
+theaterToggle.click(function() {
+    video.toggleClass("theater");
+    var captions = document.getElementById("flex-item-output");
+    if(captions.style.display == "none") {
+        captions.style.display = "block";
+    } else {
+        captions.style.display = "none";
+    }
+});
