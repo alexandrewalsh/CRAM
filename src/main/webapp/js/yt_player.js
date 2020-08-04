@@ -18,7 +18,7 @@ var done = false;
 // The API will call this function when the video player is ready.
 function onPlayerReady(event) {
   event.target.playVideo();
-  document.getElementById("theater-button").style.display = "block";
+  document.getElementById("theater-button").style.display = "inline-block";
 }
 
 // The API calls this function when the player's state changes.

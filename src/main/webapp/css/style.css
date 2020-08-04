@@ -11,8 +11,9 @@ html {
 
 body {
   margin: 0;
-  height: 100%;
   background: linear-gradient(#0f1a2b, #411d63);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 @keyframes dropdown {
@@ -70,6 +71,10 @@ h1, p {
     color:#FFFFFF;
     text-align:center;
     transition: all 0.2s;
+}
+
+a:not([href]):not([tabindex]) {
+    color: white;
 }
 
 a:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {
