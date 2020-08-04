@@ -63,6 +63,7 @@
 }
 
 .timestamps {
+    cursor: pointer;
     color: #FFFFFF;
 }
 

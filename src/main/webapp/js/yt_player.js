@@ -29,14 +29,10 @@ function onPlayerStateChange(event) {
 }
 
 var video = $(".video")
+var vidCapDisplay = $(".container-row")
 var theaterToggle = $(".theater-toggle")
 
 theaterToggle.click(function() {
     video.toggleClass("theater");
-    var captions = document.getElementById("flex-item-output");
-    if(captions.style.display == "none") {
-        captions.style.display = "block";
-    } else {
-        captions.style.display = "none";
-    }
+    vidCapDisplay.toggleClass("container-column");
 });

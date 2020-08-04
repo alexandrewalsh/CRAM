@@ -52,7 +52,7 @@ function execute(url) {
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
-    resizeIFrame()  
+    resizeIFrame();  
     player = new YT.Player('player', {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
