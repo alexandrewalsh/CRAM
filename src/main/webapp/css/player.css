@@ -19,11 +19,9 @@
     flex-direction: row;
 }
 
-/*
-#flex-item-video {
-    width: 50%
+.white-text {
+    color: #FFFFFF;
 }
-*/
 
 #flex-item-output {
     width: 40%;

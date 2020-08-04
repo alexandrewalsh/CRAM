@@ -217,8 +217,11 @@ function sendJsonForm(json) {
                 }
                 else {
                     output += '<tr><td><span class="word">' + key + ':</span></td>';
-                    for (var time in json[key]) {
-                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][time])) + '</span></td>';
+                    for (var i = 0; i < json[key].length; i++) {
+                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
+                        if (i + 1 < json[key].length) {
+                            output += '<td class="white-text">, </td>';
+                        }
                     }
                     output += '</tr>';
                 }
