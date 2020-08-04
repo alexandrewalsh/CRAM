@@ -1,10 +1,4 @@
-This Repo is meant for the STEP 2020 Internship Capstone Project. Very cash money.
+Front end Testing
 
-Principle authors:
-Nathan Zhao
-Enrique Avina
-Alexandre Walsh
 
-Hosts:
-Cassie Han
-Jiashen Wang
+Currently `player.getCurrentTime()` doesn't work, likely due to: https://stackoverflow.com/questions/32001561/youtube-player-api-getduration-getcurrenttime-getvideodata-not-working
