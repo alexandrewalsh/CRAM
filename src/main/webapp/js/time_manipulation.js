@@ -49,6 +49,5 @@ var onTimeClick = function() {
     text = timestampToEpoch(text).toString();
     var numPattern = /\d+/g;
     var time = text.match(numPattern);
-    console.log(player);
     player.seekTo(time[0], false);
 };

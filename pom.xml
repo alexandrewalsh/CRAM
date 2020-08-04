@@ -45,52 +45,53 @@
          <groupId>com.google.cloud</groupId>
          <artifactId>google-cloud-language</artifactId>
          <version>1.55.0</version>
-      </dependency>
-      <!-- Google API Client -->
-      <dependency>
-         <groupId>com.google.api-client</groupId>
-         <artifactId>google-api-client</artifactId>
-         <version>1.30.9</version>
-      </dependency>
-      <!-- Google Jetty Client -->
-      <dependency>
-         <groupId>com.google.oauth-client</groupId>
-         <artifactId>google-oauth-client-jetty</artifactId>
-         <version>1.12.0-beta</version>
-      </dependency>
-      <!-- Google HTTP Client -->
-      <dependency>
-         <groupId>com.google.http-client</groupId>
-         <artifactId>google-http-client-jackson2</artifactId>
-         <version>${project.http.version}</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-youtube -->
-      <dependency>
-         <groupId>com.google.apis</groupId>
-         <artifactId>google-api-services-youtube</artifactId>
-         <version>v3-rev222-1.25.0</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-      <dependency>
-         <groupId>org.apache.commons</groupId>
-         <artifactId>commons-lang3</artifactId>
-         <version>3.11</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-      <dependency>
-         <groupId>org.apache.httpcomponents</groupId>
-         <artifactId>httpclient</artifactId>
-         <version>4.5.12</version>
-      </dependency>
-      <dependency>
-         <groupId>com.google.code.findbugs</groupId>
-         <artifactId>jsr305</artifactId>
-         <version>3.0.2</version>
-      </dependency>
-   </dependencies>
-   <build>
-      <plugins>
-         <!-- Provides `mvn package appengine:run` for local testing
+    </dependency>
+    <!-- Google API Client -->
+   <dependency>
+     <groupId>com.google.api-client</groupId>
+     <artifactId>google-api-client</artifactId>
+     <version>1.30.9</version>
+   </dependency>
+   <!-- Google Jetty Client -->
+   <dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client-jetty</artifactId>
+    <version>1.12.0-beta</version>
+   </dependency>
+   <!-- Google HTTP Client -->
+   <dependency>
+    <groupId>com.google.http-client</groupId>
+    <artifactId>google-http-client-jackson2</artifactId>
+    <version>${project.http.version}</version>
+   </dependency>
+   <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-youtube -->
+   <dependency>
+    <groupId>com.google.apis</groupId>
+    <artifactId>google-api-services-youtube</artifactId>
+    <version>v3-rev222-1.25.0</version>
+   </dependency>
+   <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+   <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.11</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.12</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>3.0.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Provides `mvn package appengine:run` for local testing
            and `mvn package appengine:deploy` for deploying. -->
          <plugin>
             <groupId>com.google.cloud.tools</groupId>

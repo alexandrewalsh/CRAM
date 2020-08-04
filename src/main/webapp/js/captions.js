@@ -15,15 +15,11 @@
  * @param evt - the click event
  */
 function submitFn(obj, evt){
-    return new Promise((resolve, reject) => {
-        $("#search-wrapper").addClass('search-wrapper-active');
-        $('#resultsHeader').style = "display: unset;"
-        value = $(obj).find('.search-input').val().trim();
-        evt.preventDefault();
-        execute(value).then(()=>{
-            resolve();
-        });
-    });
+    $("#search-wrapper").addClass('search-wrapper-active');
+    $('#resultsHeader').style = "display: unset;"
+    value = $(obj).find('.search-input').val().trim();
+    evt.preventDefault();
+    execute(value);
 }
 
 /**
@@ -34,106 +30,53 @@ function submitFn(obj, evt){
  */
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute(url) {
-    return new Promise((resolve, reject) => {
-        // user inputs YouTube video URL
-        var videoId = "";
+    // user inputs YouTube video URL
+    var videoId = "";
 
-        try {
-            videoId = getIdFromUrl(url);
-        } catch {
-            renderYtError("Invalid youtube url!");
-            reject("Invalid YT URL");
-        }
+    try {
+        videoId = getIdFromUrl(url);
+    } catch {
+        renderYtError("Invalid youtube url!");
+        return;
+    }
 
-        // build the youtube src url
-        var youtubeSourceBuilder = "https://www.youtube.com/embed/"
-        youtubeSourceBuilder += videoId
-        youtubeSourceBuilder += "?enablejsapi=1"
-        youtubeSourceBuilder += "&origin=" + location.origin;
-        console.log(youtubeSourceBuilder);
+    // build the youtube src url
+    var youtubeSourceBuilder = "https://www.youtube.com/embed/"
+    youtubeSourceBuilder += videoId
+    youtubeSourceBuilder += "?enablejsapi=1"
+    youtubeSourceBuilder += "&origin=" + location.origin;
+    console.log(youtubeSourceBuilder);
 
-        // set player source
-        $('#player').attr('src', youtubeSourceBuilder);    
-        player = new YT.Player('player', {
-            events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
-        });
+    // set player source
+    $('#player').attr('src', youtubeSourceBuilder);    
+    player = new YT.Player('player', {
+        events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
+    });
 
-        if ($('#captionMockButton').text() == 'Mocking') {
-            sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS)).then(()=>{
-                resolve();
+    if ($('#captionMockButton').text() == 'Mocking') {
+        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
+        return;
+    }
+
+    gapi.client.youtube.captions.list({
+      "videoId": videoId,
+      "part": [
+        "id"
+      ]
+    }).then(function(response) {
+        if (response.result != null & response.result.items != null &
+            response.result.items.length > 0) {
+
+            const trackId = response.result.items[0].id;
+
+            getCaptions(trackId, url).then(json => {
+                // send to backend
+                sendJsonForm(json);
             });
         }
-
-        gapi.client.youtube.captions.list({
-            "videoId": videoId,
-            "part": [
-                "id"
-            ]
-        }).then(function(response) {
-            if (response.result != null & response.result.items != null &
-                response.result.items.length > 0) {
-
-                const trackId = response.result.items[0].id;
-
-                getCaptions(trackId, url).then(json => {
-                    // send to backend
-                    sendJsonForm(json).then(() => {
-                        resolve();   // register when elements have been rendered
-                    });
-                });
-            }
-        }, function(err) {
-            // top level error handler
-            console.error("Execute error", err); 
-            reject("Execute error: " + err);
-        });
-    });
-}
-
-/**
- * Create and send a form with the captions JSON. May need 
- * to authenticate users here too to prevent malicious requests. @enriqueavina
- * @param json - the JSON string representing the 
- *               parsed captions response
- * @return - HTML containing formatted captions and timestamps 
- */
-function sendJsonForm(json) {
-    return new Promise((resolve, reject) => {
-        var params = new URLSearchParams();
-        params.append('json', json);
-        $('#output').html('<p>Loading...</p>');
-
-        fetch('/caption', {
-                method: 'POST',
-                body: params,
-        }).then((response) => response.json()).then((json) => {
-                // display "Results" header
-                document.getElementById("resultsHeader").style.display = "inline";
-                var output = '<table>';
-
-                for (var key in json) {
-                    // METADATA line sent to log, all others are sent to Caption Results section.
-                    if (key == "METADATA") {
-                        console.log('NLP Fetch Time: ' +  json[key][1]);
-                        console.log('Total Youtube Captions: ' + json[key][0]);
-                        console.log('Total Entities Found: ' + json[key][2]);
-                    }
-                    else {
-                        output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
-                    }
-                }
-                output += '</table>';
-                document.getElementById('output').innerHTML = output;
-
-                // clickable timestamps
-                var elements = document.getElementsByClassName("timestamps");
-
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].addEventListener('click', onTimeClick, false);
-                }
-
-                resolve("Captions rendered");
-        });
+    }, function(err) {
+        // top level error handler
+        console.error("Execute error", err); 
     });
 }
 
@@ -243,7 +186,48 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+/**
+ * Create and send a form with the captions JSON. May need 
+ * to authenticate users here too to prevent malicious requests. @enriqueavina
+ * @param json - the JSON string representing the 
+ *               parsed captions response
+ * @return - HTML containing formatted captions and timestamps 
+ */
+function sendJsonForm(json) {
+    var params = new URLSearchParams();
+    params.append('json', json);
+    $('#output').html('<p>Loading...</p>');
 
+    fetch('/caption', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.json()).then((json) => {
+            // display "Results" header
+            document.getElementById("resultsHeader").style.display = "inline";
+            var output = '<table>';
+
+            for (var key in json) {
+                // METADATA line sent to log, all others are sent to Caption Results section.
+                if (key == "METADATA") {
+                    console.log('NLP Fetch Time: ' +  json[key][1]);
+                    console.log('Total Youtube Captions: ' + json[key][0]);
+                    console.log('Total Entities Found: ' + json[key][2]);
+                }
+                else {
+                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                }
+            }
+            output += '</table>';
+            document.getElementById('output').innerHTML = output;
+
+            // clickable timestamps
+            var elements = document.getElementsByClassName("timestamps");
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('click', onTimeClick, false);
+            }
+        });
+}
 
 // display that mocking captions are now active
 $(document).ready(() => {
