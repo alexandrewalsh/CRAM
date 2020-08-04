@@ -216,7 +216,11 @@ function sendJsonForm(json) {
                     console.log('Total Entities Found: ' + json[key][2]);
                 }
                 else {
-                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                    output += '<tr><td><span class="word">' + key + ':</span></td>';
+                    for (var time in json[key]) {
+                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][time])) + '</span></td>';
+                    }
+                    output += '</tr>';
                 }
             }
             output += '</table>';
