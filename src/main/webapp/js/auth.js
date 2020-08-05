@@ -9,10 +9,15 @@ const SIGN_IN_OPTIONS = {
 }
 
 $(document).ready(function() {
-/** event handler for clicking login link */
+    // event handler for clicking login link
     $("#loginBtn").click(function(e) {
         e.preventDefault();
         authenticate();
+    });
+
+    // event handler for logging out
+    $("#signoutButton").click(function(e) {
+        signOut();
     });
 });
 

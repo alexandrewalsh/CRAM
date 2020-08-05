@@ -6,6 +6,7 @@
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
+ * resizeIFrame
  * document.ready
  */
 
@@ -238,12 +239,22 @@ function sendJsonForm(json) {
         });
 }
 
+/**
+ * Resizes the embedded video based on window size, using either the 4:3 width to height ratio or the remaining screen
+ */
 function resizeIFrame() {
+    // Saves necessary parameters as variables
     var width = $('#player').width();
     var windowHeight = $(window).height();
     var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + windowHeight * 0.05;
+    
+    // The remaining avalable height for the video that avoids overflow
     var totalAvailableHeight = windowHeight - reservedHeight;
+
+    // The height of the video to keep the 4:3 aspect ratio
     var videoHeightFromRatio = width / 1.33;
+
+    // Defines and sets the best video height to ensure that overflow does not occur
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
     $('#output').height(playerHeight - $('#resultsHeader').height());
@@ -259,6 +270,7 @@ $(document).ready(() => {
         }
     });
 
+    // Resizes the video whenever the window resizes
     resizeIFrame();
     $(window).resize(() => {
         resizeIFrame();
