@@ -51,7 +51,7 @@ public final class NaturalLanguageServletTest {
     NaturalLanguageServlet servlet = null;
 
     @Before
-    public void Setup() {
+    public void Setup() throws IOException {
         // Instantiates mock and real objeccts
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
@@ -60,11 +60,7 @@ public final class NaturalLanguageServletTest {
 
         // Adds stubbing that does not require specific parameters
         when(request.getParameter(REQUEST_MOCK_PARAM)).thenReturn(REQUEST_MOCK_PARAM);
-        try { // Note: exception handling is needed here due to PrintWriter objects throwing IOExceptions
-            when(response.getWriter()).thenReturn(writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        when(response.getWriter()).thenReturn(writer);
     }
 
     @Test
