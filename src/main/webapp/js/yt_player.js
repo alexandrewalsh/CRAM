@@ -28,11 +28,24 @@ function onPlayerStateChange(event) {
   }
 }
 
-var video = $(".video")
-var vidCapDisplay = $(".container-row")
-var theaterToggle = $(".theater-toggle")
 
-theaterToggle.click(function() {
-    video.toggleClass("theater");
-    vidCapDisplay.toggleClass("container-column");
+$(document).ready(function() {
+
+    // Toggles theater mode with button click
+    $('.theater-toggle').click(function() {
+        var video = $('#flex-item-video');
+        var results = $('#flex-item-output');
+        if (video.hasClass('theater')) {
+            video.removeClass('theater');
+            results.removeClass('theater');
+            $('#output-container').removeClass('container-column');
+            $('#output-container').addClass('container-row');
+        } else {
+            video.addClass('theater');
+            results.addClass('theater');
+            $('#output-container').removeClass('container-row');
+            $('#output-container').addClass('container-column');
+        }
+    });
+
 });
