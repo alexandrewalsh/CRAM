@@ -94,6 +94,10 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.getWriter().println(result);
     }
 
+    /**
+     * Sets the NaturalLanguageProcessor instance for the servlet to use
+     * @param nlp The NaturalLanguageProcessor instance to use
+     */
     public void setNaturalLanguageProcessor(NaturalLanguageProcessor nlp) {
         this.nlp = nlp;
     }
