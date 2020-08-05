@@ -25,7 +25,6 @@ import com.google.cloud.language.v1.EncodingType;
 import com.google.cloud.language.v1.Entity;
 import com.google.cloud.language.v1.EntityMention;
 import com.google.cloud.language.v1.LanguageServiceClient;
-import com.google.sps.data.INaturalLanguage;
 import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
@@ -35,7 +34,7 @@ import java.util.Collections;
 import java.lang.Exception;
 
 /** Picks entities from text using Google's NLP API */
-public class NaturalLanguageProcessor implements INaturalLanguage{
+public class NaturalLanguageProcessor {
 
     // Error strings for exceptions
     private static final String CATEGORY_EXCEPTION = "Exception caught when trying to find the category of the input.";
@@ -91,7 +90,6 @@ public class NaturalLanguageProcessor implements INaturalLanguage{
      * @param text The string that contains the text to pull entities from
      * @return The list of entities as an unmodifiable list
      */
-    @Override
     public List<String> getEntities(String text) {
         Set<String> entities = new HashSet<String>();
         int tokens = text.split(WORD_DELIMITER).length;
@@ -160,5 +158,5 @@ public class NaturalLanguageProcessor implements INaturalLanguage{
         }
         return false;
     }
-
+    
 }

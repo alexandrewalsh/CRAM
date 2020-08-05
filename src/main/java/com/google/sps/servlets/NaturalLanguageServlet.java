@@ -26,8 +26,6 @@ import com.google.sps.data.NaturalLanguageProcessor;
 import com.google.sps.data.NaturalLanguagePostprocessor;
 import com.google.sps.data.YoutubeCaptions;
 import com.google.sps.data.TimeRangedText;
-import com.google.sps.data.INaturalLanguage;
-import com.google.sps.data.NaturalLanguageMock;
 import java.util.*;
 
 
@@ -37,8 +35,10 @@ public class NaturalLanguageServlet extends HttpServlet {
 
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
     private static final String REQUEST_JSON_PARAM = "json";
-    private static final String REQUEST_MOCK_PARAM = "mock";
+    private static final String REQUEST_NO_METADATA_PARAM = "no_metadata";
     private static final String METADATA_KEY = "METADATA";
+
+    private NaturalLanguageProcessor nlp;
 
     /**
      * Gets database data for comments
@@ -48,21 +48,20 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        boolean isMocking = false;
+        boolean includeMetadata = true;
         long startTime = System.nanoTime();
 
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
-        String mock = (String) request.getParameter(REQUEST_MOCK_PARAM);
+        String noMetadata = (String) request.getParameter(REQUEST_NO_METADATA_PARAM);
         List<String> entities = new ArrayList<String>();
         Gson gson = new Gson();
 
-        // Creates the INaturalLanguage object
-        INaturalLanguage nlp;
-        if (mock != null && mock.equals(REQUEST_MOCK_PARAM)) {
-            nlp = new NaturalLanguageMock();
-            isMocking = true;
-        } else {
-            nlp = new NaturalLanguageProcessor();
+        if (noMetadata != null) {
+            includeMetadata = false;
+        }
+
+        if (this.nlp == null) {
+            this.nlp = new NaturalLanguageProcessor();
         }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
@@ -81,7 +80,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         long endTime = System.nanoTime();
         
         // Adds metadata to the result
-        if (!isMocking) {
+        if (includeMetadata) {
             List<Long> metadataList = new ArrayList<>();
             metadataList.add((long)numCaptions); // Number of captions passed in by the request
             metadataList.add((long)(endTime - startTime)); // Amount of time the NLP process takes (in ns)
@@ -93,5 +92,9 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.setContentType(RESPONSE_JSON_CONTENT);
         String result = gson.toJson(resultMap);
         response.getWriter().println(result);
+    }
+
+    public void setNaturalLanguageProcessor(NaturalLanguageProcessor nlp) {
+        this.nlp = nlp;
     }
 }
