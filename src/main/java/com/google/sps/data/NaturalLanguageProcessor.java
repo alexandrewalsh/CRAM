@@ -89,7 +89,7 @@ public class NaturalLanguageProcessor implements INaturalLanguage{
     /**
      * Gets a list of entities using Google's NLP API
      * @param text The string that contains the text to pull entities from
-     * @return The list of entities
+     * @return The list of entities as an unmodifiable list
      */
     @Override
     public List<String> getEntities(String text) {

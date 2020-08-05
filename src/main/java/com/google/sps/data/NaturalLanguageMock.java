@@ -29,7 +29,7 @@ public class NaturalLanguageMock implements INaturalLanguage {
     /**
      * Gets a list of entities by splitting them by the comma delimiter
      * @param text The String text to extract entities from
-     * @return The list of entities from the text
+     * @return The list of entities from the text as an unmodifiable list
      */
     @Override
     public List<String> getEntities(String text) {
