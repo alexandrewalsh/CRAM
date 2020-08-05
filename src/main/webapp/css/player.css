@@ -84,3 +84,30 @@
   margin: auto;
   display: none;
 }
+
+@media screen and (max-width: 1000px) {
+    #header-buttons-div {
+        position: relative;
+        top: 0px;
+        right: 0px;
+        margin: auto;
+        text-align: center;
+    }
+
+    #heading-flex {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    #searchbar-div {
+        margin-top: 10%;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    #searchbar-div {
+        margin-top: 20%;
+    }
+}

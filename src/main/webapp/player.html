@@ -28,7 +28,7 @@
     </head>
     <body>
         <div id="heading-div" class="container">
-            <div>
+            <div id="heading-flex">
                 <h1>Lecture Buddy</h1>
                 <div id="header-buttons-div">
                     <a id="captionMockButton" class="headerBtn">Click Me to Mock Captions</a>
@@ -42,7 +42,7 @@
                     <form onsubmit="submitFn(this, event);">
                             <div id="search-wrapper" class="search-wrapper container-row">
                                 <div class="input-holder">
-                                    <input type="text" class="search-input" placeholder="Type to search" />
+                                    <input type="text" class="search-input" placeholder="Insert YouTube video URL" />
                                     <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
                                 </div>
                                 <span style="position: relative" class="close" onclick="searchToggle(this, event);"></span>
