@@ -93,15 +93,15 @@ public final class TimeRangedText {
      */
     @Override
     public boolean equals(Object other) {
-        // Tries to cast Object to a TimeRangedText, and returns false if there is a casting error
-        try {
-            TimeRangedText that = (TimeRangedText) other;
-            return (this.getStartTime() == that.getStartTime()) 
-                    && (this.getEndTime() == that.getEndTime()) 
-                    && (this.getText().equals(that.getText()));
-        } catch (Exception e) {
+        // First tests that the parameter Object is a TimeRangedText object
+        if (other == null || !(other instanceof TimeRangedText)) {
             return false;
         }
+        // Checks that both objects have the same parameter values
+        TimeRangedText that = (TimeRangedText) other;
+        return (this.getStartTime() == that.getStartTime()) 
+                && (this.getEndTime() == that.getEndTime()) 
+                && (this.getText().equals(that.getText()));
     }
     
 }
