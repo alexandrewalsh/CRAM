@@ -40,17 +40,16 @@
                 <!-- search bar -->
                 <div> <!-- unecessary div ? -->
                     <form onsubmit="submitFn(this, event);">
-                            <div id="search-wrapper" class="search-wrapper container-row">
+                            <div id="search-wrapper" class="search-wrapper container-row active">
+                                <a class="theater-toggle headerBtn" id="theater-button">Theater Mode</a>
                                 <div class="input-holder">
                                     <input type="text" class="search-input" placeholder="Type to search" />
                                     <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
                                 </div>
-                                <span style="position: relative" class="close" onclick="searchToggle(this, event);"></span>
                             </div>
                             <div class="result-container"></div>
                     </form>
                 </div>
-                <a class="theater-toggle headerBtn" id="theater-button">Theater Mode</a>
         </div>
         <!-- player & output -->
         <div id="output-container" class="container-row space-between top-10px">

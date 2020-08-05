@@ -34,5 +34,5 @@ var theaterToggle = $(".theater-toggle")
 
 theaterToggle.click(function() {
     video.toggleClass("theater");
-    vidCapDisplay.toggleClass("container-column");
+    $("#output-container").toggleClass("container-column");
 });
