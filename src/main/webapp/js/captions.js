@@ -37,7 +37,7 @@ function execute(url) {
     try {
         videoId = getIdFromUrl(url);
     } catch {
-        renderYtError("Invalid youtube url!");
+        renderError("Invalid youtube url!");
         return;
     }
 
@@ -104,13 +104,9 @@ function getCaptions(trackId, url) {
                 success(json);  
             });
         }, function(err) { 
-            console.error("errors getting captions", err); 
             renderError(err.status);
             failure(err);
         });
-    }).catch(function(error) {
-        // throw for top level handler to handle
-        throw error;   
     });
 }
 

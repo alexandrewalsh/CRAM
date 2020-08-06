@@ -121,3 +121,8 @@ table {
         margin-top: 20%;
     }
 }
+
+.error-placeholder::placeholder {
+    color: red;
+}
+
