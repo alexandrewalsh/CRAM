@@ -42,7 +42,7 @@ $(document).ready(function() {
             $('#output-container').addClass('container-row');
         } else {
             video.addClass('theater');
-            results.css('width', '90%');
+            results.css('width', '80%');
             $('#output-container').removeClass('container-row');
             $('#output-container').addClass('container-column');
         }

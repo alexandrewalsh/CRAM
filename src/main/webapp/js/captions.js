@@ -46,7 +46,6 @@ function execute(url) {
     youtubeSourceBuilder += videoId
     youtubeSourceBuilder += "?enablejsapi=1"
     youtubeSourceBuilder += "&origin=" + location.origin;
-    console.log(youtubeSourceBuilder);
 
     // display "Results" header
     document.getElementById("resultsHeader").style.display = "inline";
