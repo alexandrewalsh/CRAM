@@ -9,6 +9,9 @@ const SIGN_IN_OPTIONS = {
 }
 
 $(document).ready(function() {
+    if (window.location.pathname == '/') {
+        myMove();
+    }
     // event handler for clicking login link
     $("#loginBtn").click(function(e) {
         e.preventDefault();
@@ -118,4 +121,23 @@ function renderError(message) {
     }
 
     errorMsg.innerText = message;
+}
+
+function myMove() {
+  var elem = document.getElementsByClassName("wrapper")[0];   
+  var pos = 0;
+  var opacity = 0;
+  var opacityStep = 100 / 30 * 0.01;
+  var id = setInterval(frame, 25);
+  function frame() {
+    if (pos >= 30) {
+      clearInterval(id);
+      elem.style.opacity = 1;
+    } else {
+      pos++; 
+      elem.style.top = pos + 'vh'; 
+      opacity += opacityStep;
+      elem.style.opacity = opacity;
+    }
+  }
 }
