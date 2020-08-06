@@ -37,12 +37,12 @@ $(document).ready(function() {
         var results = $('#flex-item-output');
         if (video.hasClass('theater')) {
             video.removeClass('theater');
-            results.removeClass('theater');
+            results.css('width', '40%');
             $('#output-container').removeClass('container-column');
             $('#output-container').addClass('container-row');
         } else {
             video.addClass('theater');
-            results.addClass('theater');
+            results.css('width', '90%');
             $('#output-container').removeClass('container-row');
             $('#output-container').addClass('container-column');
         }
