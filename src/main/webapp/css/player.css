@@ -77,6 +77,10 @@ table {
     color: #FFFFFF;
 }
 
+.timestamps:hover {
+    color: grey;
+}
+
 .video {
     width: 50%;
 }
