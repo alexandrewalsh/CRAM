@@ -29,8 +29,14 @@
     color: #FFFFFF;
 }
 
-#flex-item-output {
+/* #flex-item-output {
     width: 40%;
+    margin: auto;
+} */
+
+table {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .space-between {
@@ -69,6 +75,10 @@
 .timestamps {
     cursor: pointer;
     color: #FFFFFF;
+}
+
+.timestamps:hover {
+    color: grey;
 }
 
 .video {
