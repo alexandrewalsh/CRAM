@@ -38,17 +38,14 @@
         </div>
         <div id="searchbar-div" class="container top-5">
                 <!-- search bar -->
-                <div> <!-- unecessary div ? -->
-                    <form onsubmit="submitFn(this, event);">
-                            <div id="search-wrapper" class="search-wrapper container-row active">
-                                <div class="input-holder">
-                                    <input type="text" class="search-input" placeholder="Insert YouTube video URL" />
-                                    <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
-                                </div>
-                            </div>
-                            <div class="result-container"></div>
-                    </form>
-                </div>
+                <form onsubmit="submitFn(this, event);">
+                    <div id="search-wrapper" class="search-wrapper container-row active">
+                        <div class="input-holder">
+                            <input type="text" class="search-input" placeholder="Insert YouTube video URL" />
+                            <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
+                        </div>
+                     </div>
+                </form>
         </div>
         <!-- player & output -->
         <div id="output-container" class="container-row space-between top-10px">
