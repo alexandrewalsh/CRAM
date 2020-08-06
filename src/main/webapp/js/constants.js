@@ -14,8 +14,8 @@ const MOCK_JSON_CAPTIONS = {
 
 const GAPI_CLIENT = 'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest';
 
-const PLAYER_URL = 'https://step-intern-2020.appspot.com/player.html';
-const LOGIN_URL_WITH_SLASH = 'https://step-intern-2020.appspot.com/';
-const LOGIN_URL_WITHOUT_SLASH = 'https://step-intern-2020.appspot.com';
+const PLAYER_URL = 'https://' + window.location.hostname + '/player.html';
+const LOGIN_URL_WITH_SLASH = 'https://' + window.location.hostname + '/';
+const LOGIN_URL_WITHOUT_SLASH = 'https://' + window.location.hostname;
 
 const IFRAME_API_URL = 'https://www.youtube.com/iframe_api';
