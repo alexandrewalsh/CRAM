@@ -15,6 +15,7 @@ const MOCK_JSON_CAPTIONS = {
 const GAPI_CLIENT = 'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest';
 
 const PLAYER_URL = 'https://' + window.location.hostname + '/player.html';
+const PLAYER_MOCK_URL = 'https://' + window.location.hostname + '/player.html?mock';
 const LOGIN_URL_WITH_SLASH = 'https://' + window.location.hostname + '/';
 const LOGIN_URL_WITHOUT_SLASH = 'https://' + window.location.hostname;
 

@@ -57,7 +57,9 @@ function execute(url) {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
 
-    if ($('#captionMockButton').text() == 'Mocking') {
+    // checks to see if mock captions should be used
+    const queryParams = new URLSearchParams(window.location.search)
+    if (queryParams.has('mock')) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
@@ -255,19 +257,12 @@ function resizeIFrame() {
     $('#output').height(playerHeight - $('#resultsHeader').height());
 }
 
-// display that mocking captions are now active
 $(document).ready(() => {
-    $('#captionMockButton').click(() => {
-        if ($('#captionMockButton').text() == 'Click Me to Mock Captions') {
-            $('#captionMockButton').text('Mocking');
-        } else {
-            $('#captionMockButton').text('Click Me to Mock Captions');
-        }
-    });
 
     // Resizes the video whenever the window resizes
     resizeIFrame();
     $(window).resize(() => {
         resizeIFrame();
     });
+
 });

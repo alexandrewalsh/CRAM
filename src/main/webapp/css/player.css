@@ -96,9 +96,6 @@ table {
   display: none;
 }
 
-#theater-button-container {
-    margin: auto;
-}
 
 @media screen and (max-width: 1000px) {
     #header-buttons-div {
