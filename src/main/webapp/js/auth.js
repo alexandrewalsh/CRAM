@@ -10,7 +10,7 @@ const SIGN_IN_OPTIONS = {
 
 $(document).ready(function() {
     if (window.location.pathname == '/') {
-        myMove();
+        loginBoxAnimation();
     }
     // event handler for clicking login link
     $("#loginBtn").click(function(e) {
@@ -123,21 +123,30 @@ function renderError(message) {
     errorMsg.innerText = message;
 }
 
-function myMove() {
-  var elem = document.getElementsByClassName("wrapper")[0];   
-  var pos = 0;
-  var opacity = 0;
-  var opacityStep = 100 / 30 * 0.01;
-  var id = setInterval(frame, 25);
-  function frame() {
-    if (pos >= 30) {
-      clearInterval(id);
-      elem.style.opacity = 1;
-    } else {
-      pos++; 
-      elem.style.top = pos + 'vh'; 
-      opacity += opacityStep;
-      elem.style.opacity = opacity;
+/**
+ * Animates the login box with a dropdown and opacity changes
+ */
+function loginBoxAnimation() {
+    // Sets necessary objects and initial parameters
+    var elem = document.getElementsByClassName("wrapper")[0];   
+    var pos = 0;
+    var targetPos = 30;
+    var opacity = 0;
+    var opacityStep = 100 / targetPos * 0.01;
+
+    // Changes frame animation every 25 milliseconds
+    var id = setInterval(frame, 25);
+
+    function frame() {
+        // Changes position and opacity until target position is reached
+        if (pos >= targetPos) {
+            clearInterval(id);
+            elem.style.opacity = 1;
+        } else {
+            pos++; 
+            elem.style.top = pos + 'vh'; 
+            opacity += opacityStep;
+            elem.style.opacity = opacity;
+        }
     }
-  }
 }
