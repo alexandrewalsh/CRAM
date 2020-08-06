@@ -9,9 +9,11 @@ const SIGN_IN_OPTIONS = {
 }
 
 $(document).ready(function() {
+    // Performs login box dropdown animation if on the login screen
     if (window.location.pathname == '/') {
         loginBoxAnimation();
     }
+    
     // event handler for clicking login link
     $("#loginBtn").click(function(e) {
         e.preventDefault();
@@ -129,14 +131,17 @@ function renderError(message) {
 function loginBoxAnimation() {
     // Sets necessary objects and initial parameters
     var elem = document.getElementsByClassName("wrapper")[0];   
-    var pos = 0;
-    var targetPos = 30;
-    var opacity = 0;
-    var opacityStep = 100 / targetPos * 0.01;
+    var pos = 0; // Initial position of 0vh
+    var targetPos = 30; // Final position is 30vh
+    var opacity = 0; // Initial opacity of 0
+    var opacityStep = 1 / targetPos; // The increase of opacity per frame to reach final opacity of 1
 
     // Changes frame animation every 25 milliseconds
     var id = setInterval(frame, 25);
 
+    /**
+     * Performs a single frame of the login box animation
+     */
     function frame() {
         // Changes position and opacity until target position is reached
         if (pos >= targetPos) {
