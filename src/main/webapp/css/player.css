@@ -29,10 +29,10 @@
     color: #FFFFFF;
 }
 
-/* #flex-item-output {
+#flex-item-output {
     width: 40%;
     margin: auto;
-} */
+}
 
 table {
     margin-left: auto;
@@ -83,6 +83,7 @@ table {
 
 .video {
     width: 50%;
+    margin: auto;
 }
 
 .theater {
