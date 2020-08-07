@@ -36,7 +36,28 @@ public class NaturalLanguageServlet extends HttpServlet {
 
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
     private static final String REQUEST_JSON_PARAM = "json";
+    private static final String REQUEST_ID_PARAM = "id";
     private static final String METADATA_KEY = "METADATA";
+
+
+    /**
+     * Gets database data for comments
+     * @param request The request object 
+     * @param response The response object
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DatabaseImpl dbi = new DatabaseImpl();
+        Gson gson = new Gson();
+        String videoID = (String) request.getParameter(REQUEST_ID_PARAM);
+
+        response.setContentType(RESPONSE_JSON_CONTENT);
+
+        if (dbi.videoInDb(videoID)) {
+            
+        }
+    }
+
 
     /**
      * Gets database data for comments
@@ -84,4 +105,6 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.setContentType(RESPONSE_JSON_CONTENT);
         response.getWriter().println(gson.toJson(resultMap));
     }
+
+
 }

@@ -62,6 +62,11 @@ function execute(url) {
         return;
     }
 
+    fetch('/caption?id=' + videoId, {
+            method: 'GET',
+        }).then((response) => response.text()).then((text) => alert(text));
+
+
     gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
