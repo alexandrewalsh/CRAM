@@ -16,25 +16,11 @@ body {
   background-attachment: fixed;
 }
 
-@keyframes dropdown {
-    from {
-        top: 0%;
-        opacity: 0;
-    }
-    to {
-        top: 40%;
-        opacity: 1;
-    }
-}
-
 .wrapper {
     width: 50%;
     margin: 0 auto;
     position: relative;
-    animation-name: dropdown;
-    animation-duration: 2s;
-    will-change: top, opacity;       
-    top: 40%;
+    opacity: 0;
 }
 
 .bg-container {
