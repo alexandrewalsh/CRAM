@@ -56,7 +56,14 @@ public class NaturalLanguageServlet extends HttpServlet {
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
-        dbi.addVideo(youtubeCaptions.getURL(), "no metadata");
+
+        String url = youtubeCaptions.getURL();
+        String video_id = url.split('v=')[1];
+        int ampersandPosition = video_id.indexOf('&');
+        if(ampersandPosition != -1) {
+            video_id = video_id.substring(0, ampersandPosition);
+        }
+        dbi.addVideo(video_id, "no metadata");
 
         int numCaptions = youtubeCaptions.getCaptions().size();
         NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();

@@ -151,6 +151,12 @@ public class DatabaseImpl implements DatabaseInterface {
         return hm.get(keyword); //error possibility
     }
 
+    // return true if specified video is in the database
+    public boolean videoInDb(String videoID) {
+        if (getVideo(videoID) == null) return false;
+        else return true;
+    }
+
     //================================================================================
     // Private Helper Functions
     //================================================================================
