@@ -37,6 +37,7 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
     private static final String REQUEST_JSON_PARAM = "json";
     private static final String REQUEST_ID_PARAM = "id";
+    private static final String RESPONSE_VIDEO_ID_NOT_IN_DB = "{}";
     private static final String METADATA_KEY = "METADATA";
 
 
@@ -47,20 +48,20 @@ public class NaturalLanguageServlet extends HttpServlet {
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         DatabaseImpl dbi = new DatabaseImpl();
         Gson gson = new Gson();
         String videoID = (String) request.getParameter(REQUEST_ID_PARAM);
-
         response.setContentType(RESPONSE_JSON_CONTENT);
 
-        if (dbi.videoInDb(videoID)) {
+        // Returns the entities mapping if the video id is in the database
+        if (videoID != null && dbi.videoInDb(videoID)) {
             Map<String, List<Long>> resultMap = dbi.getAllKeywords(videoID);
             response.getWriter().println(gson.toJson(resultMap));
         } else {
-            response.getWriter().println("{}");
+            response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
         }
     }
-
 
     /**
      * Gets database data for comments
@@ -70,10 +71,9 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        DatabaseImpl dbi = new DatabaseImpl();
-
         long startTime = System.nanoTime();
 
+        DatabaseImpl dbi = new DatabaseImpl();
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
         List<String> entities = new ArrayList<String>();
         Gson gson = new Gson();

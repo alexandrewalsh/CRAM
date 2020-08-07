@@ -7,6 +7,7 @@
  * getIdFromUrl
  * sendJsonForm
  * resizeIFrame
+ * styleEntitiesFromJson
  * document.ready
  */
 
@@ -64,36 +65,19 @@ function execute(url) {
         return;
     }
 
+    // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
             method: 'GET',
         }).then((response) => response.json()).then((json) => {
             if (json != {}) {
-            var output = '<table>';
+                // Sets the results table
+                document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
-            for (var key in json) {
-                // METADATA line sent to log, all others are sent to Caption Results section.
-                if (key == "METADATA") {
-                    console.log('NLP Fetch Time: ' +  json[key][1]);
-                    console.log('Total Youtube Captions: ' + json[key][0]);
-                    console.log('Total Entities Found: ' + json[key][2]);
+                // clickable timestamps
+                var elements = document.getElementsByClassName("timestamps");
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].addEventListener('click', onTimeClick, false);
                 }
-                else {
-                    output += '<tr><td><span class="word">' + key + ':</span></td>';
-                    for (var time in json[key]) {
-                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][time])) + '</span></td>';
-                    }
-                    output += '</tr>';
-                }
-            }
-            output += '</table>';
-            document.getElementById('output').innerHTML = output;
-
-            // clickable timestamps
-            var elements = document.getElementsByClassName("timestamps");
-
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].addEventListener('click', onTimeClick, false);
-            }
             return;
             }  
         });
@@ -239,28 +223,9 @@ function sendJsonForm(json) {
             method: 'POST',
             body: params,
         }).then((response) => response.json()).then((json) => {
-            var output = '<table>';
-
-            for (var key in json) {
-                // METADATA line sent to log, all others are sent to Caption Results section.
-                if (key == "METADATA") {
-                    console.log('NLP Fetch Time: ' +  json[key][1]);
-                    console.log('Total Youtube Captions: ' + json[key][0]);
-                    console.log('Total Entities Found: ' + json[key][2]);
-                }
-                else {
-                    output += '<tr><td><span class="word">' + key + ':</span></td>';
-                    for (var i = 0; i < json[key].length; i++) {
-                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
-                        if (i + 1 < json[key].length) {
-                            output += '<td class="white-text">, </td>';
-                        }
-                    }
-                    output += '</tr>';
-                }
-            }
-            output += '</table>';
-            document.getElementById('output').innerHTML = output;
+            
+            // Sets the results table
+            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
             // clickable timestamps
             var elements = document.getElementsByClassName("timestamps");
@@ -290,6 +255,34 @@ function resizeIFrame() {
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
     $('#output').height(playerHeight - $('#resultsHeader').height());
+}
+
+/**
+ * Builds the entities table from the json response
+ * @param json - The json response of entity data
+ */
+function styleEntitiesFromJson(json) {
+    var output = '<table>';
+
+    for (var key in json) {
+        // METADATA line sent to log, all others are sent to Caption Results section.
+        if (key == "METADATA") {
+            console.log('NLP Fetch Time: ' +  json[key][1]);
+            console.log('Total Youtube Captions: ' + json[key][0]);
+            console.log('Total Entities Found: ' + json[key][2]);
+        } else {
+            output += '<tr><td><span class="word">' + key + ':</span></td>';
+            for (var i = 0; i < json[key].length; i++) {
+                output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
+                if (i + 1 < json[key].length) {
+                    output += '<td class="white-text">, </td>';
+                }
+            }
+            output += '</tr>';
+        }
+    }
+    output += '</table>';
+    return output;
 }
 
 $(document).ready(() => {
