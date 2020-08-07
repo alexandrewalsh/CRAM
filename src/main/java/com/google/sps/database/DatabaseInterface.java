@@ -57,5 +57,12 @@ public interface DatabaseInterface {
      */
     public List<Long> getTimesForKeyword(String videoID, String keyword);
 
+    /*
+     * return true if specified video is in the database
+     * @param videoID       Youtube ID of video we are looking for
+     * @return              true if ID is stored in db, false if video ID not found
+     */
+    public boolean videoInDb(String videoID);
+
 }
   
