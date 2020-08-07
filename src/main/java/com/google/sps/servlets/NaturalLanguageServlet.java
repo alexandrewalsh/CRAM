@@ -54,7 +54,10 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.setContentType(RESPONSE_JSON_CONTENT);
 
         if (dbi.videoInDb(videoID)) {
-            
+            Map<String, List<Long>> resultMap = dbi.getAllKeywords(videoID);
+            response.getWriter().println(gson.toJson(resultMap));
+        } else {
+            response.getWriter().println("{}");
         }
     }
 
@@ -79,7 +82,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
 
         String url = youtubeCaptions.getURL();
-        String video_id = url.split('v=')[1];
+        String video_id = url.split("v=")[1];
         int ampersandPosition = video_id.indexOf('&');
         if(ampersandPosition != -1) {
             video_id = video_id.substring(0, ampersandPosition);
@@ -97,7 +100,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
         }
         Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
-        dbi.addClauses(youtubeCaptions.getURL(), resultMap);
+        dbi.addClauses(video_id, resultMap);
         
         long endTime = System.nanoTime();
         
