@@ -15,6 +15,7 @@
 package com.google.sps.servlets;
 
 import com.google.sps.database.DatabaseImpl;
+import com.google.sps.database.DatabaseInterface;
 import java.io.IOException;
 import java.lang.InterruptedException;
 import javax.servlet.annotation.WebServlet;
@@ -40,8 +41,12 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String REQUEST_NO_METADATA_PARAM = "no_metadata";
     private static final String RESPONSE_VIDEO_ID_NOT_IN_DB = "{}";
     private static final String METADATA_KEY = "METADATA";
+    private static final String DB_NO_METADATA = "no_metadata";
+    private static final String VIDEO_URL_ID_DELIMITER = "v=";
+    private static final char URL_QUERY_DELIMITER = '&';
 
     private NaturalLanguageProcessor nlp;
+    private DatabaseInterface db;
 
 
     /**
@@ -78,7 +83,6 @@ public class NaturalLanguageServlet extends HttpServlet {
         boolean includeMetadata = true;
         long startTime = System.nanoTime();
 
-        DatabaseImpl dbi = new DatabaseImpl();
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
         String noMetadata = (String) request.getParameter(REQUEST_NO_METADATA_PARAM);
         List<String> entities = new ArrayList<String>();
@@ -91,17 +95,28 @@ public class NaturalLanguageServlet extends HttpServlet {
         if (this.nlp == null) {
             this.nlp = new NaturalLanguageProcessor();
         }
+        if (this.db == null) {
+            this.db = new DatabaseImpl();
+        }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
 
-        String url = youtubeCaptions.getURL();
-        String video_id = url.split("v=")[1];
-        int ampersandPosition = video_id.indexOf('&');
-        if(ampersandPosition != -1) {
-            video_id = video_id.substring(0, ampersandPosition);
+        // Parses the video ID from the url
+        boolean addToDatabase = true;
+        String videoID = "";
+        String[] urlParts = youtubeCaptions.getURL().split(VIDEO_URL_ID_DELIMITER);
+        if (urlParts.length <= 1) {
+            addToDatabase = false;
         }
-        dbi.addVideo(video_id, "no metadata");
+        if (addToDatabase) {
+            videoID = urlParts[1];
+            int ampersandPosition = videoID.indexOf(URL_QUERY_DELIMITER);
+            if (ampersandPosition != -1) {
+                videoID = videoID.substring(0, ampersandPosition);
+            }
+            db.addVideo(videoID, DB_NO_METADATA);
+        }
 
         int numCaptions = youtubeCaptions.getCaptions().size();
         NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
@@ -113,7 +128,11 @@ public class NaturalLanguageServlet extends HttpServlet {
             postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
         }
         Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
-        dbi.addClauses(video_id, resultMap);
+
+        // Adds clauses to database if a video id has been found
+        if (addToDatabase) {
+            db.addClauses(videoID, resultMap);
+        }
         
         long endTime = System.nanoTime();
         
@@ -138,6 +157,14 @@ public class NaturalLanguageServlet extends HttpServlet {
      */
     public void setNaturalLanguageProcessor(NaturalLanguageProcessor nlp) {
         this.nlp = nlp;
+    }
+
+    /**
+     * Sets the DatabaseInterface instance for the servlet to use
+     * @param db The DatabaseInterface instance to use
+     */
+    public void setDatabase(DatabaseInterface db) {
+        this.db = db;
     }
 
 
