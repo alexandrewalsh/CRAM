@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import com.google.sps.database.DatabaseImpl;
 import java.io.IOException;
 import java.lang.InterruptedException;
 import javax.servlet.annotation.WebServlet;
@@ -45,6 +46,8 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        DatabaseImpl dbi = new DatabaseImpl();
+
         long startTime = System.nanoTime();
 
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
@@ -53,6 +56,8 @@ public class NaturalLanguageServlet extends HttpServlet {
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
+        dbi.addVideo(youtubeCaptions.getURL(), "no metadata");
+
         int numCaptions = youtubeCaptions.getCaptions().size();
         NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
         List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(youtubeCaptions.getCaptions());
@@ -64,6 +69,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
         }
         Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
+        dbi.addClauses(youtubeCaptions.getURL(), resultMap);
         
         long endTime = System.nanoTime();
         
