@@ -64,7 +64,37 @@ function execute(url) {
 
     fetch('/caption?id=' + videoId, {
             method: 'GET',
-        }).then((response) => response.text()).then((text) => alert(text));
+        }).then((response) => response.json()).then((json) => {
+            if (json != {}) {
+            var output = '<table>';
+
+            for (var key in json) {
+                // METADATA line sent to log, all others are sent to Caption Results section.
+                if (key == "METADATA") {
+                    console.log('NLP Fetch Time: ' +  json[key][1]);
+                    console.log('Total Youtube Captions: ' + json[key][0]);
+                    console.log('Total Entities Found: ' + json[key][2]);
+                }
+                else {
+                    output += '<tr><td><span class="word">' + key + ':</span></td>';
+                    for (var time in json[key]) {
+                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][time])) + '</span></td>';
+                    }
+                    output += '</tr>';
+                }
+            }
+            output += '</table>';
+            document.getElementById('output').innerHTML = output;
+
+            // clickable timestamps
+            var elements = document.getElementsByClassName("timestamps");
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('click', onTimeClick, false);
+            }
+            return;
+            }  
+        });
 
 
     gapi.client.youtube.captions.list({
