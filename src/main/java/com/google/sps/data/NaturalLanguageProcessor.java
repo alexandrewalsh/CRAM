@@ -88,14 +88,14 @@ public class NaturalLanguageProcessor {
     /**
      * Gets a list of entities using Google's NLP API
      * @param text The string that contains the text to pull entities from
-     * @return The list of entities
+     * @return The list of entities as an unmodifiable list
      */
     public List<String> getEntities(String text) {
         Set<String> entities = new HashSet<String>();
         int tokens = text.split(WORD_DELIMITER).length;
         boolean hasAcademicCategory = false;
 
-        // Calls the NLP API, but returns null if exceptions occur
+        // Calls the NLP API, but returns null if the API call fails
         try (LanguageServiceClient language = LanguageServiceClient.create()) {
             
             Document doc = Document.newBuilder().setContent(text).setType(Type.PLAIN_TEXT).build();
@@ -158,5 +158,5 @@ public class NaturalLanguageProcessor {
         }
         return false;
     }
-
+    
 }

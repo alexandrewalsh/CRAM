@@ -38,7 +38,7 @@ public class NaturalLanguagePreprocessor {
 
     /**
      * Constructor that uses a specified time threshold
-     * @param timeThreshold The time threshold to use in concatenating TimeRangedTexts
+     * @param timeThreshold The time threshold in seconds to use in concatenating TimeRangedTexts
      */
     public NaturalLanguagePreprocessor(long timeThreshold) {
         this.timeThreshold = timeThreshold;

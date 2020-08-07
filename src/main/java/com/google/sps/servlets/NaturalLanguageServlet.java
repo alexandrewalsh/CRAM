@@ -37,8 +37,11 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String RESPONSE_JSON_CONTENT = "application/json;";
     private static final String REQUEST_JSON_PARAM = "json";
     private static final String REQUEST_ID_PARAM = "id";
+    private static final String REQUEST_NO_METADATA_PARAM = "no_metadata";
     private static final String RESPONSE_VIDEO_ID_NOT_IN_DB = "{}";
     private static final String METADATA_KEY = "METADATA";
+
+    private NaturalLanguageProcessor nlp;
 
 
     /**
@@ -63,6 +66,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         }
     }
 
+
     /**
      * Gets database data for comments
      * @param request The request object 
@@ -71,12 +75,22 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        boolean includeMetadata = true;
         long startTime = System.nanoTime();
 
         DatabaseImpl dbi = new DatabaseImpl();
         String json = (String) request.getParameter(REQUEST_JSON_PARAM);
+        String noMetadata = (String) request.getParameter(REQUEST_NO_METADATA_PARAM);
         List<String> entities = new ArrayList<String>();
         Gson gson = new Gson();
+
+        if (noMetadata != null) {
+            includeMetadata = false;
+        }
+
+        if (this.nlp == null) {
+            this.nlp = new NaturalLanguageProcessor();
+        }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
         YoutubeCaptions youtubeCaptions = gson.fromJson(json, YoutubeCaptions.class);
@@ -94,7 +108,6 @@ public class NaturalLanguageServlet extends HttpServlet {
         List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(youtubeCaptions.getCaptions());
         
         // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
-        NaturalLanguageProcessor nlp = new NaturalLanguageProcessor();
         NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
         for (TimeRangedText text : preprocessedResults) {
             postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
@@ -105,15 +118,26 @@ public class NaturalLanguageServlet extends HttpServlet {
         long endTime = System.nanoTime();
         
         // Adds metadata to the result
-        List<Long> metadataList = new ArrayList<>();
-        metadataList.add((long)numCaptions); // Number of captions passed in by the request
-        metadataList.add((long)(endTime - startTime)); // Amount of time the NLP process takes (in ns)
-        metadataList.add((long)resultMap.size() - 1); // Number of entities found
-        resultMap.put(METADATA_KEY, metadataList);
+        if (includeMetadata) {
+            List<Long> metadataList = new ArrayList<>();
+            metadataList.add((long)numCaptions); // Number of captions passed in by the request
+            metadataList.add((long)(endTime - startTime)); // Amount of time the NLP process takes (in ns)
+            metadataList.add((long)resultMap.size()); // Number of entities found
+            resultMap.put(METADATA_KEY, metadataList);
+        }
 
         // Converts Java object to JSON and sends it back to the front end
         response.setContentType(RESPONSE_JSON_CONTENT);
-        response.getWriter().println(gson.toJson(resultMap));
+        String result = gson.toJson(resultMap);
+        response.getWriter().println(result);
+    }
+
+    /**
+     * Sets the NaturalLanguageProcessor instance for the servlet to use
+     * @param nlp The NaturalLanguageProcessor instance to use
+     */
+    public void setNaturalLanguageProcessor(NaturalLanguageProcessor nlp) {
+        this.nlp = nlp;
     }
 
 
