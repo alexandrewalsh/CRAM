@@ -85,4 +85,23 @@ public final class TimeRangedText {
     public String toString() {
         return OPEN_CURLY + START + startTime + DELIMITER + END + endTime + DELIMITER + TEXT + text + CLOSE_CURLY;
     }
+
+    /**
+     * Tests if two TimeRangedText objects are equal
+     * @param other The other object to check equality with this object
+     * @return Whether the input object has the same parameter values as this object
+     */
+    @Override
+    public boolean equals(Object other) {
+        // First tests that the parameter Object is a TimeRangedText object
+        if (other == null || !(other instanceof TimeRangedText)) {
+            return false;
+        }
+        // Checks that both objects have the same parameter values
+        TimeRangedText that = (TimeRangedText) other;
+        return (this.getStartTime() == that.getStartTime()) 
+                && (this.getEndTime() == that.getEndTime()) 
+                && (this.getText().equals(that.getText()));
+    }
+    
 }
