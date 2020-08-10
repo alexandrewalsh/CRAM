@@ -4,6 +4,7 @@
 
 #output {
     overflow: scroll;
+    width: 100%;
 }
 
 #player {

@@ -53,6 +53,16 @@ function execute(url) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
+    // checks if mock nlp should be used
+    if (queryParams.has('mockall')) {
+        console.log("TEST");
+
+        // Sets the results table
+        document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
+        // clickable timestamps
+        setClickableTimestamps();
+        console.log("TEST");
+    }
 
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
@@ -63,10 +73,8 @@ function execute(url) {
                 document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
                 // clickable timestamps
-                var elements = document.getElementsByClassName("timestamps");
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].addEventListener('click', onTimeClick, false);
-                }
+                setClickableTimestamps();
+
                 console.log("Fetching captions from database...");
             } else {
                 // video id not found in db, fetching from Youtube API
@@ -250,10 +258,7 @@ function sendJsonForm(json) {
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
             // clickable timestamps
-            var elements = document.getElementsByClassName("timestamps");
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].addEventListener('click', onTimeClick, false);
-            }
+            setClickableTimestamps();
         });
 }
 
@@ -304,6 +309,16 @@ function styleEntitiesFromJson(json) {
     }
     output += '</table>';
     return output;
+}
+
+/**
+ * Sets the timestamp class objects to be clickable
+ */
+function setClickableTimestamps() {
+    var elements = document.getElementsByClassName("timestamps");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', onTimeClick, false);
+    }
 }
 
 $(document).ready(() => {
