@@ -36,6 +36,14 @@ public final class YoutubeCaptions {
     }
 
     /**
+     * Gets the url of the video
+     * @return The url of the YouTube video
+     */
+    public String getURL() {
+        return this.url;
+    }
+
+    /**
      * Gets the String representation of the captions
      * @return The String representation of captions list
      */
