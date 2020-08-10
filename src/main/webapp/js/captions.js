@@ -312,4 +312,9 @@ $(document).ready(() => {
         resizeIFrame();
     });
 
+    // add event listeners for all caption elements
+    $('.word').click(()=> {
+        // render elements under video
+    });
+
 });
