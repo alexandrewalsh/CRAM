@@ -214,8 +214,46 @@
 	color: #B7B7B7;
 }
 
+
 @media screen and (max-width: 560px) {
 	.search-wrapper.active .input-holder {
 		width: 175px;
 	}
+}
+
+
+/** Entity Search Bar */
+form.entity-search input[type=text] {
+  padding: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+  float: left;
+  width: 80%;
+  background: #f1f1f1;
+}
+
+form.entity-search button {
+  float: left;
+  width: 20%;
+  padding: 10px;
+  background: #2196F3;
+  color: white;
+  font-size: 17px;
+  border: 1px solid grey;
+  border-left: none;
+  cursor: pointer;
+}
+
+form.entity-search button:hover {
+  background: #0b7dda;
+}
+
+form.entity-search::after {
+  content: "";
+  clear: both;
+}
+
+#entity-search-form {
+    margin: auto;
+    width: 350px;
 }

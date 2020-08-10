@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/search-bar.css">
         <link rel="stylesheet" href="css/player.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script defer src="js/time_manipulation.js"></script>
         <script defer src="js/search_bar.js"></script>
         <script defer src="js/error_handling.js"></script>
@@ -54,6 +55,15 @@
             </div>
             <div id="flex-item-output" class="text-center">
                 <h1 id="resultsHeader" class="text-center hide">Results</h1>
+
+
+                <form id="entity-search-form" class="entity-search" action="">
+                    <input type="text" placeholder="Search.." name="query">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+
+
+
                 <div id="output"></div>
             </div>
         </div>
