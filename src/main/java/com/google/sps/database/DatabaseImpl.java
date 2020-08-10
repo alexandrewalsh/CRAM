@@ -20,6 +20,10 @@ public class DatabaseImpl implements DatabaseInterface {
 
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    private static final String vKind = "video";
+    private static final String mKind = "metadata";
+    private static final String cKind = "caption";
+    private static final String tKind = "timestamps";
 
     //================================================================================
     // General Test Function (not used for official testing)
@@ -43,15 +47,15 @@ public class DatabaseImpl implements DatabaseInterface {
         timestamps2.add(404L);
         hm.put(caption2, timestamps2);
 
-        Entity myEnt = new Entity("video","ncbb5B85sd2");
+        Entity myEnt = new Entity(vKind,"ncbb5B85sd2");
 
         datastore.put(myEnt);
 
         List<Entity> le = new ArrayList<>();
 
         for (Map.Entry<String, List<Long>> me : hm.entrySet()) {
-            Entity tempEnt = new Entity("caption", me.getKey(), myEnt.getKey());
-            tempEnt.setProperty("timestamps", me.getValue());
+            Entity tempEnt = new Entity(cKind, me.getKey(), myEnt.getKey());
+            tempEnt.setProperty(tKind, me.getValue());
             datastore.put(tempEnt);
             le.add(tempEnt);
         }
@@ -68,10 +72,10 @@ public class DatabaseImpl implements DatabaseInterface {
 
     // add a video to the database
     public int addVideo(String videoID, String metadata) { 
-        Entity vidEnt = new Entity("video", videoID); //error possibility
+        Entity vidEnt = new Entity(vKind, videoID); //error possibility
         datastore.put(vidEnt);  //error possibility
 
-        Entity metaEnt = new Entity("metadata", metadata, vidEnt.getKey()); //error possibility
+        Entity metaEnt = new Entity(mKind, metadata, vidEnt.getKey()); //error possibility
         datastore.put(metaEnt); //error possibility
 
         return 0;
@@ -80,8 +84,8 @@ public class DatabaseImpl implements DatabaseInterface {
     // add a keyphrase + timestamp pair to a particular video in the db
     public int addClause(String videoID, String keyword, List<Long> timestamps) {
         Entity vidEnt = getVideo(videoID);  //error possibility
-        Entity keyEnt = new Entity("caption", keyword, vidEnt.getKey()); //error possibility
-        keyEnt.setProperty("timestamps", timestamps); //error possibility
+        Entity keyEnt = new Entity(cKind, keyword, vidEnt.getKey()); //error possibility
+        keyEnt.setProperty(tKind, timestamps); //error possibility
         datastore.put(keyEnt); //error possibility
 
         return 0;
@@ -107,9 +111,10 @@ public class DatabaseImpl implements DatabaseInterface {
 
         if (overwrite) {
             datastore.delete(metaKey); //error possibility
-            metaEnt = new Entity("metadata", metadata, vidEnt.getKey()); //error possibility
+            metaEnt = new Entity(mKind, metadata, vidEnt.getKey()); //error possibility
             datastore.put(metaEnt); //error possibility
         } else {
+// TO BE IMPLEMENTED (do not delete)
             /*
             try {
                 metaEnt = datastore.get(metaKey); //error possibility
@@ -118,7 +123,7 @@ public class DatabaseImpl implements DatabaseInterface {
             }
             String current = metaEnt.getProperty("ID/Name").toString(); //error possibility
             datastore.delete(metaKey); //error possibility
-            metaEnt = new Entity("metadata", current + metadata, vidEnt.getKey()); //error possibility
+            metaEnt = new Entity(m, current + metadata, vidEnt.getKey()); //error possibility
             */
             
         }
@@ -132,13 +137,13 @@ public class DatabaseImpl implements DatabaseInterface {
         Entity vidEnt = getVideo(videoID);  //error possibility
         Key vidKey = vidEnt.getKey();  //error possibility
 
-        Query query = new Query("caption", vidKey); //error possibility
+        Query query = new Query(cKind, vidKey); //error possibility
         PreparedQuery results = datastore.prepare(query); //error possibility
 
         Map<String, List<Long>> hm = new HashMap<String, List<Long>>();
 
         for (Entity e : results.asIterable()) {
-            hm.put(e.getKey().getName(), (List<Long>)e.getProperty("timestamps")); //error possibility
+            hm.put(e.getKey().getName(), (List<Long>)e.getProperty(t)); //error possibility
         }
 
         return hm;
@@ -161,9 +166,13 @@ public class DatabaseImpl implements DatabaseInterface {
     // Private Helper Functions
     //================================================================================
 
-    // helper function to query database for specific video entity
+    /*
+     * helper function to query database for specific video entity
+     * @param videoID       Youtube ID of the video already in the db
+     * @return              Entity representing the video in the db
+     */
     private Entity getVideo(String videoID) {
-        Query query = new Query("video");
+        Query query = new Query(vKind);
         PreparedQuery results = datastore.prepare(query); //error possibility
 
         for (Entity entity : results.asIterable()) {
@@ -174,10 +183,13 @@ public class DatabaseImpl implements DatabaseInterface {
         return null;
     }
 
-    // helper function to query database for specific metadata entity
-    // whose parent is videoID
+    /*
+     * helper function to query database for specific metadata entity whose parent is videoID
+     * @param videoID       Youtube ID of the video already in the db
+     * @return              Entity representing the metadata of the video in the db
+     */
     private Entity getMetadata(String videoID) {
-        Query query = new Query("metadata");
+        Query query = new Query(mKind);
         PreparedQuery results = datastore.prepare(query); //error possibility
 
         for (Entity entity : results.asIterable()) {
