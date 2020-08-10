@@ -55,13 +55,11 @@ function execute(url) {
     }
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
-        console.log("TEST");
-
         // Sets the results table
         document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
         // clickable timestamps
         setClickableTimestamps();
-        console.log("TEST");
+        return;
     }
 
     // checks to see if captions already exist in the database
