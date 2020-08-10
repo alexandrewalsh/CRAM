@@ -256,4 +256,5 @@ form.entity-search::after {
 #entity-search-form {
     margin: auto;
     width: 350px;
+    display: none;
 }

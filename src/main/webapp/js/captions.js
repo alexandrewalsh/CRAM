@@ -89,6 +89,9 @@ function displayVideo(videoId) {
     // display "Results" header
     document.getElementById("resultsHeader").style.display = "inline";
 
+    // Displays entity searchbar
+    $('#entity-search-form').css('display', 'unset');
+
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
     resizeIFrame();  
@@ -248,7 +251,6 @@ function sendJsonForm(json) {
 
             // clickable timestamps
             var elements = document.getElementsByClassName("timestamps");
-
             for (var i = 0; i < elements.length; i++) {
                 elements[i].addEventListener('click', onTimeClick, false);
             }
