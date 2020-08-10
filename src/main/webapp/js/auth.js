@@ -85,7 +85,7 @@ function checkLogin() {
 
         GoogleAuth.then(function() {
             if (GoogleAuth.isSignedIn.get()) {
-                if (window.location.href !== PLAYER_URL && window.location.href !== PLAYER_MOCK_URL) {
+                if (window.location.href !== PLAYER_URL && window.location.href !== PLAYER_MOCK_URL && window.location.href !== PLAYER_MOCKALL_URL) {
                     window.location.replace(PLAYER_URL);    // redirect to player
                 }
             } else {

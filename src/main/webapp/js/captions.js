@@ -53,6 +53,14 @@ function execute(url) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
+    // checks if mock nlp should be used
+    if (queryParams.has('mockall')) {
+        // Sets the results table
+        document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
+        // clickable timestamps
+        setClickableTimestamps();
+        return;
+    }
 
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
@@ -63,10 +71,8 @@ function execute(url) {
                 document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
                 // clickable timestamps
-                var elements = document.getElementsByClassName("timestamps");
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].addEventListener('click', onTimeClick, false);
-                }
+                setClickableTimestamps();
+
                 console.log("Fetching captions from database...");
             } else {
                 // video id not found in db, fetching from Youtube API
@@ -88,6 +94,9 @@ function displayVideo(videoId) {
 
     // display "Results" header
     document.getElementById("resultsHeader").style.display = "inline";
+
+    // Displays entity searchbar
+    $('#entity-search-form').css('display', 'unset');
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
@@ -247,11 +256,7 @@ function sendJsonForm(json) {
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
             // clickable timestamps
-            var elements = document.getElementsByClassName("timestamps");
-
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].addEventListener('click', onTimeClick, false);
-            }
+            setClickableTimestamps();
         });
 }
 
@@ -302,6 +307,16 @@ function styleEntitiesFromJson(json) {
     }
     output += '</table>';
     return output;
+}
+
+/**
+ * Sets the timestamp class objects to be clickable
+ */
+function setClickableTimestamps() {
+    var elements = document.getElementsByClassName("timestamps");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', onTimeClick, false);
+    }
 }
 
 $(document).ready(() => {
