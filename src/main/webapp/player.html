@@ -58,8 +58,14 @@
 
 
                 <form id="entity-search-form" class="entity-search" action="entitySearchSubmit" autocomplete="off">
-                    <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
-                    <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                    <div>
+                        <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
+                        <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                    </div>
+                    <select id="entity-sort" name="sort-option">
+                        <option value="alphabetical">A-Z</option>
+                        <option value="chronological">Time</option>
+                    </select>
                 </form>
 
 

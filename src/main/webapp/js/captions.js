@@ -96,7 +96,7 @@ function displayVideo(videoId) {
     document.getElementById("resultsHeader").style.display = "inline";
 
     // Displays entity searchbar
-    $('#entity-search-form').css('display', 'unset');
+    $('#entity-search-form').css('display', 'flex');
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  

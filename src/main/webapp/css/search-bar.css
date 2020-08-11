@@ -226,7 +226,7 @@
 form.entity-search input[type=text] {
     padding: 10px;
     float: left;
-    width: 80%;
+    width: 70%;
     background: #f1f1f1;
     border-radius: 50px 0px 0px 50px;
 }
@@ -263,6 +263,7 @@ form.entity-search::after {
 
 #entity-search-form {
     margin: auto;
-    width: 350px;
+    width: 100%;
     display: none;
+    justify-content: space-between;
 }
