@@ -13,6 +13,9 @@
  * document.ready
  */
 
+/** global variables holding the json response for timestamps*/
+var timestamps;
+
 /**
  * Event handler for search bar query, entry point
  * @param obj - the button invoking the click
@@ -53,32 +56,35 @@ function execute(url) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
+    
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
         // Sets the results table
         document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
-        // clickable timestamps
-        setClickableTimestamps();
+
+        // clickable entities and timestamps
+        setClickableEntities();
+        
         return;
     }
 
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
-            method: 'GET',
-        }).then((response) => response.json()).then((json) => {
-            if (Object.keys(json).length > 0) {
-                // Sets the results table
-                document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
+        method: 'GET',
+    }).then((response) => response.json()).then((json) => {
+        if (Object.keys(json).length > 0) {
+            // Sets the results table
+            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
-                // clickable timestamps
-                setClickableTimestamps();
+            // clickable entities and timestamps
+            setClickableEntities();
 
-                console.log("Fetching captions from database...");
-            } else {
-                // video id not found in db, fetching from Youtube API
-                beginCaptionRequest(videoId, url);
-            }
-        });
+            console.log("Fetching captions from database...");
+        } else {
+            // video id not found in db, fetching from Youtube API
+            beginCaptionRequest(videoId, url);
+        }
+    });
 }
 
 /**
@@ -255,8 +261,8 @@ function sendJsonForm(json) {
             // Sets the results table
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
-            // clickable timestamps
-            setClickableTimestamps();
+            // clickable entities and timestamps
+            setClickableEntities();
         });
 }
 
@@ -279,6 +285,9 @@ function resizeIFrame() {
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
     $('#output').height(playerHeight - $('#resultsHeader').height());
+
+    // change output size to match the player
+    $("#flex-item-output").css("height", $("#player").height());
 }
 
 /**
@@ -286,6 +295,8 @@ function resizeIFrame() {
  * @param json - The json response of entity data
  */
 function styleEntitiesFromJson(json) {
+    timestamps = json; // set global variable
+
     var output = '<table>';
 
     for (var key in json) {
@@ -295,19 +306,15 @@ function styleEntitiesFromJson(json) {
             console.log('Total Youtube Captions: ' + json[key][0]);
             console.log('Total Entities Found: ' + json[key][2]);
         } else {
-            output += '<tr><td><span class="word">' + key + ':</span></td>';
-            for (var i = 0; i < json[key].length; i++) {
-                output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
-                if (i + 1 < json[key].length) {
-                    output += '<td class="white-text">, </td>';
-                }
-            }
+            output += '<tr><td><span class="word">' + key + '</span></td>';
             output += '</tr>';
         }
     }
+    
     output += '</table>';
     return output;
 }
+
 
 /**
  * Sets the timestamp class objects to be clickable
@@ -319,6 +326,31 @@ function setClickableTimestamps() {
     }
 }
 
+/**
+ * Adds click event listeners to word entities to show
+ * timestamps. Also makes the timestamps clickable.
+ */
+function setClickableEntities() {
+    $('.word').bind("click", function(){
+        const entity = this.innerText;
+            
+        // delete all children
+        $("#timestamp-timeline").empty();
+
+        // query json
+        for (var index in timestamps[entity]) {
+            const timestamp = epochToTimestamp(timestamps[entity][index]);
+            $("#timestamp-timeline").append("<span class='timestamps'>"+timestamp+"</span>");
+            $("#timestamp-timeline").append("<p>,</p>");
+        }
+
+        $("#timestamp-timeline p:last-child").remove();
+        
+        // clickable timestamps
+        setClickableTimestamps();
+    });
+}
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -326,5 +358,4 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
-
 });
