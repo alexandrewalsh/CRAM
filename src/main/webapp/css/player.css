@@ -82,6 +82,7 @@ table {
 .timestamps {
     cursor: pointer;
     color: #FFFFFF;
+    padding: 0 0 10px 10px;
 }
 
 .timestamps:hover {
