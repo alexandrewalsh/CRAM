@@ -3,6 +3,10 @@
  *
 */
 
+.input-holder {
+    margin: auto
+}
+
 .search-wrapper {
 	position: absolute;
 	-webkit-transform: translate(-50%, -50%);
@@ -212,6 +216,6 @@
 
 @media screen and (max-width: 560px) {
 	.search-wrapper.active .input-holder {
-		width: 200px;
+		width: 175px;
 	}
 }

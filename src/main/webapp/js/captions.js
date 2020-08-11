@@ -6,6 +6,7 @@
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
+ * resizeIFrame
  * document.ready
  */
 
@@ -36,7 +37,7 @@ function execute(url) {
     try {
         videoId = getIdFromUrl(url);
     } catch {
-        renderYtError("Invalid youtube url!");
+        renderError("Invalid youtube url!");
         return;
     }
 
@@ -45,15 +46,20 @@ function execute(url) {
     youtubeSourceBuilder += videoId
     youtubeSourceBuilder += "?enablejsapi=1"
     youtubeSourceBuilder += "&origin=" + location.origin;
-    console.log(youtubeSourceBuilder);
+
+    // display "Results" header
+    document.getElementById("resultsHeader").style.display = "inline";
 
     // set player source
-    $('#player').attr('src', youtubeSourceBuilder);    
+    $('#player').attr('src', youtubeSourceBuilder);  
+    resizeIFrame();  
     player = new YT.Player('player', {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
 
-    if ($('#captionMockButton').text() == 'Mocking') {
+    // checks to see if mock captions should be used
+    const queryParams = new URLSearchParams(window.location.search)
+    if (queryParams.has('mock')) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
@@ -99,13 +105,9 @@ function getCaptions(trackId, url) {
                 success(json);  
             });
         }, function(err) { 
-            console.error("errors getting captions", err); 
             renderError(err.status);
             failure(err);
         });
-    }).catch(function(error) {
-        // throw for top level handler to handle
-        throw error;   
     });
 }
 
@@ -202,8 +204,6 @@ function sendJsonForm(json) {
             method: 'POST',
             body: params,
         }).then((response) => response.json()).then((json) => {
-            // display "Results" header
-            document.getElementById("resultsHeader").style.display = "inline";
             var output = '<table>';
 
             for (var key in json) {
@@ -214,7 +214,14 @@ function sendJsonForm(json) {
                     console.log('Total Entities Found: ' + json[key][2]);
                 }
                 else {
-                    output += '<tr><td><span class="word">' + key + ':</span></td> ' + '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][0])) + '</span></td></tr>';
+                    output += '<tr><td><span class="word">' + key + ':</span></td>';
+                    for (var i = 0; i < json[key].length; i++) {
+                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
+                        if (i + 1 < json[key].length) {
+                            output += '<td class="white-text">, </td>';
+                        }
+                    }
+                    output += '</tr>';
                 }
             }
             output += '</table>';
@@ -229,13 +236,33 @@ function sendJsonForm(json) {
         });
 }
 
-// display that mocking captions are now active
+/**
+ * Resizes the embedded video based on window size, using either the 4:3 width to height ratio or the remaining screen
+ */
+function resizeIFrame() {
+    // Saves necessary parameters as variables
+    var width = $('#player').width();
+    var windowHeight = $(window).height();
+    var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + windowHeight * 0.05;
+    
+    // The remaining avalable height for the video that avoids overflow
+    var totalAvailableHeight = windowHeight - reservedHeight;
+
+    // The height of the video to keep the 4:3 aspect ratio
+    var videoHeightFromRatio = width / 1.33;
+
+    // Defines and sets the best video height to ensure that overflow does not occur
+    var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
+    $('#player').height(playerHeight);
+    $('#output').height(playerHeight - $('#resultsHeader').height());
+}
+
 $(document).ready(() => {
-    $('#captionMockButton').click(() => {
-        if ($('#captionMockButton').text() == 'Click Me to Mock Captions') {
-            $('#captionMockButton').text('Mocking');
-        } else {
-            $('#captionMockButton').text('Click Me to Mock Captions');
-        }
+
+    // Resizes the video whenever the window resizes
+    resizeIFrame();
+    $(window).resize(() => {
+        resizeIFrame();
     });
+
 });

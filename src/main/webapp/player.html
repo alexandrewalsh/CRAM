@@ -27,38 +27,34 @@
         <script defer src="js/captions.js"></script>
     </head>
     <body>
-        <div class="container">
-            <div>
+        <div id="heading-div" class="container">
+            <div id="heading-flex">
                 <h1>Lecture Buddy</h1>
-                <div style="position: absolute; top: 10px; right: 10px;"> <!-- move to css -->
-                    <a id="captionMockButton" class="headerBtn">Click Me to Mock Captions</a>
-                    <a class="headerBtn" onclick="signOut()">Sign out</a> <!-- change to actionHandlers -->
+                <div id="header-buttons-div">
+                    <a class="theater-toggle headerBtn" id="theater-button">Theater Mode</a>
+                    <a id="signoutButton" class="headerBtn">Sign out</a>
                 </div>
             </div>
         </div>
-        <div class="container top-10">
-            <div class="container-column">
+        <div id="searchbar-div" class="container top-5">
                 <!-- search bar -->
-                <div> <!-- unecessary div ? -->
-                    <form onsubmit="submitFn(this, event);">
-                            <div id="search-wrapper" class="search-wrapper container-row">
-                                <div class="input-holder">
-                                    <input type="text" class="search-input" placeholder="Type to search" />
-                                    <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
-                                </div>
-                                <span style="position: relative" class="close" onclick="searchToggle(this, event);"></span>
-                            </div>
-                            <div class="result-container"></div>
-                    </form>
-                </div>
-                <!-- player & output -->
-                <div class="container-row space-between top-10px">
-                    <iframe id="player" width="640" height="390" src="" frameborder="0"></iframe>  <!-- dynamic width/height -->      
-                    <div class="container-column">
-                        <h1 id="resultsHeader" class="text-left hide">Results</h1>
-                        <div id="output"></div>
-                    </div>
-                </div>
+                <form onsubmit="submitFn(this, event);">
+                    <div id="search-wrapper" class="search-wrapper container-row active">
+                        <div class="input-holder">
+                            <input type="text" class="search-input" placeholder="Insert YouTube video URL" />
+                            <button class="search-icon" onclick="searchToggle(this, event);"><span></span></button>
+                        </div>
+                     </div>
+                </form>
+        </div>
+        <!-- player & output -->
+        <div id="output-container" class="container-row space-between top-10px">
+            <div id="flex-item-video" class="video">                
+                <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+            </div>
+            <div id="flex-item-output" class="text-center">
+                <h1 id="resultsHeader" class="text-center hide">Results</h1>
+                <div id="output"></div>
             </div>
         </div>
     </body>

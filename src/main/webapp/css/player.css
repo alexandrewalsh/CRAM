@@ -1,9 +1,130 @@
 /**
- * Styling for the player
+ * Styling for the player page
 */
 
 #output {
-    height: 340px;
-    width : 300px;
     overflow: scroll;
 }
+
+#player {
+    width: 100%;
+}
+
+#heading-div {
+    padding-top: 3%;
+}
+
+#header-buttons-div {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.container-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.white-text {
+    color: #FFFFFF;
+}
+
+#flex-item-output {
+    width: 40%;
+    margin: auto;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.space-between {
+    justify-content: space-around;
+}
+
+.top-10px {
+    margin-top: 10px;
+}
+
+.top-5 {
+    margin-top: 5%;
+}
+
+.container-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+
+.word {
+    color: #FFFFFF;
+}
+
+.timestamps {
+    cursor: pointer;
+    color: #FFFFFF;
+}
+
+.timestamps:hover {
+    color: grey;
+}
+
+.video {
+    width: 50%;
+    margin: auto;
+}
+
+.theater {
+  width: 90%;
+  margin: auto;
+}
+
+.theater-toggle {
+  margin: auto;
+  display: none;
+}
+
+
+@media screen and (max-width: 1000px) {
+    #header-buttons-div {
+        position: relative;
+        top: 0px;
+        right: 0px;
+        margin: auto;
+        text-align: center;
+    }
+
+    #heading-flex {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    #searchbar-div {
+        margin-top: 10%;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    #searchbar-div {
+        margin-top: 20%;
+    }
+}
+
+.error-placeholder::placeholder {
+    color: red;
+}
+
