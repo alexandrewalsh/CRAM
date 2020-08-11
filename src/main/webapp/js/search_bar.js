@@ -19,3 +19,24 @@ function searchToggle(obj, evt){
     }
 }
 
+$(document).ready(function() {
+    $('#entity-seachbar').on('keyup', function() {
+        var query = $(this).val().toLowerCase();
+        var entities = $('#output table tr td:first-child');
+        if (query == '') {
+            entities.each((i, elem) => {
+                $(elem).parent().show();
+            });
+            return;
+        }
+
+        for (var i = 0; i < entities.length; i++) {
+            if (entities[i].textContent.toLowerCase().includes(query)) {
+                $(entities[i]).parent().show();
+            } else {
+                $(entities[i]).parent().hide();
+            }
+        }
+    });
+});
+
