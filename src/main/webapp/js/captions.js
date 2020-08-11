@@ -103,6 +103,14 @@ function displayVideo(videoId) {
  * @param url - the Youtube video url
  */
 function beginCaptionRequest(videoId, url) {
+
+    // checks to see if mock captions should be used
+    const queryParams = new URLSearchParams(window.location.search)
+    if (queryParams.has('mock')) {
+        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
+        return;
+    }
+
     gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
@@ -241,8 +249,7 @@ function sendJsonForm(json) {
     fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {
-            
+        }).then((response) => response.json()).then((json) => {            
             // Sets the results table
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
@@ -303,6 +310,7 @@ function styleEntitiesFromJson(json) {
     output += '</table>';
     return output;
 }
+
 
 $(document).ready(() => {
 
