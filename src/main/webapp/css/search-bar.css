@@ -265,5 +265,6 @@ form.entity-search::after {
     margin: auto;
     width: 100%;
     display: none;
-    justify-content: space-between;
+    justify-content: center;
+    padding-bottom: 10px;
 }

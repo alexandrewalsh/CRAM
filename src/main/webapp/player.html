@@ -50,13 +50,17 @@
         </div>
         <!-- player & output -->
         <div id="output-container" class="container-row space-between top-10px">
-            <div id="flex-item-video" class="video">                
-                <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+            <!-- player -->
+            <div id="player-pane" class="container-column">
+                <div id="flex-item-video" class="video">                
+                    <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+                </div>
+                <div id="timestamp-timeline" class="container-row" >
+                    <p></p>
+                </div>
             </div>
-            <div id="flex-item-output" class="text-center">
+            <div id="flex-item-output" class="container-column text-center">
                 <h1 id="resultsHeader" class="text-center hide">Results</h1>
-
-
                 <form id="entity-search-form" class="entity-search" action="entitySearchSubmit" autocomplete="off">
                     <div>
                         <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
@@ -67,10 +71,7 @@
                         <option value="chronological">Time</option>
                     </select>
                 </form>
-
-
                 <div id="output"></div>
-
             </div>
         </div>
     </body>

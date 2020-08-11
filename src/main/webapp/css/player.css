@@ -31,8 +31,9 @@
 }
 
 #flex-item-output {
-    width: 40%;
-    margin: auto;
+    flex: 1;
+    /* width: 40%; */
+    /* margin: auto; */
 }
 
 table {
@@ -41,7 +42,7 @@ table {
 }
 
 .space-between {
-    justify-content: space-around;
+    margin: 0 0 5% 5%;
 }
 
 .top-10px {
@@ -73,19 +74,25 @@ table {
     color: #FFFFFF;
 }
 
+.word:hover {
+    cursor: pointer;
+    color: darkgrey;
+}
+
 .timestamps {
     cursor: pointer;
     color: #FFFFFF;
+    padding: 0 0 10px 10px;
 }
 
 .timestamps:hover {
     color: grey;
 }
 
-.video {
+/* .video {
     width: 50%;
     margin: auto;
-}
+} */
 
 .theater {
   width: 90%;
@@ -129,3 +136,14 @@ table {
     color: red;
 }
 
+#timestamp-timeline {
+    justify-content: center;
+}
+
+#timestamp-timeline span, p {
+    font-size: 24px;
+}
+
+#player-pane {
+    flex: 2;
+}
