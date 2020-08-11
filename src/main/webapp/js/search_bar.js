@@ -19,7 +19,14 @@ function searchToggle(obj, evt){
     }
 }
 
+function entitySearchSubmit() {
+    console.log("Submit Button pushed");
+    return;
+}
+
+
 $(document).ready(function() {
+
     $('#entity-seachbar').on('keyup', function() {
         var query = $(this).val().toLowerCase();
         var entities = $('#output table tr td:first-child');
@@ -30,13 +37,21 @@ $(document).ready(function() {
             return;
         }
 
+        entities.each((i, elem) => {
+            if ($(elem).text().toLowerCase().includes(query)) {
+                $(elem).parent().show();
+            } else {
+                $(elem).parent().hide();
+            }
+        });
+/*
         for (var i = 0; i < entities.length; i++) {
             if (entities[i].textContent.toLowerCase().includes(query)) {
                 $(entities[i]).parent().show();
             } else {
                 $(entities[i]).parent().hide();
             }
-        }
+        }*/
     });
 });
 
