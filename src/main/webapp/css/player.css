@@ -89,10 +89,10 @@ table {
     color: grey;
 }
 
-.video {
-    /* width: 50%;
-    margin: auto; */
-}
+/* .video {
+    width: 50%;
+    margin: auto;
+} */
 
 .theater {
   width: 90%;
@@ -138,6 +138,10 @@ table {
 
 #timestamp-timeline {
     justify-content: center;
+}
+
+#timestamp-timeline span, p {
+    font-size: 24px;
 }
 
 #player-pane {

@@ -56,13 +56,15 @@ function execute(url) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
+    
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
         // Sets the results table
         document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
 
-        // make word entities clickable
+        // clickable entities and timestamps
         setClickableEntities();
+        
         return;
     }
 
@@ -74,7 +76,7 @@ function execute(url) {
             // Sets the results table
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
-            // clickable timestamps
+            // clickable entities and timestamps
             setClickableEntities();
 
             console.log("Fetching captions from database...");
@@ -83,8 +85,6 @@ function execute(url) {
             beginCaptionRequest(videoId, url);
         }
     });
-
-    
 }
 
 /**
@@ -261,7 +261,7 @@ function sendJsonForm(json) {
             // Sets the results table
             document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
-            // clickable timestamps
+            // clickable entities and timestamps
             setClickableEntities();
         });
 }
@@ -285,6 +285,9 @@ function resizeIFrame() {
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
     $('#output').height(playerHeight - $('#resultsHeader').height());
+
+    // change output size to match the player
+    $("#flex-item-output").css("height", $("#player").height());
 }
 
 /**
@@ -304,12 +307,6 @@ function styleEntitiesFromJson(json) {
             console.log('Total Entities Found: ' + json[key][2]);
         } else {
             output += '<tr><td><span class="word">' + key + '</span></td>';
-            // for (var i = 0; i < json[key].length; i++) {
-            //     output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
-            //     if (i + 1 < json[key].length) {
-            //         output += '<td class="white-text">, </td>';
-            //     }
-            // }
             output += '</tr>';
         }
     }
@@ -329,6 +326,10 @@ function setClickableTimestamps() {
     }
 }
 
+/**
+ * Adds click event listeners to word entities to show
+ * timestamps. Also makes the timestamps clickable.
+ */
 function setClickableEntities() {
     $('.word').bind("click", function(){
         const entity = this.innerText;
@@ -337,8 +338,8 @@ function setClickableEntities() {
         $("#timestamp-timeline").empty();
 
         // query json
-        for (var epoch in timestamps[entity]) {
-            const timestamp = epochToTimestamp(epoch);
+        for (var index in timestamps[entity]) {
+            const timestamp = epochToTimestamp(timestamps[entity][index]);
             $("#timestamp-timeline").append("<span class='timestamps'>"+timestamp+"</span>");
             $("#timestamp-timeline").append("<p>,</p>");
         }
@@ -348,8 +349,6 @@ function setClickableEntities() {
         // clickable timestamps
         setClickableTimestamps();
     });
-
-
 }
 
 $(document).ready(() => {
