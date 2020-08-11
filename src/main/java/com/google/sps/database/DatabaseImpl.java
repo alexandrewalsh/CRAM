@@ -73,8 +73,9 @@ public class DatabaseImpl implements DatabaseInterface {
 
     // add a video to the database
     public int addVideo(String videoID, String metadata) {
+        Entity vidEnt, metaEnt;
         try {
-            Entity vidEnt = new Entity(V_KIND, videoID);
+            vidEnt = new Entity(V_KIND, videoID);
             datastore.put(vidEnt);
         } catch (Exception e) {
             System.out.println("Failed to add video to the database");
@@ -82,7 +83,7 @@ public class DatabaseImpl implements DatabaseInterface {
         }
 
         try {
-            Entity metaEnt = new Entity(M_KIND, metadata, vidEnt.getKey());
+            metaEnt = new Entity(M_KIND, metadata, vidEnt.getKey());
             datastore.put(metaEnt);
         } catch (Exception e) {
             System.out.println("Failed to add metadata to the database");
@@ -134,7 +135,7 @@ public class DatabaseImpl implements DatabaseInterface {
         }
         
         // need to find metadata already in the database
-        if (currMeta = getMetadata(videoID) == null) {
+        if ((currMeta = getMetadata(videoID)) == null) {
             System.out.println("Failed to retrieve current metadata for " + videoID + " in database");
             return -2;
         }
@@ -152,7 +153,7 @@ public class DatabaseImpl implements DatabaseInterface {
         } else {
             try {
                 currData = metaKey.getName();
-                newData = current + metadata;
+                newData = currData + metadata;
                 datastore.delete(metaKey);
                 metaEnt = new Entity(M_KIND, newData, vidEnt.getKey());
             } catch (Exception e) {
