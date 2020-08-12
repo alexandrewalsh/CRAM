@@ -24,6 +24,46 @@ function entitySearchSubmit() {
     return;
 }
 
+function compareEntities(a, b) {
+    var aText = $(a).text();
+    var bText = $(b).text();
+    if (aText > bText) {
+        return 1;
+    } 
+    if (aText < bText) {
+        return -1;
+    }
+    return 0;
+}
+
+function compareTimestamps(a, b) {
+    var aText = $(a).text();
+    var bText = $(b).text();
+    var aList = timestamps[aText];
+    var bList = timestamps[bText];
+    console.log("NEW");
+    console.log(aText);
+    console.log(bText);
+
+    var limit = (aList.length > bList.length) ? bList.length : aList.length;
+    console.log(limit);
+    for (var i = 0; i < limit; i++) {
+        if (aList[i] > bList[i]) {
+            return 1;
+        }
+        if (aList[i] < bList[i]) {
+            return -1;
+        } 
+    }
+    if (aList.length > bList.length) {
+        return 1;
+    }
+    if (aList.length < bList.length) {
+        return -1;
+    }
+    return compareEntities(a, b);
+}
+
 
 $(document).ready(function() {
 
@@ -44,14 +84,22 @@ $(document).ready(function() {
                 $(elem).parent().hide();
             }
         });
-/*
-        for (var i = 0; i < entities.length; i++) {
-            if (entities[i].textContent.toLowerCase().includes(query)) {
-                $(entities[i]).parent().show();
-            } else {
-                $(entities[i]).parent().hide();
-            }
-        }*/
     });
+
+    $('#entity-sort').change(() => {
+        var optionSelected = $("option:selected", this).val();
+        console.log(optionSelected)
+        if (optionSelected == 'alphabetical') {
+            var list = $('#output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
+            $('#output').html(styleEntitiesFromList(list));
+        }
+        if (optionSelected == 'chronological') {
+            var list = $('#output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
+            $('#output').html(styleEntitiesFromList(list));      
+        }
+        setClickableEntities();
+        setClickableTimestamps();
+    });
+
 });
 

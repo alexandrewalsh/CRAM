@@ -293,6 +293,7 @@ function resizeIFrame() {
 /**
  * Builds the entities table from the json response
  * @param json - The json response of entity data
+ * @return The HTML string that creates the table of entities
  */
 function styleEntitiesFromJson(json) {
     timestamps = json; // set global variable
@@ -312,6 +313,18 @@ function styleEntitiesFromJson(json) {
     }
     
     output += '</table>';
+    return output;
+}
+
+
+function styleEntitiesFromList(list) {
+    var output = '<table>';
+
+    for (entity of list) {
+        output += '<tr><td><span class="word">' + entity + '</span></td></tr>';
+    }
+
+    output += '</table>'
     return output;
 }
 

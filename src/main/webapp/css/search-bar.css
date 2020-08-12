@@ -228,7 +228,9 @@ form.entity-search input[type=text] {
     float: left;
     width: 70%;
     background: #f1f1f1;
-    border-radius: 50px 0px 0px 50px;
+    border-radius: 50px;
+    /** Use below code for when we have a button**/
+    /*border-radius: 50px 0px 0px 50px;*/
 }
 
 form.entity-search input[type=text]:focus {

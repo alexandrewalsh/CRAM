@@ -15,7 +15,9 @@ const MOCK_JSON_CAPTIONS = {
 const MOCK_NLP_OUTPUT = {
     mock: [0,1,2],
     mocker: [0,2],
-    mockest: [1]
+    mockest: [1],
+    apple: [30],
+    banana: [0]
 }
 
 const GAPI_CLIENT = 'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest';
