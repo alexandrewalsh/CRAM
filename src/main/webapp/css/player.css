@@ -26,6 +26,10 @@
     margin: 0 auto;
 }
 
+#resultsHeader {
+    padding-bottom: 3%;
+}
+
 .container-row {
     display: flex;
     flex-direction: row;
@@ -45,10 +49,6 @@
 table {
     margin-left: auto;
     margin-right: auto;
-}
-
-.space-between {
-    /* margin: 0 0 5% 5%; */
 }
 
 .top-10px {
@@ -96,11 +96,6 @@ table {
     color: grey;
 }
 
-/* .video {
-    width: 50%;
-    margin: auto;
-} */
-
 .theater {
   width: 90%;
   margin: auto;
@@ -109,34 +104,6 @@ table {
 .theater-toggle {
   margin: auto;
   display: none;
-}
-
-
-@media screen and (max-width: 1000px) {
-    #header-buttons-div {
-        position: relative;
-        top: 0px;
-        right: 0px;
-        margin: auto;
-        text-align: center;
-    }
-
-    #heading-flex {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    #searchbar-div {
-        margin-top: 10%;
-    }
-}
-
-@media screen and (max-width: 380px) {
-    #searchbar-div {
-        margin-top: 20%;
-    }
 }
 
 .error-placeholder::placeholder {
@@ -153,4 +120,50 @@ table {
 
 #player-pane {
     flex: 2;
+}
+
+/** Styles dependent on width of screen */
+@media screen and (max-width: 1000px) {
+    #header-buttons-div {
+        position: relative;
+        top: 0px;
+        right: 0px;
+        margin: auto;
+        text-align: center;
+    }
+
+    #heading-flex {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    #timestamp-timeline span, p {
+        font-size: inherit;
+    }
+    
+    #resultsHeader {
+        font-size: 30px;
+    }
+
+    .word {
+        font-size: 20px;
+    }
+
+    form.entity-search input[type=text] {
+        padding: 0px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    #searchbar-div {
+        margin-top: 10%;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    #searchbar-div {
+        margin-top: 20%;
+    }
 }

@@ -83,9 +83,14 @@ function compareTimestamps(a, b) {
 }
 
 
+/**
+ * Filters the entities based on the current text of the searchbar
+ */
 function filterEntities() {
     var query = $('#entity-seachbar').val().toLowerCase();
     var entities = $('#output table tr td:first-child');
+
+    // Case 1: Searchbar is empty, so all entities are displayed
     if (query == '') {
         entities.each((i, elem) => {
             $(elem).parent().show();
@@ -93,6 +98,7 @@ function filterEntities() {
         return;
     }
 
+    // Case 2: Searchbar has text, so only entities the include the query are displayed
     entities.each((i, elem) => {
         if ($(elem).text().toLowerCase().includes(query)) {
             $(elem).parent().show();
@@ -102,18 +108,29 @@ function filterEntities() {
     });
 }
 
+
+/**
+ * Sorts the entities based on the current selector 
+ */
 function sortEntities() {
-    console.log("TEST");
     var optionSelected = $("option:selected", '#entity-sort').val();
+
+    // Case 1: Sorts the table alphabetically
     if (optionSelected == 'alphabetical') {
         var list = $('#output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
         $('#output').html(styleEntitiesFromList(list));
+
+    // Case 2: Sorts the table chronologically
     } else if (optionSelected == 'chronological') {
         var list = $('#output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
-        $('#output').html(styleEntitiesFromList(list));      
+        $('#output').html(styleEntitiesFromList(list));   
+
+    // Case 3: Invalid selected option, so nothing happens   
     } else {
         return;
     }
+
+    // Must refilter entities and remap clickable entities to their timestamps
     filterEntities();
     setClickableEntities();
     setClickableTimestamps();

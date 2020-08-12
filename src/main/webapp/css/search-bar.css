@@ -224,8 +224,7 @@
 
 /** Entity Search Bar */
 form.entity-search input[type=text] {
-    padding: 10px;
-    /* float: left; */
+    padding: 5px;
     width: 80%;
     background: #f1f1f1;
     border: 0;
@@ -239,7 +238,7 @@ form.entity-search input[type=text]:focus {
 form.entity-search button {
     float: left;
     width: 20%;
-    padding: 10px;
+    padding: 5px;
     background: #cccccc;
     color: #974BE0;
     font-size: 17px;
@@ -267,5 +266,5 @@ form.entity-search::after {
     width: 350px;
     display: none;
     justify-content: center;
-    padding-bottom: 10px;
+    padding-bottom: 4%;
 }
