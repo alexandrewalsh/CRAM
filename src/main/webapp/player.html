@@ -60,10 +60,16 @@
                 </div>
             </div>
             <div id="flex-item-output" class="container-column text-center">
-                <h1 id="resultsHeader" class="text-center hide">Keywords in video</h1>
-                <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
-                    <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
-                    <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                <h1 id="resultsHeader" class="text-center hide">Results</h1>
+                <form id="entity-search-form" class="entity-search" action="entitySearchSubmit" autocomplete="off">
+                    <div>
+                        <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
+                        <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                    </div>
+                    <select id="entity-sort" name="sort-option">
+                        <option value="alphabetical">A-Z</option>
+                        <option value="chronological">Time</option>
+                    </select>
                 </form>
                 <div id="output"></div>
             </div>
