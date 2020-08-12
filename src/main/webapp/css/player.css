@@ -47,10 +47,6 @@ table {
     margin-right: auto;
 }
 
-.space-between {
-    /* margin: 0 0 5% 5%; */
-}
-
 .top-10px {
     margin-top: 10px;
 }
@@ -95,11 +91,6 @@ table {
 .timestamps:hover {
     color: grey;
 }
-
-/* .video {
-    width: 50%;
-    margin: auto;
-} */
 
 .theater {
   width: 90%;
