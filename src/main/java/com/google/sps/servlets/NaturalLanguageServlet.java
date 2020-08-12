@@ -108,7 +108,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         // Parses the video ID from the url
         boolean addToDatabase = true;
         String videoID = "";
-        String[] urlParts = youtubeCaptions.getURL().split(VIDEO_URL_ID_DELIMITER);
+        String[] urlParts = youtubeCaptions.getVideoURL().split(VIDEO_URL_ID_DELIMITER);
         if (urlParts.length <= 1) {
             addToDatabase = false;
         }

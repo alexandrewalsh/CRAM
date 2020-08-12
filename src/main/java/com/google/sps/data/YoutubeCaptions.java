@@ -39,7 +39,7 @@ public final class YoutubeCaptions {
      * Gets the url of the video
      * @return The url of the YouTube video
      */
-    public String getURL() {
+    public String getVideoURL() {
         return this.url;
     }
 
