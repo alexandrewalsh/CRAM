@@ -39,9 +39,7 @@ function authenticate() {
                 checkLogin();
             });
             },function(err) { 
-                console.error("Error signing in", err); 
-                renderError("Error signing in, please ty again.");
-                // render error elements
+                alert("Error signing in, please try again");
             });
 }
 
@@ -54,9 +52,8 @@ function loadClient() {
         .then(function() {
             console.log("GAPI client loaded for API");
             },
-            function(err) { 
-                renderError("Error loading GAPI client"); // these functions don't work yet @enriqueavina
-                console.error("Error loading GAPI client for API", err);
+            function(err) {
+                alert("Error loading Google APIs"); 
             });
 }
 

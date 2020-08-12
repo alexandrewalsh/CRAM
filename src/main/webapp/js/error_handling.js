@@ -14,7 +14,9 @@ function renderError(error) {
     // clear search var text
     $('.search-input').val("");
     // change placeholder text to red
-    $('.search-input').toggleClass('error-placeholder');
+    $('.search-input').addClass('error-placeholder');
     // display error message
     $('.search-input')[0].placeholder = msg || error;
+
+    alert(msg || error);
 }

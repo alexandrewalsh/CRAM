@@ -13,7 +13,7 @@
  * document.ready
  */
 
-/** global variables holding the json response for timestamps*/
+/** global variables holding the json response for timestamps */
 var timestamps;
 
 /**
@@ -38,6 +38,13 @@ function submitFn(obj, evt){
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute(url) {
     // user inputs YouTube video URL
+
+    // verify youtube regex 
+    if (!/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\-_]+)/.test(url)) {
+        renderError("Invalid youtube url!");
+        return;
+    }
+
     var videoId = "";
 
     try {
@@ -157,7 +164,11 @@ function getCaptions(trackId, url) {
             "tfmt": "sbv"
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {
-                success(json);  
+                success(json);
+
+                // valid YT Url, clear error status if one exists
+                $('.search-input').removeClass("error-placeholder");
+                $('.search-input')[0].placeholder = "Insert a YouTube video URL";
             });
         }, function(err) { 
             renderError(err.status);
@@ -327,7 +338,7 @@ function styleEntitiesFromJson(json) {
 /**
  * Builds the entities table from a list of entities
  * @param list - The list containing entity names
- * @return The HTML string taht creates the table of entities
+ * @return The HTML string that creates the table of entities
  */
 function styleEntitiesFromList(list) {
     var output = '<table>';
@@ -339,7 +350,6 @@ function styleEntitiesFromList(list) {
     output += '</table>'
     return output;
 }
-
 
 /**
  * Sets the timestamp class objects to be clickable
@@ -364,6 +374,7 @@ function setClickableEntities() {
 
         // query json
         $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
+
         for (var index in timestamps[entity]) {
             const timestamp = epochToTimestamp(timestamps[entity][index]);
             $("#timestamp-timeline").append("<span class='timestamps'>"+timestamp+"</span>");
