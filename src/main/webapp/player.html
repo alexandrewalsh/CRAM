@@ -49,7 +49,7 @@
                 </form>
         </div>
         <!-- player & output -->
-        <div id="output-container" class="container-row space-between top-10px">
+        <div id="output-container" class="container-row">
             <!-- player -->
             <div id="player-pane" class="container-column">
                 <div id="flex-item-video" class="video">                
@@ -60,8 +60,8 @@
                 </div>
             </div>
             <div id="flex-item-output" class="container-column text-center">
-                <h1 id="resultsHeader" class="text-center hide">Results</h1>
-                <form id="entity-search-form" class="entity-search" action="entitySearchSubmit" autocomplete="off">
+                <h1 id="resultsHeader" class="text-center hide">Keywords in video</h1>
+                <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
                     <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
                     <!--<button type="submit"><i class="fa fa-search"></i></button>-->
                 </form>

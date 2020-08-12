@@ -287,7 +287,12 @@ function resizeIFrame() {
     $('#output').height(playerHeight - $('#resultsHeader').height());
 
     // change output size to match the player
-    $("#flex-item-output").css("height", $("#player").height());
+    if ($('#flex-item-video').hasClass('theater')) {
+        $("#flex-item-output").css("width", $("#player").width());
+    } else {
+        $("#flex-item-output").css("height", $("#player").height());
+    }
+    
 }
 
 /**
@@ -338,6 +343,7 @@ function setClickableEntities() {
         $("#timestamp-timeline").empty();
 
         // query json
+        $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
         for (var index in timestamps[entity]) {
             const timestamp = epochToTimestamp(timestamps[entity][index]);
             $("#timestamp-timeline").append("<span class='timestamps'>"+timestamp+"</span>");

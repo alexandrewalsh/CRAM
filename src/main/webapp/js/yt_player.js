@@ -35,16 +35,41 @@ $(document).ready(function() {
     $('.theater-toggle').click(function() {
         var video = $('#flex-item-video');
         var results = $('#flex-item-output');
+
         if (video.hasClass('theater')) {
+
+            // remove table wrapper 
             video.removeClass('theater');
-            results.css('width', '40%');
+            results.append($("#resultsHeader"));
+            results.append($("#entity-search-form"));
+            results.append($("#output"));
+            $("#table-wrapper").remove();
+
+            // put timestamp timeline under player
+            $("#player-pane").append($("#timestamp-timeline"));
+
+            results.removeClass('container-row');
+            results.addClass('container-column');
             $('#output-container').removeClass('container-column');
             $('#output-container').addClass('container-row');
         } else {
             video.addClass('theater');
-            results.css('width', '80%');
+
+            // package results header and table in a column
+            results.prepend($("<div id='table-wrapper' class='container-column'></div>"));
+            $("#table-wrapper").append($("#resultsHeader"));
+            $("#table-wrapper").append($("#entity-search-form"));
+            $("#table-wrapper").append($("#output"));
+
+            // put timestamps into flex-output
+            results.append($("#timestamp-timeline"));
+            results.removeClass('container-column');
+            results.addClass('container-row');
             $('#output-container').removeClass('container-row');
             $('#output-container').addClass('container-column');
+
+            // change output container size to video size
+            $("#flex-item-output").css("width", $("#player").width());
         }
     });
 

@@ -225,10 +225,11 @@
 /** Entity Search Bar */
 form.entity-search input[type=text] {
     padding: 10px;
-    float: left;
+    /* float: left; */
     width: 80%;
     background: #f1f1f1;
-    border-radius: 50px 0px 0px 50px;
+    border: 0;
+    border-radius: 50px 50px 50px 50px;
 }
 
 form.entity-search input[type=text]:focus {
@@ -242,10 +243,10 @@ form.entity-search button {
     background: #cccccc;
     color: #974BE0;
     font-size: 17px;
-    border: 1px solid grey;
+    border: 0;
     border-left: none;
     cursor: pointer;
-    border-radius: 0px 50px 50px 0px;
+    border-radius: 50px 50px 50px 50px;
 }
 
 form.entity-search button:hover {
@@ -262,7 +263,7 @@ form.entity-search::after {
 }
 
 #entity-search-form {
-    margin: auto;
+    margin: 0 auto;
     width: 350px;
     display: none;
     padding-bottom: 10px;

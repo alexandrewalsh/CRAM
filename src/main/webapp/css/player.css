@@ -21,6 +21,11 @@
     right: 10px;
 }
 
+#output-container {
+    width: 90%;
+    margin: 0 auto;
+}
+
 .container-row {
     display: flex;
     flex-direction: row;
@@ -32,8 +37,9 @@
 
 #flex-item-output {
     flex: 1;
+    justify-content: space-between;
     /* width: 40%; */
-    /* margin: auto; */
+    margin: auto;
 }
 
 table {
@@ -42,7 +48,7 @@ table {
 }
 
 .space-between {
-    margin: 0 0 5% 5%;
+    /* margin: 0 0 5% 5%; */
 }
 
 .top-10px {
@@ -72,6 +78,7 @@ table {
 
 .word {
     color: #FFFFFF;
+    font-size: 24px;
 }
 
 .word:hover {
