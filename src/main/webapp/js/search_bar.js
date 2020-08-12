@@ -83,44 +83,50 @@ function compareTimestamps(a, b) {
 }
 
 
+function filterEntities() {
+    var query = $('#entity-seachbar').val().toLowerCase();
+    var entities = $('#output table tr td:first-child');
+    if (query == '') {
+        entities.each((i, elem) => {
+            $(elem).parent().show();
+        });
+        return;
+    }
+
+    entities.each((i, elem) => {
+        if ($(elem).text().toLowerCase().includes(query)) {
+            $(elem).parent().show();
+        } else {
+            $(elem).parent().hide();
+        }
+    });
+}
+
+function sortEntities() {
+    console.log("TEST");
+    var optionSelected = $("option:selected", '#entity-sort').val();
+    if (optionSelected == 'alphabetical') {
+        var list = $('#output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
+        $('#output').html(styleEntitiesFromList(list));
+    } else if (optionSelected == 'chronological') {
+        var list = $('#output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
+        $('#output').html(styleEntitiesFromList(list));      
+    } else {
+        return;
+    }
+    filterEntities();
+    setClickableEntities();
+    setClickableTimestamps();
+}
+
+
 $(document).ready(function() {
 
     // Searchbar to filter entities 
-    $('#entity-seachbar').on('keyup', function() {
-        var query = $(this).val().toLowerCase();
-        var entities = $('#output table tr td:first-child');
-        if (query == '') {
-            entities.each((i, elem) => {
-                $(elem).parent().show();
-            });
-            return;
-        }
-
-        entities.each((i, elem) => {
-            if ($(elem).text().toLowerCase().includes(query)) {
-                $(elem).parent().show();
-            } else {
-                $(elem).parent().hide();
-            }
-        });
-    });
+    $('#entity-seachbar').on('keyup', filterEntities);
 
     // Select to sort entities
-    $('#entity-sort').change(() => {
-        var optionSelected = $("option:selected", this).val();
-        console.log(optionSelected)
-        if (optionSelected == 'alphabetical') {
-            var list = $('#output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
-            $('#output').html(styleEntitiesFromList(list));
-        } else if (optionSelected == 'chronological') {
-            var list = $('#output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
-            $('#output').html(styleEntitiesFromList(list));      
-        } else {
-            return;
-        }
-        setClickableEntities();
-        setClickableTimestamps();
-    });
+    $('#entity-sort').change(sortEntities);
 
 });
 

@@ -64,6 +64,7 @@ function execute(url) {
 
         // clickable entities and timestamps
         setClickableEntities();
+        sortEntities();
         
         return;
     }
@@ -78,6 +79,7 @@ function execute(url) {
 
             // clickable entities and timestamps
             setClickableEntities();
+            sortEntities();
 
             console.log("Fetching captions from database...");
         } else {
@@ -263,6 +265,7 @@ function sendJsonForm(json) {
 
             // clickable entities and timestamps
             setClickableEntities();
+            sortEntities();
         });
 }
 
@@ -321,7 +324,11 @@ function styleEntitiesFromJson(json) {
     return output;
 }
 
-
+/**
+ * Builds the entities table from a list of entities
+ * @param list - The list containing entity names
+ * @return The HTML string taht creates the table of entities
+ */
 function styleEntitiesFromList(list) {
     var output = '<table>';
 
