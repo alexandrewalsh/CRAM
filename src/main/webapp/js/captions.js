@@ -26,6 +26,10 @@ function submitFn(obj, evt){
     $('#resultsHeader').style = "display: unset;"
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
+
+    // delete all children
+    $("#timestamp-timeline").empty();
+
     execute(value);
 }
 
@@ -116,9 +120,14 @@ function displayVideo(videoId) {
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
     resizeIFrame();  
-    player = new YT.Player('player', {
-        events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
-    });
+
+    if (player == null) {
+        player = new YT.Player('player', {
+            events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
+        });
+    } else {
+        player.loadVideoByUrl("http://www.youtube.com/v/"+videoId+"?version=3");
+    }
 }
 
 /**
