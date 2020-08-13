@@ -17,7 +17,7 @@ package com.google.sps.storage;
 import com.google.appengine.api.datastore.*;
 import java.util.*;
 
-public class CaptionStorage implements CaptionStorageInterface {
+public class CaptionStorageManager implements CaptionStorageInterface {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     private static final String COLUMN_VIDEO = "video";
     private static final String COLUMN_METADATA = "metadata";
@@ -50,12 +50,8 @@ public class CaptionStorage implements CaptionStorageInterface {
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException {
         Entity vidEnt;
         
-        try {
-            if ((vidEnt = getVideo(videoID)) == null) {
-                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
-            }
-        } catch (CaptionStorageException cse) {
-            throw cse;
+        if ((vidEnt = getVideo(videoID)) == null) {
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
         }
 
         try {
@@ -73,8 +69,6 @@ public class CaptionStorage implements CaptionStorageInterface {
             for (Map.Entry<String, List<Long>> me : clauses.entrySet()) {
                 addClause(videoID, me.getKey(), me.getValue());
             }
-        } catch (CaptionStorageException cse) {
-            throw cse;
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_KEYPHRASE_ERR, e.getMessage(), e.getCause());
         }
@@ -83,29 +77,20 @@ public class CaptionStorage implements CaptionStorageInterface {
     // add metadata information to a particular video in the db
     // overwite param will determine whether current metadata is replaced or just added on to
     public void addMetadata(String videoID, String metadata, boolean overwrite) throws CaptionStorageException {
-        Entity vidEnt, metaEnt, currMeta;
-        Key metaKey;
-        String currData, newData;
-
-        try {
-            if ((vidEnt = getVideo(videoID)) == null) {
-                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
-            }
-        } catch (CaptionStorageException cse) {
-            throw cse;
+        Entity vidEnt;
+        if ((vidEnt = getVideo(videoID)) == null) {
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
         }
         
         // need to find metadata already in the database
-        try {
-            if ((currMeta = getMetadata(videoID)) == null) {
-                throw new CaptionStorageException(Reason.NO_META_EXISTS, "Requested metadata does not exist");
-            }
-        } catch (CaptionStorageException cse) {
-            throw cse;
+        Entity currMeta;
+        if ((currMeta = getMetadata(videoID)) == null) {
+            throw new CaptionStorageException(Reason.NO_META_EXISTS, "Requested metadata does not exist");
         }
 
-        metaKey = currMeta.getKey();
+        Key metaKey = currMeta.getKey();
 
+        Entity metaEnt;
         if (overwrite) {
             try {
                 datastore.delete(metaKey);
@@ -115,8 +100,8 @@ public class CaptionStorage implements CaptionStorageInterface {
             }
         } else {
             try {
-                currData = metaKey.getName();
-                newData = currData + metadata;
+                String currData = metaKey.getName();
+                String newData = currData + metadata;
                 datastore.delete(metaKey);
                 metaEnt = new Entity(COLUMN_METADATA, newData, vidEnt.getKey());
             } catch (Exception e) {
@@ -133,11 +118,6 @@ public class CaptionStorage implements CaptionStorageInterface {
     // retrieve all keywords + their timestamps in a specified videoID
     public Map<String, List<Long>> getAllKeywords(String videoID) throws CaptionStorageException {
         Entity vidEnt;
-        Key vidKey;
-        Query query;
-        PreparedQuery results;
-        Map<String, List<Long>> clauseMap;
-
         try {
             if ((vidEnt = getVideo(videoID)) == null) {
                 throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
@@ -146,12 +126,12 @@ public class CaptionStorage implements CaptionStorageInterface {
             throw cse;
         }
 
-        vidKey = vidEnt.getKey();
+        Key vidKey = vidEnt.getKey();
 
-        query = new Query(COLUMN_CAPTION, vidKey);
-        results = datastore.prepare(query);
+        Query query = new Query(COLUMN_CAPTION, vidKey);
+        PreparedQuery results = datastore.prepare(query);
 
-        clauseMap = new HashMap<String, List<Long>>();
+        Map<String, List<Long>> clauseMap = new HashMap<String, List<Long>>();
 
         try {
             for (Entity entity : results.asIterable()) {
@@ -171,8 +151,6 @@ public class CaptionStorage implements CaptionStorageInterface {
         
         try {
             clauseMap = getAllKeywords(videoID);
-        } catch (CaptionStorageException cse) {
-            throw cse;
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.GET_KEYPHRASE_ERR, e.getMessage(), e.getCause());
         }
@@ -191,24 +169,15 @@ public class CaptionStorage implements CaptionStorageInterface {
 
     // return true if specified video is in the database
     public boolean videoInDb(String videoID) throws CaptionStorageException {
-        try {
-            if ((getVideo(videoID)) == null) {
-                return false;
-            }
-        } catch (CaptionStorageException cse) {
-            throw cse;
+        if ((getVideo(videoID)) == null) {
+            return false;
         }
-
         return true;
     }
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
-        try {
-            Entity data = getMetadata(videoID);
-        } catch (CaptionStorageException cse) {
-            throw cse;
-        }
+        Entity data = getMetadata(videoID);
         if (data.getKey().getName().equals(meta)) {
                 return true;
         } 

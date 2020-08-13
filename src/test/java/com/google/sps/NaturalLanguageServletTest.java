@@ -16,7 +16,7 @@ package com.google.sps;
 
 import com.google.sps.servlets.NaturalLanguageServlet;
 import com.google.sps.data.NaturalLanguageProcessor;
-import com.google.sps.storage.CaptionStorage;
+import com.google.sps.storage.CaptionStorageManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
@@ -52,7 +52,7 @@ public final class NaturalLanguageServletTest {
     HttpServletRequest request = null;
     HttpServletResponse response = null;
     NaturalLanguageProcessor nlp = null;
-    CaptionStorage db = null;
+    CaptionStorageManager db = null;
     PrintWriter writer = null;
     NaturalLanguageServlet servlet = null;
 
@@ -63,7 +63,7 @@ public final class NaturalLanguageServletTest {
         response = mock(HttpServletResponse.class);
         writer = mock(PrintWriter.class);
         nlp = mock(NaturalLanguageProcessor.class);
-        db = mock(CaptionStorage.class);
+        db = mock(CaptionStorageManager.class);
         servlet = new NaturalLanguageServlet();
 
         // Adds stubbing that does not require specific parameters

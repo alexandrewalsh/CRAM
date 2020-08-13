@@ -56,7 +56,7 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        CaptionStorage dbi = new CaptionStorage();
+        CaptionStorageManager dbi = new CaptionStorageManager();
         Gson gson = new Gson();
         String videoID = (String) request.getParameter(REQUEST_ID_PARAM);
         response.setContentType(RESPONSE_JSON_CONTENT);
@@ -70,9 +70,8 @@ public class NaturalLanguageServlet extends HttpServlet {
                 response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
             }
         } catch (CaptionStorageException e) {
-            Map<String, String> exceptionMap = new Map<String, String>();
-            exceptionMap.put(e.getReason().toString(), e.getMessage()); 
-            response.getWriter().println(gson.toJson(exceptionMap));
+            String exceptionString = "{ \"ERROR\": " + e.getReason().toString() + "}";
+            response.getWriter().println(exceptionString);
         }
     }
 
@@ -101,7 +100,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             this.nlp = new NaturalLanguageProcessor();
         }
         if (this.db == null) {
-            this.db = new CaptionStorage();
+            this.db = new CaptionStorageManager();
         }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
@@ -165,6 +164,7 @@ public class NaturalLanguageServlet extends HttpServlet {
     }
 
     /**
+     * For mock testing only
      * Sets the NaturalLanguageProcessor instance for the servlet to use
      * @param nlp The NaturalLanguageProcessor instance to use
      */
@@ -173,11 +173,11 @@ public class NaturalLanguageServlet extends HttpServlet {
     }
 
     /**
+     * For mock testing only
      * Sets the CaptionStorageInterface instance for the servlet to use
      * @param db The CaptionStorageInterface instance to use
      */
     public void setDatabase(CaptionStorageInterface db) {
         this.db = db;
     }
-
 }
