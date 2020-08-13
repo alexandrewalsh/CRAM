@@ -30,7 +30,8 @@ public class CaptionStorageManager implements CaptionStorageInterface {
 
     // add a video to the database
     public void addVideo(String videoID, String metadata) throws CaptionStorageException {
-        Entity vidEnt, metaEnt;
+        // Tries to add video to the database
+        Entity vidEnt;
         try {
             vidEnt = new Entity(COLUMN_VIDEO, videoID);
             datastore.put(vidEnt);
@@ -38,6 +39,8 @@ public class CaptionStorageManager implements CaptionStorageInterface {
             throw new CaptionStorageException(Reason.ADD_VIDEO_ERR, e.getMessage(), e.getCause());
         }
 
+        // Tries to add the video metadata to the database
+        Entity metaEnt;
         try {
             metaEnt = new Entity(COLUMN_METADATA, metadata, vidEnt.getKey());
             datastore.put(metaEnt);
@@ -49,7 +52,6 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     // add a keyphrase + timestamp pair to a particular video in the db
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException {
         Entity vidEnt;
-        
         if ((vidEnt = getVideo(videoID)) == null) {
             throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
         }
@@ -177,16 +179,12 @@ public class CaptionStorageManager implements CaptionStorageInterface {
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
-<<<<<<< HEAD:src/main/java/com/google/sps/storage/CaptionStorageManager.java
-        Entity data = getMetadata(videoID);
-=======
         Entity data;
         try {
             data = getMetadata(videoID);
         } catch (CaptionStorageException cse) {
             throw cse;
         }
->>>>>>> 304960db9ae10101b7116114c167b87abc1d88ae:src/main/java/com/google/sps/storage/CaptionStorage.java
         if (data.getKey().getName().equals(meta)) {
             return true;
         } 
