@@ -12,7 +12,7 @@ public interface CaptionStorageInterface {
      * add a video to the database
      * @param videoID       Youtube ID of the video to be entered in the db
      * @param metadata      String containing any metadata to be stored about the video
-     * @return              Error code (0 upon success)
+     * @exception           throws ADD_VIDEO_ERR or ADD_META_ERR
      */
     public void addVideo(String videoID, String metadata) throws CaptionStorageException;
 
@@ -21,7 +21,7 @@ public interface CaptionStorageInterface {
      * @param videoID       Youtube ID of the video already in the db
      * @param keyword       Keyphrase to be added to the video's entry in the db
      * @param timestamps    List of timestamps corresponding to the entity's appearances in the video
-     * @return              Error code (0 upon success, -1 if videoID not in db)
+     * @exception           throws NO_VIDEO_EXISTS or GET_VIDEO_ERR or ADD_KEYPHRASE_ERR
      */
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException;
 
@@ -29,7 +29,7 @@ public interface CaptionStorageInterface {
      * add multiple keyphrase + timestamp pairs to a particular video's entry
      * @param videoID       Youtube ID of the video already in the db
      * @param clauses       map containing pairs of keys & corresponding timestamps
-     * @return              Error code (0 upon success, -1 if videoID not in db)
+     * @exception           throws NO_VIDEO_EXISTS or GET_VIDEO_ERR or ADD_KEYPHRASE_ERR
      */
     public void addClauses(String videoID, Map<String, List<Long>> clauses) throws CaptionStorageException;
 
@@ -38,13 +38,14 @@ public interface CaptionStorageInterface {
      * @param videoID       Youtube ID of the video already in the db
      * @param metadata      String containing any metadata to be stored about the video
      * @param overwrite     if true, any current metadata will be overwritten (otherwise, append)
-     * @return              Error code (0 upon success, -1 if videoID not in db)
+     * @exception           throws NO_VIDEO_EXISTS or GET_VIDEO_ERR or ADD_KEYPHRASE_ERR or NO_META_EXISTS
      */
     public void addMetadata(String videoID, String metadata, boolean overwrite) throws CaptionStorageException;
 
     /*
      * retrieve all keywords + their timestamps in a specified videoID
      * @param videoID       Youtube ID of the video already in the db
+     * @exception           throws GET_VIDEO_ERR or NO_VIDEO_EXISTS or GET_KEYPHRASE_ERR
      * @return              Map of keyword + timestamp pairs belonging to videoID (null if videoID not in db)
      */
     public Map<String, List<Long>> getAllKeywords(String videoID) throws CaptionStorageException;
@@ -53,6 +54,7 @@ public interface CaptionStorageInterface {
      * retrieve specific timestamps for a specified keyword belonging to videoID
      * @param videoID       Youtube ID of the video already in the db
      * @param keyword       Keyphrase in the videoID's db entry
+     * @exception           throws GET_VIDEO_ERR or NO_VIDEO_EXISTS or GET_KEYPHRASE_ERR or NO_KEYPHRASE_EXISTS
      * @return              List of timestamps representing the times that keyword appears in videoID (null if videoID not in db or keyword not in videoID)
      */
     public List<Long> getTimesForKeyword(String videoID, String keyword) throws CaptionStorageException;
@@ -60,6 +62,7 @@ public interface CaptionStorageInterface {
     /*
      * return true if specified video is in the database
      * @param videoID       Youtube ID of video we are looking for
+     * @exception           throws GET_VIDEO_ERR
      * @return              true if ID is stored in db, false if video ID not found
      */
     public boolean videoInDb(String videoID) throws CaptionStorageException;
