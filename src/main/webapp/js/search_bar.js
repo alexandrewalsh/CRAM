@@ -87,7 +87,7 @@ function compareTimestamps(a, b) {
  * Filters the entities based on the current text of the searchbar
  */
 function filterEntities() {
-    var query = $('#entity-seachbar').val().toLowerCase();
+    var query = $('#entity-seachbar').val().toLowerCase().trim();
     var entities = $('#output table tr td:first-child');
 
     // Case 1: Searchbar is empty, so all entities are displayed
