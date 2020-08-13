@@ -27,6 +27,9 @@ import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public final class CaptionStorageTests {
+    
+    private static final String dummyId = "dummyId";
+
     private CaptionStorage db = null;
 
     @Before
@@ -40,10 +43,23 @@ public final class CaptionStorageTests {
 
         db = mock(CaptionStorage.class);
         try {
-            db.addVideo("dummyId", "");
-            db.addVideo("dummyId", "");
+            db.addVideo(dummyId, "");
+            db.addVideo(dummyId, "");
 
-            // how to verify this worked?
+            Assert.assertTrue(db.videoInDb(dummyId));
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testVideoNotInDb() {
+        // test grabbing a video that isn't in the db
+
+        db = mock(CaptionStorage.class);
+        
+        try {
+            Assert.assertFalse(db.videoInDb(dummyId));
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
@@ -58,13 +74,10 @@ public final class CaptionStorageTests {
             db.addVideo("dummyId", "");
             db.addVideo("dummyId", "{'length': 2}");
 
-            // how to verify this worked?
+            // this test is for the future, when metadata is used
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }  
     }
-
-    @Test
-
 
 }
