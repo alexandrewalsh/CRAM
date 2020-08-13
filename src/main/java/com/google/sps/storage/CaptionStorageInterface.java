@@ -67,5 +67,13 @@ public interface CaptionStorageInterface {
      */
     public boolean videoInDb(String videoID) throws CaptionStorageException;
 
+    /*
+     * return true if specified meta is the metadata for videoID
+     * @param videoID       Youtube ID of video whose metadata we are looking for
+     * @param meta          metadata we are looking for
+     * @exception           throws GET_VIDEO_ERR
+     * @return              true if meta is the metadata for videoID, false otherwise
+     */
+    public boolean metaInDb(String videoID, String meta) throws CaptionStorageException;
 }
   

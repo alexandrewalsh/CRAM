@@ -44,8 +44,6 @@ public class CaptionStorage implements CaptionStorageInterface {
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_META_ERR, e.getMessage(), e.getCause());
         }
-        
-        return;
     }
 
     // add a keyphrase + timestamp pair to a particular video in the db
@@ -67,8 +65,6 @@ public class CaptionStorage implements CaptionStorageInterface {
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_KEYPHRASE_ERR, e.getMessage(), e.getCause());
         }
-
-        return;
     }
     
     // add multiple keyphrase + timestamp pairs to a particular video's entry
@@ -82,8 +78,6 @@ public class CaptionStorage implements CaptionStorageInterface {
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_KEYPHRASE_ERR, e.getMessage(), e.getCause());
         }
-
-        return;
     }
     
     // add metadata information to a particular video in the db
@@ -134,8 +128,6 @@ public class CaptionStorage implements CaptionStorageInterface {
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_META_ERR, e.getMessage(), e.getCause());
         }
-
-        return;
     }
     
     // retrieve all keywords + their timestamps in a specified videoID
@@ -208,6 +200,19 @@ public class CaptionStorage implements CaptionStorageInterface {
         }
 
         return true;
+    }
+
+    // return true if specified meta is the metadata for videoID
+    public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
+        try {
+            Entity data = getMetadata(videoID);
+        } catch (CaptionStorageException cse) {
+            throw cse;
+        }
+        if (data.getKey().getName().equals(meta)) {
+                return true;
+        } 
+        return false;
     }
 
     //================================================================================
