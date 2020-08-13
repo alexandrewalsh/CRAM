@@ -50,13 +50,13 @@ public class CaptionStorage implements CaptionStorageInterface {
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException {
         Entity vidEnt;
         
-        try {
+       // try {
             if ((vidEnt = getVideo(videoID)) == null) {
                 throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
             }
-        } catch (CaptionStorageException cse) {
-            throw cse;
-        }
+       // } catch (CaptionStorageException cse) {
+       //     throw cse;
+       // }
 
         try {
             Entity keyEnt = new Entity(COLUMN_CAPTION, keyword, vidEnt.getKey());
@@ -204,13 +204,14 @@ public class CaptionStorage implements CaptionStorageInterface {
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
+        Entity data;
         try {
-            Entity data = getMetadata(videoID);
+            data = getMetadata(videoID);
         } catch (CaptionStorageException cse) {
             throw cse;
         }
         if (data.getKey().getName().equals(meta)) {
-                return true;
+            return true;
         } 
         return false;
     }

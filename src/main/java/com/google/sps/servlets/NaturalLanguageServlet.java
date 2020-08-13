@@ -70,7 +70,7 @@ public class NaturalLanguageServlet extends HttpServlet {
                 response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
             }
         } catch (CaptionStorageException e) {
-            Map<String, String> exceptionMap = new Map<String, String>();
+            Map<String, String> exceptionMap = new HashMap<String, String>();
             exceptionMap.put(e.getReason().toString(), e.getMessage()); 
             response.getWriter().println(gson.toJson(exceptionMap));
         }
