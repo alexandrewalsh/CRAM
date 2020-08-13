@@ -119,15 +119,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         }
 
         int numCaptions = youtubeCaptions.getCaptions().size();
-        NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
-        List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(youtubeCaptions.getCaptions());
-        
-        // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
-        NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
-        for (TimeRangedText text : preprocessedResults) {
-            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
-        }
-        Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
+        Map<String, List<Long>> resultMap = getEntitiesMapFromCaptions(youtubeCaptions.getCaptions());
 
         // Adds clauses to database if a video id has been found
         if (addToDatabase) {
@@ -151,6 +143,26 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.getWriter().println(result);
     }
 
+
+    /**
+     * Generates the entities map from the captions of time ranged texts
+     * @param captions The list of time ranged text that represent the timed captions
+     * @return The entities map that maps each found entity to its list of occurrences in time
+     */
+    public Map<String, List<Long>> getEntitiesMapFromCaptions(List<TimeRangedText> captions) {
+        NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
+        List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(captions);
+        
+        // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
+        NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
+        for (TimeRangedText text : preprocessedResults) {
+            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
+        }
+
+        return postprocessor.getEntitiesMap();
+    }
+
+
     /**
      * Sets the NaturalLanguageProcessor instance for the servlet to use
      * @param nlp The NaturalLanguageProcessor instance to use
@@ -158,6 +170,7 @@ public class NaturalLanguageServlet extends HttpServlet {
     public void setNaturalLanguageProcessor(NaturalLanguageProcessor nlp) {
         this.nlp = nlp;
     }
+
 
     /**
      * Sets the DatabaseInterface instance for the servlet to use
