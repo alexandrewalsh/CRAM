@@ -16,6 +16,7 @@ package com.google.sps;
 
 import com.google.sps.storage.*;
 import java.io.IOException;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
 public final class CaptionStorageTests {
     
     private static final String dummyId = "dummyId";
+    private static final String keyword = "keyword";
 
     private CaptionStorage db = null;
 
@@ -71,10 +73,47 @@ public final class CaptionStorageTests {
 
         db = mock(CaptionStorage.class);
         try {
-            db.addVideo("dummyId", "");
-            db.addVideo("dummyId", "{'length': 2}");
+            db.addVideo(dummyId, "");
+            db.addVideo(dummyId, "{'length': 2}");
 
             // this test is for the future, when metadata is used
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }  
+    }
+
+    @Test
+    public void testEmptyTimestamps() {
+        // Test an empty list as the timestamps
+
+        db = mock(CaptionStorage.class);
+        try {
+            List<Long> empty = new ArrayList<>();
+
+            db.addVideo(dummyId, "");
+            db.addClause(dummyId, keyword, empty);
+
+            Map<String, List<Long>> computed = db.getAllKeywords(dummyId);
+            Map<String, List<Long>> expected = new HashMap();
+            expected.put(dummyId, empty);
+
+            Assert.assertEquals(computed, expected);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }  
+    }
+
+    @Test
+    public void testKeywordsForMissingVideo() {
+        // Try to retrieve keywords for a video that 
+        // was never added
+
+        db = mock(CaptionStorage.class);
+        
+        try {
+            assertThrows(CaptionStorageException.class, () -> {
+                db.addClause(dummyId, keyword, Collections.emptyList());
+            });
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }  
