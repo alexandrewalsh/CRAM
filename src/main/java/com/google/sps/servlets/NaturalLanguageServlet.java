@@ -70,7 +70,9 @@ public class NaturalLanguageServlet extends HttpServlet {
                 response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
             }
         } catch (CaptionStorageException e) {
-            // TODO: what to do if we get an exception from videoInDb() or getAllKeywords()?
+            Map<String, String> exceptionMap = new Map<String, String>();
+            exceptionMap.put(e.getReason().toString(), e.getMessage()); 
+            response.getWriter().println(gson.toJson(exceptionMap));
         }
     }
 
@@ -121,7 +123,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             try {
                 db.addVideo(videoID, DB_NO_METADATA);
             } catch (CaptionStorageException e) {
-                // TODO: what to do if we get an exception from addVideo()?
+                // TODO: report problem in metadataList at the end of this function
             }
         }
 
@@ -177,6 +179,5 @@ public class NaturalLanguageServlet extends HttpServlet {
     public void setDatabase(CaptionStorageInterface db) {
         this.db = db;
     }
-
 
 }
