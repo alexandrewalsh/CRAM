@@ -177,9 +177,18 @@ public class CaptionStorageManager implements CaptionStorageInterface {
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
+<<<<<<< HEAD:src/main/java/com/google/sps/storage/CaptionStorageManager.java
         Entity data = getMetadata(videoID);
+=======
+        Entity data;
+        try {
+            data = getMetadata(videoID);
+        } catch (CaptionStorageException cse) {
+            throw cse;
+        }
+>>>>>>> 304960db9ae10101b7116114c167b87abc1d88ae:src/main/java/com/google/sps/storage/CaptionStorage.java
         if (data.getKey().getName().equals(meta)) {
-                return true;
+            return true;
         } 
         return false;
     }
