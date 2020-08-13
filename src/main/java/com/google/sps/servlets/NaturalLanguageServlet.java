@@ -39,6 +39,8 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String REQUEST_ID_PARAM = "id";
     private static final String REQUEST_NO_METADATA_PARAM = "no_metadata";
     private static final String RESPONSE_VIDEO_ID_NOT_IN_DB = "{}";
+    private static final String EXCEPTION_JSON_START = "{ \"ERROR\": ";
+    private static final String EXCEPTION_JSON_END = "}";
     private static final String METADATA_KEY = "METADATA";
     private static final String DB_NO_METADATA = "no_metadata";
     private static final String VIDEO_URL_ID_DELIMITER = "v=";
@@ -70,7 +72,7 @@ public class NaturalLanguageServlet extends HttpServlet {
                 response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
             }
         } catch (CaptionStorageException e) {
-            String exceptionString = "{ \"ERROR\": " + e.getReason().toString() + "}";
+            String exceptionString = EXCEPTION_JSON_START + e.getReason().toString() + EXCEPTION_JSON_END;
             response.getWriter().println(exceptionString);
         }
     }
