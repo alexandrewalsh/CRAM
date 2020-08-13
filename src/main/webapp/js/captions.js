@@ -22,12 +22,15 @@ var timestamps;
  */
 function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
-    $('#resultsHeader').style = "display: unset;"
+    // hide results and search form
+    $('#resultsHeader').hide(); //style = "display: unset;"
+    $('#entity-search-form').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
 
     // delete all children
     $("#timestamp-timeline").empty();
+    $("#output").empty();
 
     execute(value);
 }
@@ -70,12 +73,7 @@ function execute(url) {
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
         // Sets the results table
-        document.getElementById('output').innerHTML = styleEntitiesFromJson(MOCK_NLP_OUTPUT);
-
-        // clickable entities and timestamps
-        setClickableEntities();
-        sortEntities();
-        
+        successfulDisplay(MOCK_NLP_OUTPUT);
         return;
     }
 
@@ -85,12 +83,7 @@ function execute(url) {
     }).then((response) => response.json()).then((json) => {
         if (Object.keys(json).length > 0) {
             // Sets the results table
-            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-
-            // clickable entities and timestamps
-            setClickableEntities();
-            sortEntities();
-
+            successfulDisplay(json);
             console.log("Fetching captions from database...");
         } else {
             // video id not found in db, fetching from Youtube API
@@ -98,6 +91,23 @@ function execute(url) {
         }
     });
 }
+
+function successfulDisplay(json) {
+    // display results
+    $("#resultsHeader").text("Key Words in Video");
+    $('#entity-search-form').show(); // css('display', 'flex');
+
+    // valid YT Url, clear error status if one exists
+    $('.search-input').removeClass("error-placeholder");
+            
+    document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
+    $("#output").show();
+
+    // clickable entities and timestamps
+    setClickableEntities();
+    sortEntities();
+}
+
 
 /**
  * Renders the YouTube video in the iframe tag
@@ -111,10 +121,11 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += "&origin=" + location.origin;
 
     // display "Results" header
-    document.getElementById("resultsHeader").style.display = "inline";
+    $("#resultsHeader").show(); //style.display = "inline";
 
-    // Displays entity searchbar
-    $('#entity-search-form').css('display', 'flex');
+
+    // Display loading screen
+    $("#resultsHeader").text("Loading...");
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
@@ -173,10 +184,6 @@ function getCaptions(trackId, url) {
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {
                 success(json);
-
-                // valid YT Url, clear error status if one exists
-                $('.search-input').removeClass("error-placeholder");
-                $('.search-input')[0].placeholder = "Insert a YouTube video URL";
             });
         }, function(err) { 
             renderError(err.status);
@@ -272,7 +279,7 @@ function getIdFromUrl(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
-    $('#output').html('<p>Loading...</p>');
+    // $('#output').html('<p>Loading...</p>');
 
     fetch('/caption', {
             method: 'POST',
@@ -280,11 +287,11 @@ function sendJsonForm(json) {
         }).then((response) => response.json()).then((json) => {
             
             // Sets the results table
-            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-
+            
+            successfulDisplay(json);
             // clickable entities and timestamps
-            setClickableEntities();
-            sortEntities();
+            // setClickableEntities();
+            // sortEntities();
         });
 }
 

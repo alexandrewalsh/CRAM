@@ -4,9 +4,11 @@
  */
 function renderError(error) {
     var msg;
+    var longMsg;
 
     if (error == 403) {
         msg = "Video has private captions!";
+        longMsg = "Ask the uploader to enable public captions or try another video";
     } else if (error == 404) {
         msg = "Something went wrong, try again.";
     }
@@ -18,5 +20,12 @@ function renderError(error) {
     // display error message
     $('.search-input')[0].placeholder = msg || error;
 
+    // empty output if any exists
+    $("output").empty();
+    $('#entity-search-form').hide();
+
+    // display error message
+    $("#resultsHeader").show();
+    $("#resultsHeader").text((msg || error) + (longMsg ? "\n"+longMsg:""));
     alert(msg || error);
 }

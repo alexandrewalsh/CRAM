@@ -107,22 +107,6 @@ function signOut() {
 }
 
 /**
- * Render a generic error with a `message`. Currently does not work
- * @param message - the message to render
- */
-function renderError(message) {
-    var errorMsg = document.getElementById('error');
-    if (!errorMsg) {
-        errorMsg.setAttribute('id', 'error');
-        errorMsg = document.createElement('p');
-        errorMsg.classList += 'error';
-        document.body.appendChild(errorMsg);
-    }
-
-    errorMsg.innerText = message;
-}
-
-/**
  * Animates the login box with a dropdown and opacity changes
  */
 function loginBoxAnimation() {
