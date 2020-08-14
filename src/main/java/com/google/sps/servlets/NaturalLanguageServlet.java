@@ -133,13 +133,6 @@ public class NaturalLanguageServlet extends HttpServlet {
 
         // Adds clauses to database if a video id has been found
         if (addToDatabase) {
-            db.addClauses(videoID, resultMap);
-        }
-
-        Map<String, List<Long>> resultMap = getEntitiesMapFromCaptions(youtubeCaptions.getCaptions());
-
-        // Adds clauses to database if a video id has been found
-        if (addToDatabase) {
             try {
                 db.addClauses(videoID, resultMap);
             } catch (CaptionStorageException e) {
