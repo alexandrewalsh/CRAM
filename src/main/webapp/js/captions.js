@@ -2,11 +2,14 @@
  * Currently holds:
  * submitFn                 -- event handler for search bar query
  * execute                  -- execute a request to download captions from Youtube API
+ * displayVideo
+ * beginCaptionRequest
  * getCaptions
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
  * resizeIFrame
+ * styleEntitiesFromJson
  * document.ready
  */
 
@@ -41,6 +44,42 @@ function execute(url) {
         return;
     }
 
+    // displays the video in the front end
+    displayVideo(videoId);
+
+    // checks to see if mock captions should be used
+    const queryParams = new URLSearchParams(window.location.search)
+    if (queryParams.has('mock')) {
+        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
+        return;
+    }
+
+    // checks to see if captions already exist in the database
+    fetch('/caption?id=' + videoId, {
+            method: 'GET',
+        }).then((response) => response.json()).then((json) => {
+            if (Object.keys(json).length > 0) {
+                // Sets the results table
+                document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
+
+                // clickable timestamps
+                var elements = document.getElementsByClassName("timestamps");
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].addEventListener('click', onTimeClick, false);
+                }
+                console.log("Fetching captions from database...");
+            } else {
+                // video id not found in db, fetching from Youtube API
+                beginCaptionRequest(videoId, url);
+            }
+        });
+}
+
+/**
+ * Renders the YouTube video in the iframe tag
+ * @param videoId - the id of the YouTube video to display
+ */
+function displayVideo(videoId) {
     // build the youtube src url
     var youtubeSourceBuilder = "https://www.youtube.com/embed/"
     youtubeSourceBuilder += videoId
@@ -56,6 +95,14 @@ function execute(url) {
     player = new YT.Player('player', {
         events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
     });
+}
+
+/**
+ * Sets up the caption request call
+ * @param videoId - the Youtube video id to find the captions of
+ * @param url - the Youtube video url
+ */
+function beginCaptionRequest(videoId, url) {
 
     // checks to see if mock captions should be used
     const queryParams = new URLSearchParams(window.location.search)
@@ -85,7 +132,6 @@ function execute(url) {
         console.error("Execute error", err); 
     });
 }
-
 
 /** 
  * Get the captions and timestamps for a video with a given `trackId`
@@ -203,29 +249,9 @@ function sendJsonForm(json) {
     fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {
-            var output = '<table>';
-
-            for (var key in json) {
-                // METADATA line sent to log, all others are sent to Caption Results section.
-                if (key == "METADATA") {
-                    console.log('NLP Fetch Time: ' +  json[key][1]);
-                    console.log('Total Youtube Captions: ' + json[key][0]);
-                    console.log('Total Entities Found: ' + json[key][2]);
-                }
-                else {
-                    output += '<tr><td><span class="word">' + key + ':</span></td>';
-                    for (var i = 0; i < json[key].length; i++) {
-                        output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
-                        if (i + 1 < json[key].length) {
-                            output += '<td class="white-text">, </td>';
-                        }
-                    }
-                    output += '</tr>';
-                }
-            }
-            output += '</table>';
-            document.getElementById('output').innerHTML = output;
+        }).then((response) => response.json()).then((json) => {            
+            // Sets the results table
+            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
 
             // clickable timestamps
             var elements = document.getElementsByClassName("timestamps");
@@ -256,6 +282,35 @@ function resizeIFrame() {
     $('#player').height(playerHeight);
     $('#output').height(playerHeight - $('#resultsHeader').height());
 }
+
+/**
+ * Builds the entities table from the json response
+ * @param json - The json response of entity data
+ */
+function styleEntitiesFromJson(json) {
+    var output = '<table>';
+
+    for (var key in json) {
+        // METADATA line sent to log, all others are sent to Caption Results section.
+        if (key == "METADATA") {
+            console.log('NLP Fetch Time: ' +  json[key][1]);
+            console.log('Total Youtube Captions: ' + json[key][0]);
+            console.log('Total Entities Found: ' + json[key][2]);
+        } else {
+            output += '<tr><td><span class="word">' + key + ':</span></td>';
+            for (var i = 0; i < json[key].length; i++) {
+                output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
+                if (i + 1 < json[key].length) {
+                    output += '<td class="white-text">, </td>';
+                }
+            }
+            output += '</tr>';
+        }
+    }
+    output += '</table>';
+    return output;
+}
+
 
 $(document).ready(() => {
 

@@ -16,6 +16,7 @@ package com.google.sps;
 
 import com.google.sps.servlets.NaturalLanguageServlet;
 import com.google.sps.data.NaturalLanguageProcessor;
+import com.google.sps.storage.CaptionStorageManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
@@ -51,6 +52,7 @@ public final class NaturalLanguageServletTest {
     HttpServletRequest request = null;
     HttpServletResponse response = null;
     NaturalLanguageProcessor nlp = null;
+    CaptionStorageManager db = null;
     PrintWriter writer = null;
     NaturalLanguageServlet servlet = null;
 
@@ -61,6 +63,7 @@ public final class NaturalLanguageServletTest {
         response = mock(HttpServletResponse.class);
         writer = mock(PrintWriter.class);
         nlp = mock(NaturalLanguageProcessor.class);
+        db = mock(CaptionStorageManager.class);
         servlet = new NaturalLanguageServlet();
 
         // Adds stubbing that does not require specific parameters
@@ -93,6 +96,7 @@ public final class NaturalLanguageServletTest {
         // Runs doPost and fails if exceptions are thrown
         try { 
             servlet.setNaturalLanguageProcessor(nlp);
+            servlet.setDatabase(db);
             servlet.doPost(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,6 +123,7 @@ public final class NaturalLanguageServletTest {
         // Runs doPost and fails if exceptions are thrown
         try { 
             servlet.setNaturalLanguageProcessor(nlp);
+            servlet.setDatabase(db);
             servlet.doPost(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,6 +164,7 @@ public final class NaturalLanguageServletTest {
         // Runs doPost and fails if exceptions are thrown
         try { 
             servlet.setNaturalLanguageProcessor(nlp);
+            servlet.setDatabase(db);
             servlet.doPost(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,6 +204,7 @@ public final class NaturalLanguageServletTest {
         // Runs doPost and fails if exceptions are thrown
         try { 
             servlet.setNaturalLanguageProcessor(nlp);
+            servlet.setDatabase(db);
             servlet.doPost(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -247,6 +254,7 @@ public final class NaturalLanguageServletTest {
         // Runs doPost and fails if exceptions are thrown
         try { 
             servlet.setNaturalLanguageProcessor(nlp);
+            servlet.setDatabase(db);
             servlet.doPost(request, response);
         } catch (Exception e) {
             e.printStackTrace();
