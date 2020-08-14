@@ -12,10 +12,19 @@ const MOCK_JSON_CAPTIONS = {
     ]
 }
 
+const MOCK_NLP_OUTPUT = {
+    mock: [0,1,2],
+    mocker: [0,2],
+    mockest: [1],
+    apple: [30],
+    banana: [0]
+}
+
 const GAPI_CLIENT = 'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest';
 
 const PLAYER_URL = 'https://' + window.location.hostname + '/player.html';
 const PLAYER_MOCK_URL = 'https://' + window.location.hostname + '/player.html?mock';
+const PLAYER_MOCKALL_URL = 'https://' + window.location.hostname + '/player.html?mockall';
 const LOGIN_URL_WITH_SLASH = 'https://' + window.location.hostname + '/';
 const LOGIN_URL_WITHOUT_SLASH = 'https://' + window.location.hostname;
 
