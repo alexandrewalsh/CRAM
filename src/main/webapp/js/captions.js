@@ -96,7 +96,7 @@ function execute(url) {
 function successfulDisplay(json) {
     // display results
     $("#resultsHeader").text("Key Words in Video");
-    $('#entity-search-form').show(); // css('display', 'flex');
+    $('#entity-search-form').show();
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
@@ -122,7 +122,7 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += "&origin=" + location.origin;
 
     // display "Results" header
-    $("#resultsHeader").show(); //style.display = "inline";
+    $("#resultsHeader").show();
 
     // Display loading screen
     $("#resultsHeader").text("Loading...");
@@ -138,6 +138,9 @@ function displayVideo(videoId) {
     } else {
         player.loadVideoByUrl("http://www.youtube.com/v/"+videoId+"?version=3");
     }
+
+    // append bookmark button
+    setBookmarkButton();
 }
 
 
@@ -285,14 +288,9 @@ function sendJsonForm(json) {
     fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {
-            
-            // Sets the results table
-            
+        }).then((response) => response.json()).then((json) => {     
+            // Sets the results table            
             successfulDisplay(json);
-            // clickable entities and timestamps
-            // setClickableEntities();
-            // sortEntities();
         });
 }
 
@@ -360,6 +358,9 @@ function setClickableEntities() {
         // delete all children
         $("#timestamp-timeline").empty();
 
+        // append bookmark button
+        setBookmarkButton();
+
         // query json
         $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
 
@@ -377,6 +378,37 @@ function setClickableEntities() {
 }
 
 
+/**
+ * Adds button to add bookmarks and listeners
+ */
+function setBookmarkButton() {
+    // append bookmark button
+    $("#timestamp-timeline").append("<button id='add-bookmark-button'>+</button>");
+
+    // Displays modal for adding bookmark
+    $('#add-bookmark-button').click(() => {
+        $('#myModal').css('display', 'block');
+        $('.modal-body form').css('display', 'block');
+        player.pauseVideo();
+    });
+
+    // Closes modal when clicking close button
+    $('.modal-close').click(() => {
+        $('#myModal').css('display', 'none');
+        $('.modal-body form').css('display', 'none');
+    });
+
+    // Closes modal when clicking outside the modal
+    $(window).click(function(event) {
+        // Must check if the modal is open before closing the modal
+        if (event.target == document.getElementById('myModal')) {
+            $('#myModal').css('display', 'none');
+            $('.modal-body form').css('display', 'none');
+        }
+    });
+}
+
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -384,4 +416,5 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
+
 });

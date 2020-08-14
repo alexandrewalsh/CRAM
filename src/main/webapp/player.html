@@ -28,6 +28,26 @@
         <script defer src="js/captions.js"></script>
     </head>
     <body>
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add Bookmark</h2>
+                    <span class="modal-close">&times;</span>
+                </div>
+                <div class="modal-body">
+                        <label for="title">Title:</label><br>
+                        <input type="text" id="bookmark-title" name="title"><br><br>
+                        <label for="content">Content:</label><br>
+                        <textarea id="bookmark-content" name="content" rows="10" cols="30"></textarea><br><br>
+                        <button id="bookmark-add-button">Submit</button>
+                </div>
+
+            </div>
+        </div>        
+
         <div id="heading-div" class="container">
             <div id="heading-flex">
                 <h1>Lecture Buddy</h1>
