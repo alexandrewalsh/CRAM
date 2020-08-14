@@ -49,7 +49,6 @@ public class NaturalLanguageServlet extends HttpServlet {
     private NaturalLanguageProcessor nlp;
     private CaptionStorageInterface db;
 
-
     /**
      * Gets database data for comments
      * @param request The request object 
@@ -121,6 +120,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             if (ampersandPosition != -1) {
                 videoID = videoID.substring(0, ampersandPosition);
             }
+
             try {
                 db.addVideo(videoID, DB_NO_METADATA);
             } catch (CaptionStorageException e) {
@@ -129,15 +129,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         }
 
         int numCaptions = youtubeCaptions.getCaptions().size();
-        NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
-        List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(youtubeCaptions.getCaptions());
-        
-        // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
-        NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
-        for (TimeRangedText text : preprocessedResults) {
-            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
-        }
-        Map<String, List<Long>> resultMap = postprocessor.getEntitiesMap();
+        Map<String, List<Long>> resultMap = getEntitiesMapFromCaptions(youtubeCaptions.getCaptions());
 
         // Adds clauses to database if a video id has been found
         if (addToDatabase) {
@@ -165,6 +157,26 @@ public class NaturalLanguageServlet extends HttpServlet {
         response.getWriter().println(result);
     }
 
+
+    /**
+     * Generates the entities map from the captions of time ranged texts
+     * @param captions The list of time ranged text that represent the timed captions
+     * @return The entities map that maps each found entity to its list of occurrences in time
+     */
+    public Map<String, List<Long>> getEntitiesMapFromCaptions(List<TimeRangedText> captions) {
+        NaturalLanguagePreprocessor preprocessor = new NaturalLanguagePreprocessor();
+        List<TimeRangedText> preprocessedResults = preprocessor.setTimeRanges(captions);
+        
+        // Sends the text of newly defined time ranges to the NLP API and organizes the results in the postprocessor
+        NaturalLanguagePostprocessor postprocessor = new NaturalLanguagePostprocessor();
+        for (TimeRangedText text : preprocessedResults) {
+            postprocessor.addEntities(nlp.getEntities(text.getText()), text.getStartTime());
+        }
+
+        return postprocessor.getEntitiesMap();
+    }
+
+
     /**
      * For mock testing only
      * Sets the NaturalLanguageProcessor instance for the servlet to use
@@ -174,6 +186,7 @@ public class NaturalLanguageServlet extends HttpServlet {
         this.nlp = nlp;
     }
 
+  
     /**
      * For mock testing only
      * Sets the CaptionStorageInterface instance for the servlet to use

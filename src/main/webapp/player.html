@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/search-bar.css">
         <link rel="stylesheet" href="css/player.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script defer src="js/time_manipulation.js"></script>
         <script defer src="js/search_bar.js"></script>
         <script defer src="js/error_handling.js"></script>
@@ -48,12 +49,29 @@
                 </form>
         </div>
         <!-- player & output -->
-        <div id="output-container" class="container-row space-between top-10px">
-            <div id="flex-item-video" class="video">                
-                <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+        <div id="output-container" class="container-row">
+            <!-- player -->
+            <div id="player-pane" class="container-column">
+                <div id="flex-item-video" class="video">                
+                    <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>      
+                </div>
+                <div id="timestamp-timeline" class="container-row" >
+                    <p></p>
+                </div>
             </div>
-            <div id="flex-item-output" class="text-center">
-                <h1 id="resultsHeader" class="text-center hide">Results</h1>
+            <div id="flex-item-output" class="container-column text-center">
+                <h1 id="resultsHeader" class="text-center hide">Keywords in Video</h1>
+                <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
+                    <div>
+                        <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
+                        <!-- NOTE: Button will be used for semantic similarity with python server -->
+                        <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                    </div>
+                    <select id="entity-sort" name="sort-option">
+                        <option value="alphabetical">A-Z</option>
+                        <option value="chronological">Time</option>
+                    </select>
+                </form>
                 <div id="output"></div>
             </div>
         </div>

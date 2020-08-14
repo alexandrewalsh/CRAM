@@ -39,9 +39,7 @@ function authenticate() {
                 checkLogin();
             });
             },function(err) { 
-                console.error("Error signing in", err); 
-                renderError("Error signing in, please ty again.");
-                // render error elements
+                alert("Error signing in, please try again");
             });
 }
 
@@ -54,9 +52,8 @@ function loadClient() {
         .then(function() {
             console.log("GAPI client loaded for API");
             },
-            function(err) { 
-                renderError("Error loading GAPI client"); // these functions don't work yet @enriqueavina
-                console.error("Error loading GAPI client for API", err);
+            function(err) {
+                alert("Error loading Google APIs"); 
             });
 }
 
@@ -85,7 +82,7 @@ function checkLogin() {
 
         GoogleAuth.then(function() {
             if (GoogleAuth.isSignedIn.get()) {
-                if (window.location.href !== PLAYER_URL && window.location.href !== PLAYER_MOCK_URL) {
+                if (window.location.href !== PLAYER_URL && window.location.href !== PLAYER_MOCK_URL && window.location.href !== PLAYER_MOCKALL_URL) {
                     window.location.replace(PLAYER_URL);    // redirect to player
                 }
             } else {
@@ -107,22 +104,6 @@ function signOut() {
         GoogleAuth.signOut();
         window.location.replace(LOGIN_URL_WITHOUT_SLASH);    // redirect back to login page
     });
-}
-
-/**
- * Render a generic error with a `message`. Currently does not work
- * @param message - the message to render
- */
-function renderError(message) {
-    var errorMsg = document.getElementById('error');
-    if (!errorMsg) {
-        errorMsg.setAttribute('id', 'error');
-        errorMsg = document.createElement('p');
-        errorMsg.classList += 'error';
-        document.body.appendChild(errorMsg);
-    }
-
-    errorMsg.innerText = message;
 }
 
 /**
