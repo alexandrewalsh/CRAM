@@ -14,8 +14,7 @@
 
 package com.google.sps.servlets;
 
-import com.google.sps.database.DatabaseImpl;
-import com.google.sps.database.DatabaseInterface;
+import com.google.sps.storage.*;
 import java.io.IOException;
 import java.lang.InterruptedException;
 import javax.servlet.annotation.WebServlet;
@@ -40,14 +39,15 @@ public class NaturalLanguageServlet extends HttpServlet {
     private static final String REQUEST_ID_PARAM = "id";
     private static final String REQUEST_NO_METADATA_PARAM = "no_metadata";
     private static final String RESPONSE_VIDEO_ID_NOT_IN_DB = "{}";
+    private static final String EXCEPTION_JSON_START = "{ \"ERROR\": ";
+    private static final String EXCEPTION_JSON_END = "}";
     private static final String METADATA_KEY = "METADATA";
     private static final String DB_NO_METADATA = "no_metadata";
     private static final String VIDEO_URL_ID_DELIMITER = "v=";
     private static final char URL_QUERY_DELIMITER = '&';
 
     private NaturalLanguageProcessor nlp;
-    private DatabaseInterface db;
-
+    private CaptionStorageInterface db;
 
     /**
      * Gets database data for comments
@@ -57,17 +57,22 @@ public class NaturalLanguageServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        DatabaseImpl dbi = new DatabaseImpl();
+        CaptionStorageManager dbi = new CaptionStorageManager();
         Gson gson = new Gson();
         String videoID = (String) request.getParameter(REQUEST_ID_PARAM);
         response.setContentType(RESPONSE_JSON_CONTENT);
 
         // Returns the entities mapping if the video id is in the database
-        if (videoID != null && dbi.videoInDb(videoID)) {
-            Map<String, List<Long>> resultMap = dbi.getAllKeywords(videoID);
-            response.getWriter().println(gson.toJson(resultMap));
-        } else {
-            response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
+        try {
+            if (videoID != null && dbi.videoInDb(videoID)) {
+                Map<String, List<Long>> resultMap = dbi.getAllKeywords(videoID);
+                response.getWriter().println(gson.toJson(resultMap));
+            } else {
+                response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
+            }
+        } catch (CaptionStorageException e) {
+            String exceptionString = EXCEPTION_JSON_START + e.getReason().toString() + EXCEPTION_JSON_END;
+            response.getWriter().println(exceptionString);
         }
     }
 
@@ -96,7 +101,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             this.nlp = new NaturalLanguageProcessor();
         }
         if (this.db == null) {
-            this.db = new DatabaseImpl();
+            this.db = new CaptionStorageManager();
         }
 
         // Builds the Java object from JSON and preprocesses the captions by redefining time ranges
@@ -115,7 +120,12 @@ public class NaturalLanguageServlet extends HttpServlet {
             if (ampersandPosition != -1) {
                 videoID = videoID.substring(0, ampersandPosition);
             }
-            db.addVideo(videoID, DB_NO_METADATA);
+
+            try {
+                db.addVideo(videoID, DB_NO_METADATA);
+            } catch (CaptionStorageException e) {
+                // TODO: report problem in metadataList at the end of this function
+            }
         }
 
         int numCaptions = youtubeCaptions.getCaptions().size();
@@ -124,6 +134,17 @@ public class NaturalLanguageServlet extends HttpServlet {
         // Adds clauses to database if a video id has been found
         if (addToDatabase) {
             db.addClauses(videoID, resultMap);
+        }
+
+        Map<String, List<Long>> resultMap = getEntitiesMapFromCaptions(youtubeCaptions.getCaptions());
+
+        // Adds clauses to database if a video id has been found
+        if (addToDatabase) {
+            try {
+                db.addClauses(videoID, resultMap);
+            } catch (CaptionStorageException e) {
+                // TODO: what to do if we get an exception from addClauses()?
+            }
         }
         
         long endTime = System.nanoTime();
@@ -164,6 +185,7 @@ public class NaturalLanguageServlet extends HttpServlet {
 
 
     /**
+     * For mock testing only
      * Sets the NaturalLanguageProcessor instance for the servlet to use
      * @param nlp The NaturalLanguageProcessor instance to use
      */
@@ -171,14 +193,13 @@ public class NaturalLanguageServlet extends HttpServlet {
         this.nlp = nlp;
     }
 
-
+  
     /**
-     * Sets the DatabaseInterface instance for the servlet to use
-     * @param db The DatabaseInterface instance to use
+     * For mock testing only
+     * Sets the CaptionStorageInterface instance for the servlet to use
+     * @param db The CaptionStorageInterface instance to use
      */
-    public void setDatabase(DatabaseInterface db) {
+    public void setDatabase(CaptionStorageInterface db) {
         this.db = db;
     }
-
-
 }

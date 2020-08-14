@@ -8,6 +8,7 @@
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
+ * resizeIFrame
  * styleEntitiesFromJson
  * document.ready
  */
@@ -123,7 +124,6 @@ function displayVideo(videoId) {
     // display "Results" header
     $("#resultsHeader").show(); //style.display = "inline";
 
-
     // Display loading screen
     $("#resultsHeader").text("Loading...");
 
@@ -131,6 +131,18 @@ function displayVideo(videoId) {
     $('#player').attr('src', youtubeSourceBuilder);  
     resizeIFrame();  
 
+    player = new YT.Player('player', {
+        events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
+    });
+}
+
+
+/**
+ * Sets up the caption request call
+ * @param videoId - the Youtube video id to find the captions of
+ * @param url - the Youtube video url
+ */
+function beginCaptionRequest(videoId, url) {
     if (player == null) {
         player = new YT.Player('player', {
             events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
@@ -374,6 +386,35 @@ function setClickableEntities() {
         setClickableTimestamps();
     });
 }
+
+/**
+ * Builds the entities table from the json response
+ * @param json - The json response of entity data
+ */
+function styleEntitiesFromJson(json) {
+    var output = '<table>';
+
+    for (var key in json) {
+        // METADATA line sent to log, all others are sent to Caption Results section.
+        if (key == "METADATA") {
+            console.log('NLP Fetch Time: ' +  json[key][1]);
+            console.log('Total Youtube Captions: ' + json[key][0]);
+            console.log('Total Entities Found: ' + json[key][2]);
+        } else {
+            output += '<tr><td><span class="word">' + key + ':</span></td>';
+            for (var i = 0; i < json[key].length; i++) {
+                output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
+                if (i + 1 < json[key].length) {
+                    output += '<td class="white-text">, </td>';
+                }
+            }
+            output += '</tr>';
+        }
+    }
+    output += '</table>';
+    return output;
+}
+
 
 $(document).ready(() => {
 
