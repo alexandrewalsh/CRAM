@@ -14,7 +14,9 @@
  */
 
 /** global variables holding the json response for timestamps */
+var currentVideoID;
 var timestamps;
+var bookmarks = [];
 
 /**
  * Event handler for search bar query, entry point
@@ -56,6 +58,7 @@ function execute(url) {
 
     try {
         videoId = getIdFromUrl(url);
+        currentVideoID = videoId;
     } catch {
         renderError("Invalid youtube url!");
         return;
@@ -377,6 +380,13 @@ function setClickableEntities() {
     });
 }
 
+/**
+ * Clears the contents of the bookmarks form
+ */
+function clearBookmarkForm() {
+    $('#bookmark-title').val('');
+    $('#bookmark-content').val('');
+}
 
 /**
  * Adds button to add bookmarks and listeners
@@ -396,6 +406,7 @@ function setBookmarkButton() {
     $('.modal-close').click(() => {
         $('#myModal').css('display', 'none');
         $('.modal-body form').css('display', 'none');
+        clearBookmarkForm();
     });
 
     // Closes modal when clicking outside the modal
@@ -404,6 +415,7 @@ function setBookmarkButton() {
         if (event.target == document.getElementById('myModal')) {
             $('#myModal').css('display', 'none');
             $('.modal-body form').css('display', 'none');
+            clearBookmarkForm();
         }
     });
 }
@@ -415,6 +427,28 @@ $(document).ready(() => {
     resizeIFrame();
     $(window).resize(() => {
         resizeIFrame();
+    });
+
+    $('#bookmark-add-button').click(() => {
+        var params = new URLSearchParams();
+        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        params.append('videoId', currentVideoID);
+        params.append('timestamp', Math.floor(player.getCurrentTime()));
+        params.append('title', $('#bookmark-title').val());
+        params.append('content', $('#bookmark-content').val());
+        params.append('function', 'add');
+
+        fetch('/bookmark', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.text()).then((text) => {     
+            console.log(text);
+        });
+
+        // Hides the modal
+        $('#myModal').css('display', 'none');
+        $('.modal-body form').css('display', 'none');
+        clearBookmarkForm();
     });
 
 });
