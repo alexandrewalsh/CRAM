@@ -3,7 +3,8 @@
 */
 
 #output {
-    overflow: scroll;
+    overflow: auto;
+    width: 100%;
 }
 
 #player {
@@ -20,6 +21,15 @@
     right: 10px;
 }
 
+#output-container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+#resultsHeader {
+    padding-bottom: 3%;
+}
+
 .container-row {
     display: flex;
     flex-direction: row;
@@ -30,17 +40,14 @@
 }
 
 #flex-item-output {
-    width: 40%;
-    margin: auto;
+    flex: 1;
+    justify-content: space-between;
+    margin: 0 auto;
 }
 
 table {
     margin-left: auto;
     margin-right: auto;
-}
-
-.space-between {
-    justify-content: space-around;
 }
 
 .top-10px {
@@ -70,20 +77,22 @@ table {
 
 .word {
     color: #FFFFFF;
+    font-size: 24px;
+}
+
+.word:hover {
+    cursor: pointer;
+    color: darkgrey;
 }
 
 .timestamps {
     cursor: pointer;
     color: #FFFFFF;
+    padding: 0 0 10px 10px;
 }
 
 .timestamps:hover {
     color: grey;
-}
-
-.video {
-    width: 50%;
-    margin: auto;
 }
 
 .theater {
@@ -96,7 +105,23 @@ table {
   display: none;
 }
 
+.error-placeholder::placeholder {
+    color: red;
+}
 
+#timestamp-timeline {
+    justify-content: center;
+}
+
+#timestamp-timeline span, p {
+    font-size: 24px;
+}
+
+#player-pane {
+    flex: 2;
+}
+
+/** Styles dependent on width of screen */
 @media screen and (max-width: 1000px) {
     #header-buttons-div {
         position: relative;
@@ -112,6 +137,24 @@ table {
     }
 }
 
+@media screen and (max-width: 900px) {
+    #timestamp-timeline span, p {
+        font-size: inherit;
+    }
+    
+    #resultsHeader {
+        font-size: 30px;
+    }
+
+    .word {
+        font-size: 20px;
+    }
+
+    form.entity-search input[type=text] {
+        padding: 0px;
+    }
+}
+
 @media screen and (max-width: 700px) {
     #searchbar-div {
         margin-top: 10%;
@@ -123,8 +166,3 @@ table {
         margin-top: 20%;
     }
 }
-
-.error-placeholder::placeholder {
-    color: red;
-}
-
