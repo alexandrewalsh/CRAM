@@ -110,6 +110,8 @@ function successfulDisplay(json) {
     // clickable entities and timestamps
     setClickableEntities();
     sortEntities();
+
+    displayBookmarks('TEST_FOR_NOW', currentVideoID);
 }
 
 
@@ -377,6 +379,24 @@ function setClickableEntities() {
         
         // clickable timestamps
         setClickableTimestamps();
+    });
+}
+
+/**
+ * Fetches and displays the bookmarks for the current user and video
+ * @param email - The email of the current user
+ * @param videoId - The videoId of the current video
+ */
+function displayBookmarks(email, videoId) {
+    var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
+    fetch(fetchUrlBuilder).then((res) => res.json()).then(list => {
+        var output = '<table>';
+        for (bookmark of list) {
+            output += '<tr><td><span class="bookmark">' + bookmark.title + '</span></td>';
+            output += '<td><button value="' + bookmark.id + '">Remove</button></td></tr>';
+        }
+        output += '</table>'
+        $('#temp').html(output);
     });
 }
 
