@@ -1,7 +1,6 @@
 /*
  * Implementation for DatabaseImpl class
  *  Current public functions at a glance:
- *  test()
  *  addVideo()
  *  addClause()
  *  addClauses()
@@ -9,7 +8,10 @@
  *  getAllKeywords()
  *  getTimesForKeyword()
  *  videoInDb()
- * 
+ *  metaInDb()
+ *  deleteVideo()
+ *  deleteClause()
+ *  deleteMetadata()
  */
 
 package com.google.sps.storage;
@@ -179,16 +181,75 @@ public class CaptionStorageManager implements CaptionStorageInterface {
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
-        Entity data;
-        try {
-            data = getMetadata(videoID);
-        } catch (CaptionStorageException cse) {
-            throw cse;
-        }
+        Entity data = getMetadata(videoID);
         if (data.getKey().getName().equals(meta)) {
             return true;
-        } 
+        }
         return false;
+    }
+
+    // delete a video & all its children (metadata & captions) from the database
+    public void deleteVideo(String videoID) throws CaptionStorageException {
+        Entity vidEnt;
+        if ((vidEnt = getVideo(videoID)) == null) {
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+        }
+        Key vidKey = vidEnt.getKey();
+        try {
+            datastore.delete(vidKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_VIDEO_ERR, e.getMessage(), e.getCause());
+        }
+    }
+
+    // delete a specific keyword from a video in the database
+    public void deleteClause(String videoID, String keyword) throws CaptionStorageException {
+        Query query = new Query(COLUMN_CAPTION);
+        PreparedQuery results = datastore.prepare(query);
+
+        Entity keywordEnt = null;
+        try {
+            for (Entity entity : results.asIterable()) {
+                if (entity.getKey().getName().equals(keyword)) {
+                    keywordEnt = entity;
+                }
+            }
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.GET_KEYPHRASE_ERR, e.getMessage(), e.getCause());
+        }
+
+        Key keywordKey = keywordEnt.getKey();
+        try {
+            datastore.delete(keywordKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_KEYPHRASE_ERR, e.getMessage(), e.getCause());
+        }
+        
+    }
+
+    // delete the metadata belonging to a specific video in the database
+    public void deleteMetadata(String metadata) throws CaptionStorageException {
+        Query query = new Query(COLUMN_METADATA);
+        PreparedQuery results = datastore.prepare(query);
+
+        Entity metaEnt = null;
+        try {
+            for (Entity entity : results.asIterable()) {
+                if (entity.getKey().getName().equals(metadata)) {
+                    metaEnt = entity;
+                }
+            }
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.GET_META_ERR, e.getMessage(), e.getCause());
+        }
+
+        Key metaKey = metaEnt.getKey();
+        try {
+            datastore.delete(metaKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_META_ERR, e.getMessage(), e.getCause());
+        }
+        
     }
 
     //================================================================================
