@@ -431,7 +431,8 @@ $(document).ready(() => {
 
     $('#bookmark-add-button').click(() => {
         var params = new URLSearchParams();
-        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        //params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        params.append('email', 'TEST_FOR_NOW');
         params.append('videoId', currentVideoID);
         params.append('timestamp', Math.floor(player.getCurrentTime()));
         params.append('title', $('#bookmark-title').val());

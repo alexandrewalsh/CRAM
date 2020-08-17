@@ -14,15 +14,16 @@
 
 package com.google.sps.storage;
 
-import com.google.sps.data.Bookmark;
-import java.util.List;
+public class BookmarkStorageException extends Exception {
 
-public interface BookmarkStorageInterface {
+    private String reason;
 
-    public List<Bookmark> getAllBookmarks(String email, String videoId) throws BookmarkStorageException;
+    public BookmarkStorageException(String reason, String errorMessage, Throwable err) {
+        super(errorMessage, err);
+        this.reason = reason;
+    }
 
-    public void addBookmark(String userEmail, String videoId, long videoTimestamp, String title, String content) throws BookmarkStorageException;
-
-    public void removeBookmark(String id) throws BookmarkStorageException;
-
+    public String getReason() {
+        return this.reason;
+    }
 }

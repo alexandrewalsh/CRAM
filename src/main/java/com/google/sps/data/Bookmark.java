@@ -21,20 +21,32 @@ import javax.annotation.*;
 /** The object that represents a single Bookmark */
 public final class Bookmark {
 
-    private final long id;
-    private final String email;
-    private final String videoId;
+    private final String id;
     private final long timestamp;
     private final String title;
     private final String content;
 
-    public Bookmark(long id, String email, String videoId, long timestamp, String title, String conent) {
+    public Bookmark(String id, long timestamp, String title, String content) {
         this.id = id;
-        this.email = email;
-        this.videoId = videoId;
         this.timestamp = timestamp;
         this.title = title;
-        this.conent = conent;
+        this.content = content;
+    }
+
+    public String getBookmarkId() {
+        return this.id;
+    }
+
+    public long getVideoTimestamp() {
+        return this.timestamp;
+    }
+
+    public String getBookmarkTitle() {
+        return this.title;
+    }
+
+    public String getBookmarkContent() {
+        return this.content;
     }
 
 }
