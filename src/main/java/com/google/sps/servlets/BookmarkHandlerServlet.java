@@ -74,11 +74,11 @@ public class BookmarkHandlerServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
         String function = (String) request.getParameter(REQUEST_FUNCTION_PARAM);
+        String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
+        String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
         BookmarkStorageInterface storage = new BookmarkStorageManager();
 
         if (function.equals(REQUEST_ADD_FUNCTION)) {
-            String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
-            String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
             long timestamp = Long.parseLong((String) request.getParameter(REQUEST_TIMESTAMP_PARAM));
             String title = (String) request.getParameter(REQUEST_TITLE_PARAM);
             String content = (String) request.getParameter(REQUEST_CONTENT_PARAM);
@@ -97,6 +97,17 @@ public class BookmarkHandlerServlet extends HttpServlet {
                 // TODO: Handle exception
             }
         }
+
+        List<Bookmark> bookmarks = new ArrayList<>();
+        try {
+            bookmarks = storage.getAllBookmarks(email, videoId);
+        } catch (BookmarkStorageException e) {
+            // TODO: Handle exception
+        }
+
+        Gson gson = new Gson();
+        response.setContentType(RESPONSE_JSON_CONTENT);
+        response.getWriter().println(gson.toJson(bookmarks));
 
     }
 

@@ -16,7 +16,7 @@
 /** global variables holding the json response for timestamps */
 var currentVideoID;
 var timestamps;
-var bookmarks = [];
+var bookmarks;
 
 /**
  * Event handler for search bar query, entry point
@@ -111,7 +111,7 @@ function successfulDisplay(json) {
     setClickableEntities();
     sortEntities();
 
-    displayBookmarks('TEST_FOR_NOW', currentVideoID);
+    fetchBookmarks('TEST_FOR_NOW', currentVideoID);
 }
 
 
@@ -357,7 +357,7 @@ function setClickableTimestamps() {
  * timestamps. Also makes the timestamps clickable.
  */
 function setClickableEntities() {
-    $('.word').bind("click", function(){
+    $('.word').bind("click", function() {
         const entity = this.innerText;
             
         // delete all children
@@ -387,16 +387,43 @@ function setClickableEntities() {
  * @param email - The email of the current user
  * @param videoId - The videoId of the current video
  */
-function displayBookmarks(email, videoId) {
+function fetchBookmarks(email, videoId) {
     var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
-    fetch(fetchUrlBuilder).then((res) => res.json()).then(list => {
-        var output = '<table>';
-        for (bookmark of list) {
-            output += '<tr><td><span class="bookmark">' + bookmark.title + '</span></td>';
-            output += '<td><button value="' + bookmark.id + '">Remove</button></td></tr>';
-        }
-        output += '</table>'
-        $('#temp').html(output);
+
+    fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
+        displayBookmarks(json);
+    });
+
+}
+
+function displayBookmarks(list) {
+    bookmarks = {};
+    var output = '<table>';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<tr><td><span class="bookmark">' + bookmark.title + '</span></td>';
+        output += '<td><button class="remove-bookmark" value="' + bookmark.id + '">Remove</button></td></tr>';
+    }
+    output += '</table>'
+    $('#temp').html(output);
+
+    $('.remove-bookmark').off('click');
+    $('.remove-bookmark').click(function() {
+        var id = $(this).val();
+        var params = new URLSearchParams();
+        //params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        params.append('email', 'TEST_FOR_NOW');
+        params.append('videoId', currentVideoID);
+        params.append('bookmarkId', id);
+        params.append('function', 'remove');
+        fetch('/bookmark', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.json()).then(json => {
+            displayBookmarks(json);
+        });
+
+
     });
 }
 
@@ -462,8 +489,8 @@ $(document).ready(() => {
         fetch('/bookmark', {
             method: 'POST',
             body: params,
-        }).then((response) => response.text()).then((text) => {     
-            console.log(text);
+        }).then((response) => response.json()).then(json => {
+            displayBookmarks(json);
         });
 
         // Hides the modal

@@ -29,6 +29,7 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
     private static final String BOOKMARK_TITLE_PROPERTY = "title";
     private static final String BOOKMARK_CONTENT_PROPERTY = "content";
     private static final String EXCEPTION_ADD_BOOKMARK = "AddBookmarkException";
+    private static final String EXCEPTION_REMOVE_BOOKMARK = "RemoveBookmarkException";
 
     
     
@@ -79,6 +80,12 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
     }
 
     public void removeBookmark(String id) throws BookmarkStorageException {
-
+        Key key;
+        try {
+            key = KeyFactory.stringToKey(id);
+            datastore.delete(key);
+        } catch (Exception e) {
+            throw new BookmarkStorageException(EXCEPTION_REMOVE_BOOKMARK, e.getMessage(), e.getCause()); 
+        }
     }
 }
