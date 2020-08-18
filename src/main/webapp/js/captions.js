@@ -409,9 +409,12 @@ function displayBookmarks(list) {
         output += bookmark.id;
         output += '">Remove</button></div></div>'
     }
+    
+    $('#bookmark-display-div').html(output);
 
     $('.remove-bookmark').off('click');
     $('.remove-bookmark').click(function() {
+        console.log("BOO");
         var id = $(this).val();
         var params = new URLSearchParams();
         //params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
@@ -427,8 +430,11 @@ function displayBookmarks(list) {
         });
     });
 
+    console.log("TEST");
+
     $('.view-bookmark').off('click');
     $('.view-bookmark').click(function() {
+        console.log("TESTTTT");
         if ($(this).text() == 'View') {
             var id = $(this).val();
             var timestamp = bookmarks[id].timestamp;
@@ -441,9 +447,6 @@ function displayBookmarks(list) {
             $(this).text('View');
         }
     });
-
-    $('#bookmark-display-div').html(output);
-
 }
 
 /**
