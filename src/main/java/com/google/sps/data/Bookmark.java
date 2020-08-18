@@ -26,6 +26,13 @@ public final class Bookmark {
     private final String title;
     private final String content;
 
+    /**
+     * Constructor for a Bookmark object with specified parameters
+     * @param id The database id of this bookmark
+     * @param timestamp The timestamp that this bookmark was taken from
+     * @param title The title of this timestamp
+     * @param content The content of this timestamp
+     */
     public Bookmark(String id, long timestamp, String title, String content) {
         this.id = id;
         this.timestamp = timestamp;
@@ -33,18 +40,34 @@ public final class Bookmark {
         this.content = content;
     }
 
+    /**
+     * Getter function for the bookmark id
+     * @return The bookmark id
+     */
     public String getBookmarkId() {
         return this.id;
     }
 
+    /**
+     * Getter function for the video timestamp
+     * @return The timestamp of this bookmark
+     */
     public long getVideoTimestamp() {
         return this.timestamp;
     }
 
+    /**
+     * Getter function for the bookmark title
+     * @return The bookmark title
+     */
     public String getBookmarkTitle() {
         return this.title;
     }
 
+    /**
+     * Getter function for the bookmark content
+     * @return The bookmark content
+     */
     public String getBookmarkContent() {
         return this.content;
     }

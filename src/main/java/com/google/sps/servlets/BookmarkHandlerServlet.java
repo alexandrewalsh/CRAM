@@ -27,7 +27,7 @@ import com.google.sps.storage.BookmarkStorageManager;
 import com.google.sps.storage.BookmarkStorageException;
 
 
-/** Servlet that interacts with Google's NLP API */
+/** Servlet that interacts with setting and fetching bookmarks */
 @WebServlet("/bookmark")
 public class BookmarkHandlerServlet extends HttpServlet {
 
@@ -52,6 +52,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
         String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
         String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
 
+        // Tries to get all the bookmarks for the current user and video
         BookmarkStorageInterface storage = new BookmarkStorageManager();
         List<Bookmark> bookmarks = new ArrayList<>();
         try {
@@ -60,9 +61,12 @@ public class BookmarkHandlerServlet extends HttpServlet {
             // TODO: Handle exception
         }
 
+        // Converts the fetched database data and passes it to the front end
         Gson gson = new Gson();
         response.setContentType(RESPONSE_JSON_CONTENT);
-        response.getWriter().println(gson.toJson(bookmarks));
+        String res = gson.toJson(bookmarks);
+        System.out.println(res);
+        response.getWriter().println(res);
     }
 
     /**
@@ -78,6 +82,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
         String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
         BookmarkStorageInterface storage = new BookmarkStorageManager();
 
+        // Case 1: Post request is used to add a bookmark
         if (function.equals(REQUEST_ADD_FUNCTION)) {
             long timestamp = Long.parseLong((String) request.getParameter(REQUEST_TIMESTAMP_PARAM));
             String title = (String) request.getParameter(REQUEST_TITLE_PARAM);
@@ -89,6 +94,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
             }
         }
 
+        // Case 2: Post request is used to remove a bookmark
         if (function.equals(REQUEST_REMOVE_FUNCTION)) {
             String bookmarkId = (String) request.getParameter(REQUEST_BOOKMARK_ID_PARAM);
             try {
@@ -98,6 +104,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
             }
         }
 
+        // After performing database writes, fetch all bookmarks to update front-end
         List<Bookmark> bookmarks = new ArrayList<>();
         try {
             bookmarks = storage.getAllBookmarks(email, videoId);
@@ -105,6 +112,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
             // TODO: Handle exception
         }
 
+        // Converts the fetched database results to JSON
         Gson gson = new Gson();
         response.setContentType(RESPONSE_JSON_CONTENT);
         response.getWriter().println(gson.toJson(bookmarks));

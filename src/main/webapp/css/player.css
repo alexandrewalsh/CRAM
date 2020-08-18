@@ -243,3 +243,44 @@ table {
         margin-top: 20%;
     }
 }
+
+/** Bookmark display styling */
+.bg-primary {
+    background-color: purple!important;
+}
+
+.card-title {
+    color: white!important;
+}
+
+.view-bookmark {
+    margin-right: 1em;
+}
+
+.remove-bookmark {
+    margin-left: 1em;
+}
+
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 4;
+    }
+}
+
+@media (min-width: 1200px) {
+    .card-columns {
+        column-count: 5;
+    }
+}

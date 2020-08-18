@@ -398,14 +398,17 @@ function fetchBookmarks(email, videoId) {
 
 function displayBookmarks(list) {
     bookmarks = {};
-    var output = '<table>';
+    var output = '';
     for (bookmark of list) {
         bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<tr><td><span class="bookmark">' + bookmark.title + '</span></td>';
-        output += '<td><button class="remove-bookmark" value="' + bookmark.id + '">Remove</button></td></tr>';
+        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
+        output += bookmark.title;
+        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
+        output += bookmark.id;
+        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
+        output += bookmark.id;
+        output += '">Remove</button></div></div>'
     }
-    output += '</table>'
-    $('#temp').html(output);
 
     $('.remove-bookmark').off('click');
     $('.remove-bookmark').click(function() {
@@ -422,9 +425,25 @@ function displayBookmarks(list) {
         }).then((response) => response.json()).then(json => {
             displayBookmarks(json);
         });
-
-
     });
+
+    $('.view-bookmark').off('click');
+    $('.view-bookmark').click(function() {
+        if ($(this).text() == 'View') {
+            var id = $(this).val();
+            var timestamp = bookmarks[id].timestamp;
+            var content = bookmarks[id].content;
+            player.seekTo(timestamp);
+            $(this).parent().find('p')[0].innerText = content;
+            $(this).text('Hide');
+        } else if ($(this).text() == 'Hide') {
+            $(this).parent().find('p')[0].innerText = '';
+            $(this).text('View');
+        }
+    });
+
+    $('#bookmark-display-div').html(output);
+
 }
 
 /**
