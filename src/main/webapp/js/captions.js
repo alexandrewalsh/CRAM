@@ -111,7 +111,15 @@ function successfulDisplay(json) {
     setClickableEntities();
     sortEntities();
 
-    fetchBookmarks('TEST_FOR_NOW', currentVideoID);
+    const queryParams = new URLSearchParams(window.location.search);
+    var email = '';
+    if (queryParams.has('mockall')) {
+        email = 'MOCK';
+    } else {
+        email = getAuth().currentUser.get().getBasicProfile().getEmail();
+    }
+
+    fetchBookmarks(email, currentVideoID);
 }
 
 
@@ -424,10 +432,14 @@ function displayBookmarks(list) {
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
     $('.remove-bookmark').click(function() {
+        const queryParams = new URLSearchParams(window.location.search)
         var id = $(this).val();
         var params = new URLSearchParams();
-        //params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        params.append('email', 'TEST_FOR_NOW');
+        if (queryParams.has('mockall')) {
+            params.append('email', 'MOCK');
+        } else {
+            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        }
         params.append('videoId', currentVideoID);
         params.append('bookmarkId', id);
         params.append('function', 'remove');
@@ -509,9 +521,13 @@ $(document).ready(() => {
     // Adds a bookmark when clicking the 'add bookmark' button
     $('#bookmark-add-button').click(() => {
         // Creates the request parameters
+        const queryParams = new URLSearchParams(window.location.search)
         var params = new URLSearchParams();
-        //params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        params.append('email', 'TEST_FOR_NOW');
+        if (queryParams.has('mockall')) {
+            params.append('email', 'MOCK');
+        } else {
+            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        }
         params.append('videoId', currentVideoID);
         params.append('timestamp', Math.floor(player.getCurrentTime()));
         params.append('title', $('#bookmark-title').val());

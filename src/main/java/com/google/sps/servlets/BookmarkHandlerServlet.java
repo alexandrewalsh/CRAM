@@ -65,7 +65,6 @@ public class BookmarkHandlerServlet extends HttpServlet {
         Gson gson = new Gson();
         response.setContentType(RESPONSE_JSON_CONTENT);
         String res = gson.toJson(bookmarks);
-        System.out.println(res);
         response.getWriter().println(res);
     }
 
