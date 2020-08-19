@@ -479,6 +479,7 @@ function displayBookmarks(list) {
 function clearBookmarkForm() {
     $('#bookmark-title').val('');
     $('#bookmark-content').val('');
+    player.playVideo();
 }
 
 /**
@@ -486,7 +487,7 @@ function clearBookmarkForm() {
  */
 function setBookmarkButton() {
     // append bookmark button
-    $("#timestamp-timeline").append("<button id='add-bookmark-button'>+</button>");
+    $("#timestamp-timeline").append('<button id="add-bookmark-button"><i style="font-size:24px" class="fa">&#xf097;</i></button>');
 
     // Displays modal for adding bookmark
     $('#add-bookmark-button').click(() => {
