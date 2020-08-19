@@ -14,15 +14,26 @@
 
 package com.google.sps.storage;
 
+/** Exception class to handle bookmark storage database exception */
 public class BookmarkStorageException extends Exception {
 
     private String reason;
 
+    /**
+     * Constructor for a BookmarkStorageException
+     * @param reason The reason for the exception
+     * @param errorMessage The error message of the Exception superclass
+     * @param err The Throwable object for this exception
+     */
     public BookmarkStorageException(String reason, String errorMessage, Throwable err) {
         super(errorMessage, err);
         this.reason = reason;
     }
 
+    /**
+     * Gets the reason for this exception
+     * @return The reason for this exception as a String
+     */
     public String getReason() {
         return this.reason;
     }

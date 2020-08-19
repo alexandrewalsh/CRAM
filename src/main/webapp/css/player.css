@@ -253,6 +253,10 @@ table {
     color: white!important;
 }
 
+.card-text {
+    font-size: inherit;
+}
+
 .view-bookmark {
     margin-right: 1em;
 }

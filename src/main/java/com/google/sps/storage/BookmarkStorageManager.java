@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.Query.*;
 import java.util.List;
 import java.util.ArrayList;
 
+/** The implemented Bookmark database manager that communicates with Google Datastore */
 public class BookmarkStorageManager implements BookmarkStorageInterface {
 
     private static final String ENTITY_BOOKMARK = "Bookmark";
@@ -31,24 +32,26 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
     private static final String EXCEPTION_ADD_BOOKMARK = "AddBookmarkException";
     private static final String EXCEPTION_REMOVE_BOOKMARK = "RemoveBookmarkException";
 
-    
-    
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        
+    /**
+     * Gets all bookmarks for the current email and videoId from the Datastore database
+     * @param email The email to fetch the bookmarks of
+     * @param videoId The Youtube video id to fetch the bookmarks of
+     * @return The list of Bookmark objects for the given email and videoId 
+     */
     public List<Bookmark> getAllBookmarks(String email, String videoId) throws BookmarkStorageException {
 
-
+        // Defines filters for the query and gets the prepared query results
         Filter userFilter = new FilterPredicate(BOOKMARK_EMAIL_PROPERTY, FilterOperator.EQUAL, email);
         Filter videoIdFilter = new FilterPredicate(BOOKMARK_VIDEOID_PROPERTY, FilterOperator.EQUAL, videoId);
         Filter bookmarkFilter = CompositeFilterOperator.and(userFilter, videoIdFilter);
-
         Query query = new Query(ENTITY_BOOKMARK).setFilter(bookmarkFilter);
         PreparedQuery results = datastore.prepare(query);
 
-
         List<Bookmark> bookmarks = new ArrayList<>();
 
+        // Creates a list of Bookmarks from the perpared query results
         for (Entity entity : results.asIterable()) {
             String id = KeyFactory.keyToString(entity.getKey());
             long timestamp = (long) entity.getProperty(BOOKMARK_TIMESTAMP_PROPERTY);
@@ -58,12 +61,20 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
             Bookmark bookmark = new Bookmark(id, timestamp, title, content);
             bookmarks.add(bookmark);
         }
-
         return bookmarks;
+
     }
 
+    /**
+     * Adds a bookmark with the defined parameters to the Datastore database
+     * @param userEmail The user email for the bookmark
+     * @param videoId The Youtube video id for the bookmark
+     * @param videoTimestamp The Youtube timestamp for the bookmark
+     * @param title The title of the bookmark
+     * @param content The content of the bookmark
+     */
     public void addBookmark(String userEmail, String videoId, long videoTimestamp, String title, String content) throws BookmarkStorageException {
-
+        // Tries to create an Entity object and store it in Datastore
         Entity bookmark;
         try {
             bookmark = new Entity(ENTITY_BOOKMARK);
@@ -79,7 +90,12 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
         }
     }
 
+    /**
+     * Removes a bookmark from the database
+     * @param id The globally unique id of the bookmark to remove
+     */
     public void removeBookmark(String id) throws BookmarkStorageException {
+        // Tries to parse the Entity Key from the string to remove the Entity from Datastore
         Key key;
         try {
             key = KeyFactory.stringToKey(id);

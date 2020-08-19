@@ -17,12 +17,31 @@ package com.google.sps.storage;
 import com.google.sps.data.Bookmark;
 import java.util.List;
 
+/** The database interface for managing bookmarks */
 public interface BookmarkStorageInterface {
 
+    /**
+     * Gets all bookmarks for the current email and videoId
+     * @param email The email to fetch the bookmarks of
+     * @param videoId The Youtube video id to fetch the bookmarks of
+     * @return The list of Bookmark objects for the given email and videoId 
+     */
     public List<Bookmark> getAllBookmarks(String email, String videoId) throws BookmarkStorageException;
 
+    /**
+     * Adds a bookmark with the defined parameters to the database
+     * @param userEmail The user email for the bookmark
+     * @param videoId The Youtube video id for the bookmark
+     * @param videoTimestamp The Youtube timestamp for the bookmark
+     * @param title The title of the bookmark
+     * @param content The content of the bookmark
+     */
     public void addBookmark(String userEmail, String videoId, long videoTimestamp, String title, String content) throws BookmarkStorageException;
 
+    /**
+     * Removes a bookmark from the database
+     * @param id The globally unique id of the bookmark to remove
+     */
     public void removeBookmark(String id) throws BookmarkStorageException;
 
 }
