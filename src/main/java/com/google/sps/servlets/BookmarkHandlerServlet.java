@@ -51,6 +51,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
         String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
+        response.setContentType(RESPONSE_JSON_CONTENT);
 
         // Tries to get all the bookmarks for the current user and video
         BookmarkStorageInterface storage = new BookmarkStorageManager();
@@ -58,12 +59,12 @@ public class BookmarkHandlerServlet extends HttpServlet {
         try {
             bookmarks = storage.getAllBookmarks(email, videoId);
         } catch (BookmarkStorageException e) {
-            // TODO: Handle exception
+            response.getWriter().println(e.getReasonAsJsonString());
+            return;
         }
 
         // Converts the fetched database data and passes it to the front end
         Gson gson = new Gson();
-        response.setContentType(RESPONSE_JSON_CONTENT);
         String res = gson.toJson(bookmarks);
         response.getWriter().println(res);
     }
@@ -80,6 +81,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
         String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
         String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
         BookmarkStorageInterface storage = new BookmarkStorageManager();
+        response.setContentType(RESPONSE_JSON_CONTENT);
 
         // Case 1: Post request is used to add a bookmark
         if (function.equals(REQUEST_ADD_FUNCTION)) {
@@ -89,7 +91,8 @@ public class BookmarkHandlerServlet extends HttpServlet {
             try {
                 storage.addBookmark(email, videoId, timestamp, title, content);
             } catch (BookmarkStorageException e) {
-                // TODO: Handle exception
+                response.getWriter().println(e.getReasonAsJsonString());
+                return;
             }
         }
 
@@ -99,7 +102,8 @@ public class BookmarkHandlerServlet extends HttpServlet {
             try {
                 storage.removeBookmark(bookmarkId);
             } catch (BookmarkStorageException e) {
-                // TODO: Handle exception
+                response.getWriter().println(e.getReasonAsJsonString());
+                return;
             }
         }
 
@@ -108,12 +112,12 @@ public class BookmarkHandlerServlet extends HttpServlet {
         try {
             bookmarks = storage.getAllBookmarks(email, videoId);
         } catch (BookmarkStorageException e) {
-            // TODO: Handle exception
+            response.getWriter().println(e.getReasonAsJsonString());
+            return;
         }
 
         // Converts the fetched database results to JSON
         Gson gson = new Gson();
-        response.setContentType(RESPONSE_JSON_CONTENT);
         response.getWriter().println(gson.toJson(bookmarks));
 
     }

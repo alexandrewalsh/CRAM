@@ -341,11 +341,9 @@ function styleEntitiesFromJson(json) {
  */
 function styleEntitiesFromList(list) {
     var output = '<table>';
-
     for (entity of list) {
         output += '<tr><td><span class="word">' + entity + '</span></td></tr>';
     }
-
     output += '</table>'
     return output;
 }
@@ -399,7 +397,13 @@ function fetchBookmarks(email, videoId) {
     var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
 
     fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
-        displayBookmarks(json);
+        $('#bookmark-display-div').html('');
+        if (Array.isArray(json)) {
+            displayBookmarks(json);
+        } else if (typeof json === 'object' && json !== null) {
+            console.log(json.ERROR);
+            alert(json.ERROR);
+        }
     });
 
 }

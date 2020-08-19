@@ -17,6 +17,9 @@ package com.google.sps.storage;
 /** Exception class to handle bookmark storage database exception */
 public class BookmarkStorageException extends Exception {
 
+    private static final String JSON_ERROR_START = "{\"ERROR\":";
+    private static final String JSON_ERROR_END = "}";
+
     private String reason;
 
     /**
@@ -37,4 +40,13 @@ public class BookmarkStorageException extends Exception {
     public String getReason() {
         return this.reason;
     }
+
+    /**
+     * Gets the reason for this exception as a JSON string
+     * @return The reason for this exception as a JSON string
+     */
+    public String getReasonAsJsonString() {
+        return JSON_ERROR_START + this.reason + JSON_ERROR_END;
+    }
+    
 }
