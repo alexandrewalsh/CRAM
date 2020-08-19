@@ -13,23 +13,79 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify
+from re import sub
+from gensim.utils import simple_preprocess
+import nltk
+from nltk.corpus import stopwords
+import numpy as np
+import json
+
 
 app = Flask(__name__)
+
+
+# def quickstart():
+#     import os
+#     credential_path = "client_secret.json"
+#     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
+
+
+def preprocess(doc, stop_words):
+    """ Tokenize webpages from Wikipedia.
+
+    Keyword arguments:
+    doc        -- a Wikipedia page to preprocess and tokenize
+    stop_words -- a collection of words to ignore
+    """
+
+    # Tokenize, clean up input document string
+    doc = sub(r'<img[^<>]+(>|$)', " image_token ", doc)
+    doc = sub(r'<[^<>]+(>|$)', " ", doc)
+    doc = sub(r'\[img_assist[^]]*?\]', " ", doc)
+    doc = sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', " url_token ", doc)
+    return [token for token in simple_preprocess(doc, min_len=0, max_len=float("inf")) if token not in stop_words]
+
+
+def processInput(json_in):
+    """ format input JSON to a document format
+
+    Keywords arguments:
+    json_in -- json returned from the YouTube Captions API
+
+    Returns:
+    An array of caption strings
+    """
+
+    documents = []
+    json_processed = json.loads(json_in)
+    for caption in json_processed['captions']:
+        documents.append(caption['text'])
+
+    return documents
+ 
+
+def createModel(json_in):
+    # get stop words
+    nltk.download('stopwords')
+    stop_words = set(stopwords.words('english')) # common words to ignore
+    documents = processInput(json_in)
+    return documents
 
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
-        print(request.data)
-        print(request.args.get('test'))
-        return jsonify({'test': 1})
+        # Instantiates a client
+        return jsonify({'test': request.args.get('test')})
 
     if request.method == 'POST':
         # get params from post: request.form[KEY]
-        response = jsonify({'some': request.form['test']})
+        print(request)
+        print(request.form)
+        response = jsonify({'some': request.form['captions']})
         response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
+        return "YES"
 
 
 if __name__ == '__main__':
