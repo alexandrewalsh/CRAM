@@ -535,8 +535,8 @@ $(document).ready(() => {
         }
         params.append('videoId', currentVideoID);
         params.append('timestamp', Math.floor(player.getCurrentTime()));
-        params.append('title', $('#bookmark-title').val());
-        params.append('content', $('#bookmark-content').val());
+        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
         params.append('function', 'add');
 
         // Sends the bookmark parameters to the servlet to process
