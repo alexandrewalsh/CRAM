@@ -13,6 +13,9 @@
  * document.ready
  */
 
+/** global variables holding the json response for timestamps */
+var timestamps;
+
 /**
  * Event handler for search bar query, entry point
  * @param obj - the button invoking the click
@@ -20,9 +23,16 @@
  */
 function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
-    $('#resultsHeader').style = "display: unset;"
+    // hide results and search form
+    $('#resultsHeader').hide(); //style = "display: unset;"
+    $('#entity-search-form').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
+
+    // delete all children
+    $("#timestamp-timeline").empty();
+    $("#output").empty();
+
     execute(value);
 }
 
@@ -35,6 +45,13 @@ function submitFn(obj, evt){
 // Make sure the client is loaded and sign-in is complete before calling this method.
 function execute(url) {
     // user inputs YouTube video URL
+
+    // verify youtube regex 
+    if (!/(?:https?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\-_]+)/.test(url)) {
+        renderError("Invalid youtube url!");
+        return;
+    }
+
     var videoId = "";
 
     try {
@@ -53,27 +70,45 @@ function execute(url) {
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
+    
+    // checks if mock nlp should be used
+    if (queryParams.has('mockall')) {
+        // Sets the results table
+        successfulDisplay(MOCK_NLP_OUTPUT);
+        return;
+    }
 
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
-            method: 'GET',
-        }).then((response) => response.json()).then((json) => {
-            if (Object.keys(json).length > 0) {
-                // Sets the results table
-                document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-
-                // clickable timestamps
-                var elements = document.getElementsByClassName("timestamps");
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].addEventListener('click', onTimeClick, false);
-                }
-                console.log("Fetching captions from database...");
-            } else {
-                // video id not found in db, fetching from Youtube API
-                beginCaptionRequest(videoId, url);
-            }
-        });
+        method: 'GET',
+    }).then((response) => response.json()).then((json) => {
+        if (Object.keys(json).length > 0) {
+            // Sets the results table
+            successfulDisplay(json);
+            console.log("Fetching captions from database...");
+        } else {
+            // video id not found in db, fetching from Youtube API
+            beginCaptionRequest(videoId, url);
+        }
+    });
 }
+
+function successfulDisplay(json) {
+    // display results
+    $("#resultsHeader").text("Key Words in Video");
+    $('#entity-search-form').show(); // css('display', 'flex');
+
+    // valid YT Url, clear error status if one exists
+    $('.search-input').removeClass("error-placeholder");
+            
+    document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
+    $("#output").show();
+
+    // clickable entities and timestamps
+    setClickableEntities();
+    sortEntities();
+}
+
 
 /**
  * Renders the YouTube video in the iframe tag
@@ -87,15 +122,24 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += "&origin=" + location.origin;
 
     // display "Results" header
-    document.getElementById("resultsHeader").style.display = "inline";
+    $("#resultsHeader").show(); //style.display = "inline";
+
+    // Display loading screen
+    $("#resultsHeader").text("Loading...");
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
     resizeIFrame();  
-    player = new YT.Player('player', {
-        events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
-    });
+
+    if (player == null) {
+        player = new YT.Player('player', {
+            events: {'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange}
+        });
+    } else {
+        player.loadVideoByUrl("http://www.youtube.com/v/"+videoId+"?version=3");
+    }
 }
+
 
 /**
  * Sets up the caption request call
@@ -103,14 +147,6 @@ function displayVideo(videoId) {
  * @param url - the Youtube video url
  */
 function beginCaptionRequest(videoId, url) {
-
-    // checks to see if mock captions should be used
-    const queryParams = new URLSearchParams(window.location.search)
-    if (queryParams.has('mock')) {
-        sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
-        return;
-    }
-
     gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
@@ -152,7 +188,7 @@ function getCaptions(trackId, url) {
             "tfmt": "sbv"
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {
-                success(json);  
+                success(json);
             });
         }, function(err) { 
             renderError(err.status);
@@ -248,50 +284,31 @@ function getIdFromUrl(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
-    $('#output').html('<p>Loading...</p>');
+    // $('#output').html('<p>Loading...</p>');
 
     fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {            
+        }).then((response) => response.json()).then((json) => {
+            
             // Sets the results table
-            document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-
-            // clickable timestamps
-            var elements = document.getElementsByClassName("timestamps");
-
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].addEventListener('click', onTimeClick, false);
-            }
+            
+            successfulDisplay(json);
+            // clickable entities and timestamps
+            // setClickableEntities();
+            // sortEntities();
         });
 }
 
-/**
- * Resizes the embedded video based on window size, using either the 4:3 width to height ratio or the remaining screen
- */
-function resizeIFrame() {
-    // Saves necessary parameters as variables
-    var width = $('#player').width();
-    var windowHeight = $(window).height();
-    var reservedHeight = $('#heading-div').outerHeight(true) + $('#searchbar-div').outerHeight(true) + windowHeight * 0.05;
-    
-    // The remaining avalable height for the video that avoids overflow
-    var totalAvailableHeight = windowHeight - reservedHeight;
-
-    // The height of the video to keep the 4:3 aspect ratio
-    var videoHeightFromRatio = width / 1.33;
-
-    // Defines and sets the best video height to ensure that overflow does not occur
-    var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
-    $('#player').height(playerHeight);
-    $('#output').height(playerHeight - $('#resultsHeader').height());
-}
 
 /**
  * Builds the entities table from the json response
  * @param json - The json response of entity data
+ * @return The HTML string that creates the table of entities
  */
 function styleEntitiesFromJson(json) {
+    timestamps = json; // set global variable
+
     var output = '<table>';
 
     for (var key in json) {
@@ -301,18 +318,66 @@ function styleEntitiesFromJson(json) {
             console.log('Total Youtube Captions: ' + json[key][0]);
             console.log('Total Entities Found: ' + json[key][2]);
         } else {
-            output += '<tr><td><span class="word">' + key + ':</span></td>';
-            for (var i = 0; i < json[key].length; i++) {
-                output += '<td><span class="timestamps">' + epochToTimestamp(JSON.stringify(json[key][i])) + '</span></td>';
-                if (i + 1 < json[key].length) {
-                    output += '<td class="white-text">, </td>';
-                }
-            }
+            output += '<tr><td><span class="word">' + key + '</span></td>';
             output += '</tr>';
         }
     }
+    
     output += '</table>';
     return output;
+}
+
+/**
+ * Builds the entities table from a list of entities
+ * @param list - The list containing entity names
+ * @return The HTML string that creates the table of entities
+ */
+function styleEntitiesFromList(list) {
+    var output = '<table>';
+
+    for (entity of list) {
+        output += '<tr><td><span class="word">' + entity + '</span></td></tr>';
+    }
+
+    output += '</table>'
+    return output;
+}
+
+/**
+ * Sets the timestamp class objects to be clickable
+ */
+function setClickableTimestamps() {
+    var elements = document.getElementsByClassName("timestamps");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', onTimeClick, false);
+    }
+}
+
+/**
+ * Adds click event listeners to word entities to show
+ * timestamps. Also makes the timestamps clickable.
+ */
+function setClickableEntities() {
+    $('.word').bind("click", function(){
+        const entity = this.innerText;
+            
+        // delete all children
+        $("#timestamp-timeline").empty();
+
+        // query json
+        $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
+
+        for (var index in timestamps[entity]) {
+            const timestamp = epochToTimestamp(timestamps[entity][index]);
+            $("#timestamp-timeline").append("<span class='timestamps'>"+timestamp+"</span>");
+            $("#timestamp-timeline").append("<p>,</p>");
+        }
+
+        $("#timestamp-timeline p:last-child").remove();
+        
+        // clickable timestamps
+        setClickableTimestamps();
+    });
 }
 
 
@@ -323,5 +388,4 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
-
 });
