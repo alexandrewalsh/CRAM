@@ -85,18 +85,8 @@ def root():
 
     if request.method == 'POST':
         # get params from post: request.form[KEY]
-        print("request json: " + str(request.json))
-        print("request args: ")
-        print(request.form)
-        print(request.json)
         request_json = request.json
-        # json_in = request.form['json']
-        try:
-            handlePost(request_json)
-        except:
-            return _corsify_actual_response('', 500)
-
-        return _corsify_actual_response(jsonify(request_json), 200)
+        return _corsify_actual_response(jsonify(request_json))
     
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()

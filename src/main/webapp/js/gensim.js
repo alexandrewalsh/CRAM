@@ -7,15 +7,29 @@
  *          completes its POST processes, and 505 
  *          if some error occurs 
  */
-async function postGensim(url = '', data={}) {
+async function postGensim(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-    const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    return response.json()
+        return response
+    } catch(err) {
+        console.log(err);
+        return "{error: " + err + "}"
+    }
+}
+
+/**
+ * Callback for when gensim finishes POST operations
+ * @param response - a 200 code if gensim operations were successful
+ *                   500 otherwise
+ */
+function handleGensimResponse(response) {
+    // perhaps `successfulDisplay` should be set here
 }
