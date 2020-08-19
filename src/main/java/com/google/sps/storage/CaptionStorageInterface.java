@@ -5,16 +5,17 @@
 package com.google.sps.storage;
 
 import java.util.*;
+import com.google.sps.data.TimeRangedText;
 
 public interface CaptionStorageInterface {
 
     /*
-     * add a video to the database
+     * add a video, its metadata, and its full captions to the database 
      * @param videoID       Youtube ID of the video to be entered in the db
      * @param metadata      String containing any metadata to be stored about the video
      * @exception           throws ADD_VIDEO_ERR or ADD_META_ERR
      */
-    public void addVideo(String videoID, String metadata) throws CaptionStorageException;
+    public void addVideo(String videoID, String metadata, List<TimeRangedText> fullCaptions) throws CaptionStorageException;
 
     /*
      * add a keyphrase + timestamp pair to a particular video in the db
@@ -58,6 +59,13 @@ public interface CaptionStorageInterface {
      * @return              List of timestamps representing the times that keyword appears in videoID (null if videoID not in db or keyword not in videoID)
      */
     public List<Long> getTimesForKeyword(String videoID, String keyword) throws CaptionStorageException;
+
+    /*
+     * retrieve full captions of videoID and return them as a list of TimeRangedText objects
+     * @param videoID       Youtube ID of video already in the db
+     * @return              List of TimeRangedText objects, which each represent a single line of the full YT captions
+     */
+    public List<TimeRangedText> getFullCaptions(String videoID);
 
     /*
      * return true if specified video is in the database

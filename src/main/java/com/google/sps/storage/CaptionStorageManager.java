@@ -17,28 +17,30 @@
 package com.google.sps.storage;
 
 import com.google.appengine.api.datastore.*;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import java.util.*;
+import com.google.sps.data.TimeRangedText;
 
 public class CaptionStorageManager implements CaptionStorageInterface {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     private static final String COLUMN_VIDEO = "video";
     private static final String COLUMN_METADATA = "metadata";
     private static final String COLUMN_CAPTION = "caption";
-    private static final String COLUMN_TIMES = "timestamps";
+    private static final String COLUMN_FULL_CAPTIONS = "full_captions";
     private static final String COLUMN_TIMES = "timestamps";
     private static final String NO_VID_ERR = "Requested video does not exist";
     private static final String NO_META_ERR = "Requested metadata does not exist";
     private static final String NO_PHRASE_ERR = "Requested keyphrase does not exist in ";
-    
-
+    private static final String COLUMN_START = "start_time";
+    private static final String COLUMN_END = "end_time";
 
     //================================================================================
     // Public Interface Functions (see DatabaseInterface.java for official descriptions)
     //================================================================================    
 
-    // add a video to the database
-    public void addVideo(String videoID, String metadata) throws CaptionStorageException {
-        // Tries to add video to the database
+    // add a video, its metadata, and its full captions to the database
+    public void addVideo(String videoID, String metadata, List<TimeRangedText> fullCaptions) throws CaptionStorageException {
+        // add video to the database
         Entity vidEnt;
         try {
             vidEnt = new Entity(COLUMN_VIDEO, videoID);
@@ -47,13 +49,28 @@ public class CaptionStorageManager implements CaptionStorageInterface {
             throw new CaptionStorageException(Reason.ADD_VIDEO_ERR, e.getMessage(), e.getCause());
         }
 
-        // Tries to add the video metadata to the database
+        // add metadata to the database
         Entity metaEnt;
         try {
             metaEnt = new Entity(COLUMN_METADATA, metadata, vidEnt.getKey());
             datastore.put(metaEnt);
         } catch (Exception e) {
             throw new CaptionStorageException(Reason.ADD_META_ERR, e.getMessage(), e.getCause());
+        }
+
+        // add full captions to the database
+        int i = 0;
+        try {
+            for (TimeRangedText single_line : fullCaptions) {
+                String caption = single_line.getText();
+                Entity capEnt = new Entity(COLUMN_FULL_CAPTIONS, Integer.toString(i++), vidEnt.getKey());
+                capEnt.setProperty(COLUMN_CAPTION, caption);
+                capEnt.setProperty(COLUMN_START, single_line.getStartTime());
+                capEnt.setProperty(COLUMN_END, single_line.getEndTime());
+                datastore.put(capEnt);
+            }
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.ADD_FULL_CAPTIONS_ERR, e.getMessage(), e.getCause());
         }
     }
 
@@ -175,6 +192,21 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         }
 
         return result;
+    }
+
+    // retrieve full captions of videoID and return them as a list of TimeRangedText objects
+    public List<TimeRangedText> getFullCaptions(String videoID) {
+        Query query = new Query(COLUMN_FULL_CAPTIONS).addSort(COLUMN_START, SortDirection.ASCENDING);
+        PreparedQuery results = datastore.prepare(query);
+
+        List<TimeRangedText> full_captions = new ArrayList<TimeRangedText>();
+
+        for (Entity entity : results.asIterable()) {
+            TimeRangedText single_line = new TimeRangedText((Long)entity.getProperty(COLUMN_START), (Long)entity.getProperty(COLUMN_END), (String)entity.getProperty(COLUMN_CAPTION));
+            full_captions.add(single_line);
+        }
+
+        return full_captions;
     }
 
     // return true if specified video is in the database
