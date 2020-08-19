@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from re import sub
 from gensim.utils import simple_preprocess
 import nltk
@@ -62,7 +62,7 @@ def processInput(json_in):
         documents.append(caption['text'])
 
     return documents
- 
+
 
 def createModel(json_in):
     # get stop words
@@ -72,8 +72,12 @@ def createModel(json_in):
     return documents
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def root():
+    origin = ''
+    if request.headers.get('Origin'):
+        origin = request.headers.get('Origin')
+
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
         # Instantiates a client
@@ -81,12 +85,41 @@ def root():
 
     if request.method == 'POST':
         # get params from post: request.form[KEY]
-        print(request)
+        print("request json: " + str(request.json))
+        print("request args: ")
         print(request.form)
-        response = jsonify({'some': request.form['captions']})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return "YES"
+        print(request.json)
+        request_json = request.json
+        # json_in = request.form['json']
+        try:
+            handlePost(request_json)
+        except:
+            return _corsify_actual_response('', 500)
 
+        return _corsify_actual_response(jsonify(request_json), 200)
+    
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+
+
+def _build_cors_prelight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+    # method, origin
+
+
+def handlePost(json):
+    '''
+    Handle POST request
+    '''
+    return None
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

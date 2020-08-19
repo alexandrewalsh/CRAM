@@ -26,20 +26,6 @@ function submitFn(obj, evt){
     execute(value);
 }
 
-async function postGensim(url = '', data={}) {
-    // const proxyurl = "https://cors-anywhere.herokuapp.com/";
-
-    const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    return response.json()
-}
-
 /**
  * Excecutes a request to download captions for a YouTube 
  * video with a given `url`, and send data to the backend servlet
