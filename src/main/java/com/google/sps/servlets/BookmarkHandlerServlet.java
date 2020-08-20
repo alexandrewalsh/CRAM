@@ -42,6 +42,8 @@ public class BookmarkHandlerServlet extends HttpServlet {
     private static final String REQUEST_REMOVE_FUNCTION = "remove";
     private static final String RESPONSE_JSON_CONTENT = "json";
 
+    private BookmarkStorageInterface storage;
+
     /**
      * Gets the bookmarks of the current video and user
      * @param request The request object 
@@ -54,7 +56,9 @@ public class BookmarkHandlerServlet extends HttpServlet {
         response.setContentType(RESPONSE_JSON_CONTENT);
 
         // Tries to get all the bookmarks for the current user and video
-        BookmarkStorageInterface storage = new BookmarkStorageManager();
+        if (storage == null) {
+            storage = new BookmarkStorageManager();
+        }
         List<Bookmark> bookmarks = new ArrayList<>();
         try {
             bookmarks = storage.getAllBookmarks(email, videoId);
@@ -80,7 +84,9 @@ public class BookmarkHandlerServlet extends HttpServlet {
         String function = (String) request.getParameter(REQUEST_FUNCTION_PARAM);
         String email = (String) request.getParameter(REQUEST_EMAIL_PARAM);
         String videoId = (String) request.getParameter(REQUEST_VIDEO_ID_PARAM);
-        BookmarkStorageInterface storage = new BookmarkStorageManager();
+        if (storage == null) {
+            storage = new BookmarkStorageManager();
+        }        
         response.setContentType(RESPONSE_JSON_CONTENT);
 
         // Case 1: Post request is used to add a bookmark
@@ -120,6 +126,10 @@ public class BookmarkHandlerServlet extends HttpServlet {
         Gson gson = new Gson();
         response.getWriter().println(gson.toJson(bookmarks));
 
+    }
+
+    public void setBookmarkStorageInterface(BookmarkStorageInterface storage) {
+        this.storage = storage;
     }
 
 }

@@ -31,6 +31,7 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
     private static final String BOOKMARK_CONTENT_PROPERTY = "content";
     private static final String EXCEPTION_ADD_BOOKMARK = "AddBookmarkException";
     private static final String EXCEPTION_REMOVE_BOOKMARK = "RemoveBookmarkException";
+    private static final String EXCEPTION_GET_BOOKMARKS = "GetBookmarksException";
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -47,21 +48,25 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
         Filter videoIdFilter = new FilterPredicate(BOOKMARK_VIDEOID_PROPERTY, FilterOperator.EQUAL, videoId);
         Filter bookmarkFilter = CompositeFilterOperator.and(userFilter, videoIdFilter);
         Query query = new Query(ENTITY_BOOKMARK).setFilter(bookmarkFilter);
-        PreparedQuery results = datastore.prepare(query);
+        
+        try {
+            PreparedQuery results = datastore.prepare(query);
+            List<Bookmark> bookmarks = new ArrayList<>();
 
-        List<Bookmark> bookmarks = new ArrayList<>();
+            // Creates a list of Bookmarks from the perpared query results
+            for (Entity entity : results.asIterable()) {
+                String id = KeyFactory.keyToString(entity.getKey());
+                long timestamp = (long) entity.getProperty(BOOKMARK_TIMESTAMP_PROPERTY);
+                String title = (String) entity.getProperty(BOOKMARK_TITLE_PROPERTY);
+                String content = (String) entity.getProperty(BOOKMARK_CONTENT_PROPERTY);
 
-        // Creates a list of Bookmarks from the perpared query results
-        for (Entity entity : results.asIterable()) {
-            String id = KeyFactory.keyToString(entity.getKey());
-            long timestamp = (long) entity.getProperty(BOOKMARK_TIMESTAMP_PROPERTY);
-            String title = (String) entity.getProperty(BOOKMARK_TITLE_PROPERTY);
-            String content = (String) entity.getProperty(BOOKMARK_CONTENT_PROPERTY);
-
-            Bookmark bookmark = new Bookmark(id, timestamp, title, content);
-            bookmarks.add(bookmark);
+                Bookmark bookmark = new Bookmark(id, timestamp, title, content);
+                bookmarks.add(bookmark);
+            }
+            return bookmarks;
+        } catch (Exception e) {
+            throw new BookmarkStorageException(EXCEPTION_GET_BOOKMARKS, e.getMessage(), e.getCause());
         }
-        return bookmarks;
 
     }
 
