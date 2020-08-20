@@ -128,6 +128,10 @@ public class BookmarkHandlerServlet extends HttpServlet {
 
     }
 
+    /**
+     * Sets the BookmarkStorageInterface object to be used my the servlet, used for testing purposes
+     * @param storage The BookmarkStorageInterface implementation to set
+     */
     public void setBookmarkStorageInterface(BookmarkStorageInterface storage) {
         this.storage = storage;
     }
