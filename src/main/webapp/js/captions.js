@@ -64,6 +64,9 @@ function execute(url) {
         return;
     }
 
+    // hides the bookmarks for the previous video
+    $('#bookmark-display-div').html('');
+
     // displays the video in the front end
     displayVideo(videoId);
 
