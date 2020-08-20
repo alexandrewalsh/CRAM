@@ -584,7 +584,7 @@ $(document).ready(() => {
 
 });
 
-function toggleFullCap() {
+$('.fullcapBtn').click(function() {
     // checks to see if captions already exist in the database
     fetch('/fullcaption?id=' + video_id, {
         method: 'GET',
@@ -595,5 +595,4 @@ function toggleFullCap() {
             console.log("Fetching full captions from database...");
         }
     });
-
-}
+});

@@ -100,7 +100,7 @@ table {
   margin: auto;
 }
 
-.theater-toggle {
+.theater-toggle .fullcapBtn {
   margin: auto;
   display: none;
 }
