@@ -388,6 +388,20 @@ $(document).ready(() => {
     });
 });
 
+$('.fullcapBtn').click(function() {
+    // checks to see if captions already exist in the database
+    fetch('/fullcaption?id=' + video_id, {
+        method: 'GET',
+    }).then((response) => response.text()).then((text) => {
+        if (text.length > 0) {
+            // Sets the results table
+            document.getElementById("FullCap").innerHTML = text;
+            console.log("Fetching full captions from database...");
+        }
+    });
+});
+
+/*
 function toggleFullCap() {
     // checks to see if captions already exist in the database
     fetch('/fullcaption?id=' + video_id, {
@@ -399,5 +413,5 @@ function toggleFullCap() {
             console.log("Fetching full captions from database...");
         }
     });
-
 }
+*/
