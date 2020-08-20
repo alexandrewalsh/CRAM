@@ -2,14 +2,21 @@
  * Currently holds:
  * submitFn                 -- event handler for search bar query
  * execute                  -- execute a request to download captions from Youtube API
+ * successfulDisplay
  * displayVideo
  * beginCaptionRequest
  * getCaptions
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
- * resizeIFrame
  * styleEntitiesFromJson
+ * styleEntitiesFromList
+ * setClickableTimestamps
+ * setClickableEntities
+ * fetchBookmarks
+ * displayBookmarks
+ * clearBookmarkForm
+ * setBookmarkButton
  * document.ready
  */
 
@@ -99,6 +106,10 @@ function execute(url) {
     });
 }
 
+/**
+ * Renders the entities of the video after a successful json fetch
+ * @param json The json of the entities fetched
+ */
 function successfulDisplay(json) {
     // display results
     $("#resultsHeader").text("Key Words in Video");
