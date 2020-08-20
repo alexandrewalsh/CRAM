@@ -110,7 +110,7 @@ table {
 }
 
 #timestamp-timeline {
-    justify-content: center;
+    margin-right: auto;
 }
 
 #timestamp-timeline span, p {
