@@ -7,7 +7,7 @@
  *          completes its POST processes, and 505 
  *          if some error occurs 
  */
-async function postGensim(url, data) {
+async function postGensim(url, data, query) {
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -15,10 +15,11 @@ async function postGensim(url, data) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({'query': query,
+                                'ytCaptions': data})
         });
 
-        return response
+        return response;
     } catch(err) {
         console.log(err);
         return "{error: " + err + "}"

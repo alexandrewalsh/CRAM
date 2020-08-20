@@ -68,7 +68,7 @@ function execute(url) {
     const queryParams = new URLSearchParams(window.location.search)
     if (queryParams.has('mock')) {
         // send JSON to gensim server
-        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS).then(handleGensimResponse);
+        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS, TEST_QUERY).then(handleGensimResponse);
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
@@ -76,7 +76,7 @@ function execute(url) {
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
         // send JSON to gensim server
-        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS).then(handleGensimResponse);
+        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS, TEST_QUERY).then(handleGensimResponse);
         // Sets the results table
         successfulDisplay(MOCK_NLP_OUTPUT);
         return;
@@ -88,7 +88,7 @@ function execute(url) {
     }).then((response) => response.json()).then((json) => {
         if (Object.keys(json).length > 0) {
             // send JSON to gensim server
-            postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json).then(handleGensimResponse);
+            postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json, TEST_QUERY).then(handleGensimResponse);
             // Sets the results table
             successfulDisplay(json);
             console.log("Fetching captions from database...");
@@ -166,7 +166,7 @@ function beginCaptionRequest(videoId, url) {
 
             getCaptions(trackId, url).then(json => {
                 // send asyncronous request to python server
-                postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json).then(handleGensimResponse);
+                postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json, TEST_QUERY).then(handleGensimResponse);
                 // send to backend
                 sendJsonForm(json);
             });

@@ -13,12 +13,7 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-from re import sub
-from gensim.utils import simple_preprocess
-import nltk
-from nltk.corpus import stopwords
-import numpy as np
-import json
+import gensim_req as gen
 
 
 app = Flask(__name__)
@@ -30,63 +25,34 @@ app = Flask(__name__)
 #     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 
-def preprocess(doc, stop_words):
-    """ Tokenize webpages from Wikipedia.
-
-    Keyword arguments:
-    doc        -- a Wikipedia page to preprocess and tokenize
-    stop_words -- a collection of words to ignore
-    """
-
-    # Tokenize, clean up input document string
-    doc = sub(r'<img[^<>]+(>|$)', " image_token ", doc)
-    doc = sub(r'<[^<>]+(>|$)', " ", doc)
-    doc = sub(r'\[img_assist[^]]*?\]', " ", doc)
-    doc = sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', " url_token ", doc)
-    return [token for token in simple_preprocess(doc, min_len=0, max_len=float("inf")) if token not in stop_words]
-
-
-def processInput(json_in):
-    """ format input JSON to a document format
-
-    Keywords arguments:
-    json_in -- json returned from the YouTube Captions API
-
-    Returns:
-    An array of caption strings
-    """
-
-    documents = []
-    json_processed = json.loads(json_in)
-    for caption in json_processed['captions']:
-        documents.append(caption['text'])
-
-    return documents
-
-
-def createModel(json_in):
-    # get stop words
-    nltk.download('stopwords')
-    stop_words = set(stopwords.words('english')) # common words to ignore
-    documents = processInput(json_in)
-    return documents
 
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def root():
-    origin = ''
-    if request.headers.get('Origin'):
-        origin = request.headers.get('Origin')
 
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
+        # {query: "...", "captions": "{...}"}
+        # from captions create dictionary and model
+        
         # Instantiates a client
-        return jsonify({'test': request.args.get('test')})
+        # gen.hello(
+        
+        # return jsonify(get_request)
 
     if request.method == 'POST':
         # get params from post: request.form[KEY]
         request_json = request.json
+        query = request_json['query']
+        json_in = request_json['ytCaptions']
+        print("query: " + str(query))
+        print("\n\n************************************\n\n")
+        print(json_in)
         return _corsify_actual_response(jsonify(request_json))
+
+        # # for future
+        # response = jsonify({"indices": query_phrase(query, json_in, 3)})
+        # return _corsify_actual_response(response)
     
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -98,6 +64,7 @@ def _build_cors_prelight_response():
     response.headers.add('Access-Control-Allow-Headers', "*")
     response.headers.add('Access-Control-Allow-Methods', "*")
     return response
+
 
 def _corsify_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
