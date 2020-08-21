@@ -16,7 +16,9 @@
  * fetchBookmarks
  * displayBookmarks
  * clearBookmarkForm
+ * setButtons
  * setBookmarkButton
+ * setCaptionsButton
  * document.ready
  */
 
@@ -538,20 +540,24 @@ function setBookmarkButton() {
 function setCaptionsButton() {
     // append full-captions button
     $("#timestamp-timeline").append('<button id="fullcap-button"><i style="font-size:24px" class="fa fa-cc"></i></button>');
+    document.getElementById("FullCap").innerHTML = "";
 
     // Display captions on click
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
-        fetch('/fullcaption?id=' + video_id, {
-            method: 'GET',
-        }).then((response) => response.text()).then((text) => {
-            if (text.length > 0) {
-                // Sets the results table
-                document.getElementById("FullCap").innerHTML = text;
-                console.log("Fetching full captions from database...");
-                console.log(video_id);
-            }
-        });
+        if (document.getElementById("FullCap").innerHTML == "") {
+            fetch('/fullcaption?id=' + video_id, {
+                method: 'GET',
+            }).then((response) => response.text()).then((text) => {
+                if (text.length > 0) {
+                    // Sets the results table
+                    document.getElementById("FullCap").innerHTML = text;
+                    console.log("Fetching full captions from database...");
+                }
+            });
+        } else {
+            document.getElementById("FullCap").innerHTML = "";
+        }
     });
 }
 
