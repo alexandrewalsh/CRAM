@@ -140,18 +140,28 @@ function showSelectedSection(selected) {
     switch(selected) {
         case 'keywords':
             $('#keywords-output').show();
+            $('#keywords-toggle-button').addClass('active-tab');
             $('#query-output').hide();
+            $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').hide();
+            $('#bookmarks-toggle-button').removeClass('active-tab');
             break;
         case 'query':
             $('#keywords-output').hide();
+            $('#keywords-toggle-button').removeClass('active-tab');
             $('#query-output').show();
+            $('#query-toggle-button').addClass('active-tab');
             $('#bookmarks-output').hide();
+            $('#bookmarks-toggle-button').removeClass('active-tab');
             break;
         case 'bookmarks':
             $('#keywords-output').hide();
+            $('#keywords-toggle-button').removeClass('active-tab');
             $('#query-output').hide();
+            $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').show();
+            $('#bookmarks-toggle-button').addClass('active-tab');
+
             break;
     }
 }

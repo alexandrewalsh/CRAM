@@ -245,7 +245,20 @@ table {
 }
 
 /** Tabs for different searches */
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
 
+.btn:hover {
+	color:black;
+    background-color: white;
+}
+
+.btn-primary {
+    background-color: #00000000;
+    border-color: white;
+}
 
 
 
