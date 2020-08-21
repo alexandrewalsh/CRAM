@@ -408,7 +408,7 @@ function fetchBookmarks(email, videoId) {
     var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
 
     fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
-        $('#bookmark-display-div').html('');
+        $('#bookmarks-output').html('');
         if (Array.isArray(json)) {
             displayBookmarks(json);
         } else if (typeof json === 'object' && json !== null) {
@@ -428,20 +428,15 @@ function displayBookmarks(list) {
     bookmarks = {};
 
     // Builds the HTML text to display on page
-    var output = '';
+    var output = '<ul>';
     for (bookmark of list) {
         bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
-        output += bookmark.title;
-        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
-        output += bookmark.id;
-        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
-        output += bookmark.id;
-        output += '">Remove</button></div></div>'
+        output += '<li class="bookmark">' + bookmark.title + '<span class="close">&times;</span></li>';        
     }
+    output += '</ul>';
     
     // Inserts the HTML text to the page
-    $('#bookmark-display-div').html(output);
+    $('#bookmarks-output').html(output);
 
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
