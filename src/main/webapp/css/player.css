@@ -26,10 +26,6 @@
     margin: 0 auto;
 }
 
-#resultsHeader {
-    padding-bottom: 3%;
-}
-
 .container-row {
     display: flex;
     flex-direction: row;
@@ -218,10 +214,7 @@ table {
     #timestamp-timeline span, p {
         font-size: inherit;
     }
-    
-    #resultsHeader {
-        font-size: 30px;
-    }
+
 
     .word {
         font-size: 20px;
@@ -250,6 +243,10 @@ table {
   box-shadow: none;
 }
 
+#tab-container {
+    padding-bottom: 3%;
+}
+
 .btn:hover {
 	color:black;
     background-color: white;
@@ -260,6 +257,10 @@ table {
     border-color: white;
 }
 
+.active-tab {
+  background-color: white;
+  color: black;
+}
 
 
 /** Bookmark display styling */

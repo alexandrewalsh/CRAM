@@ -272,3 +272,7 @@ form.entity-search::after {
     justify-content: center;
     padding-bottom: 4%;
 }
+
+#entity-search-form div {
+    display: flex;
+}

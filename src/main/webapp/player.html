@@ -81,18 +81,15 @@
             </div>
             <div id="flex-item-output" class="container-column text-center">
 
-            <div class="btn-group hide">
-                <button type="button" id="keywords-toggle-button" class="btn btn-primary">Keywords</button>
-                <button type="button" id="query-toggle-button" class="btn btn-primary">Query</button>
-                <button type="button" id="bookmarks-toggle-button" class="btn btn-primary">Bookmarks</button>
-            </div>
-
-                <h1 id="resultsHeader" class="text-center hide">Keywords in Video</h1>
+                <div id="tab-container" class="btn-group hide">
+                    <button type="button" id="keywords-toggle-button" class="btn btn-primary">Keywords</button>
+                    <button type="button" id="query-toggle-button" class="btn btn-primary">Query</button>
+                    <button type="button" id="bookmarks-toggle-button" class="btn btn-primary">Bookmarks</button>
+                </div>
                 <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
                     <div>
                         <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
-                        <!-- NOTE: Button will be used for semantic similarity with python server -->
-                        <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                        <button id="entity-searchbar-button" type="submit"><i class="fa fa-search"></i></button>
                     </div>
                     <select id="entity-sort" name="sort-option">
                         <option value="alphabetical">A-Z</option>

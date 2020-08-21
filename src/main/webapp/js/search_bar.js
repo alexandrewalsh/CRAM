@@ -136,6 +136,23 @@ function sortEntities() {
     setClickableTimestamps();
 }
 
+function editTabSeachbar(selected) {
+    $('#entity-sort').css('margin-left', '5%');
+    if (selected == 'query') {
+        $('#entity-seachbar').css('width', '80%');
+        $('#entity-seachbar').css('border-radius', '50px 0px 0px 50px');
+        $('#entity-searchbar-button').css('width', '20%');
+        $('#entity-searchbar-button').css('border-radius', '0px 50px 50px 0px');
+        $('#entity-searchbar-button').show();
+        $('#entity-sort').hide();
+    } else {
+        $('#entity-seachbar').css('width', '100%');
+        $('#entity-seachbar').css('border-radius', '50px 50px 50px 50px');
+        $('#entity-searchbar-button').hide(); 
+        $('#entity-sort').show(); 
+    }
+}
+
 function showSelectedSection(selected) {
     switch(selected) {
         case 'keywords':
@@ -161,9 +178,9 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
-
             break;
     }
+    editTabSeachbar(selected);
 }
 
 

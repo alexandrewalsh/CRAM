@@ -33,7 +33,6 @@ var bookmarks;
 function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
     // hide results and search form
-    $('#resultsHeader').hide(); //style = "display: unset;"
     $('#entity-search-form').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
@@ -114,13 +113,16 @@ function execute(url) {
  */
 function successfulDisplay(json) {
     // display results
-    $("#resultsHeader").text("Key Words in Video");
     $('#entity-search-form').show();
+    $('#entity-search-form').css('display', 'flex');
+    $('#entity-search-form').css('justify-content', 'center');
+
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
 
     document.getElementById('keywords-output').innerHTML = styleEntitiesFromJson(json);
+    $('#keywords-toggle-button').trigger('click');
     $("#output").show();
     $('.btn-group').css('display', 'block');
     // clickable entities and timestamps
@@ -149,12 +151,6 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += videoId
     youtubeSourceBuilder += "?enablejsapi=1"
     youtubeSourceBuilder += "&origin=" + location.origin;
-
-    // display "Results" header
-    $("#resultsHeader").show();
-
-    // Display loading screen
-    $("#resultsHeader").text("Loading...");
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  

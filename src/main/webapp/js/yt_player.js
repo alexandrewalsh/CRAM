@@ -47,7 +47,7 @@ function resizeIFrame() {
     // Defines and sets the best video height to ensure that overflow does not occur
     var playerHeight = (videoHeightFromRatio > totalAvailableHeight) ? totalAvailableHeight : videoHeightFromRatio;
     $('#player').height(playerHeight);
-    $('#output').height(playerHeight - $('#resultsHeader').height());
+    $('#output').height(playerHeight);
 
     // change output size to match the player
     if ($('#flex-item-video').hasClass('theater')) {
@@ -70,7 +70,7 @@ $(document).ready(function() {
 
             // remove table wrapper 
             video.removeClass('theater');
-            results.append($("#resultsHeader"));
+            results.append($("#tab-container"));
             results.append($("#entity-search-form"));
             results.append($("#output"));
             $("#table-wrapper").remove();
@@ -87,7 +87,7 @@ $(document).ready(function() {
 
             // package results header and table in a column
             results.prepend($("<div id='table-wrapper' class='container-column'></div>"));
-            $("#table-wrapper").append($("#resultsHeader"));
+            $("#table-wrapper").append($("#tab-container"));
             $("#table-wrapper").append($("#entity-search-form"));
             $("#table-wrapper").append($("#output"));
 
