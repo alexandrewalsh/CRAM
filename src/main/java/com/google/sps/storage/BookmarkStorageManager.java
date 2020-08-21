@@ -101,9 +101,8 @@ public class BookmarkStorageManager implements BookmarkStorageInterface {
      */
     public void removeBookmark(String id) throws BookmarkStorageException {
         // Tries to parse the Entity Key from the string to remove the Entity from Datastore
-        Key key;
+        Key key = KeyFactory.stringToKey(id);
         try {
-            key = KeyFactory.stringToKey(id);
             datastore.delete(key);
         } catch (Exception e) {
             throw new BookmarkStorageException(EXCEPTION_REMOVE_BOOKMARK, e.getMessage(), e.getCause()); 
