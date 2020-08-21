@@ -105,6 +105,8 @@ a .headerBtn:hover {
     font-size: 24px;
     margin-left: 3pc;
     margin-right: 3pc;
+    overflow: auto;
+    height: 25vh;
 }
 
 .ground {
