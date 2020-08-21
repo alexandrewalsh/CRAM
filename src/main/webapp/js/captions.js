@@ -562,6 +562,7 @@ function setCaptionsButton() {
                 // Sets the results table
                 document.getElementById("FullCap").innerHTML = text;
                 console.log("Fetching full captions from database...");
+                console.log(video_id);
             }
         });
     });

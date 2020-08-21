@@ -202,8 +202,10 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         List<TimeRangedText> full_captions = new ArrayList<TimeRangedText>();
 
         for (Entity entity : results.asIterable()) {
-            TimeRangedText single_line = new TimeRangedText((Long)entity.getProperty(COLUMN_START), (Long)entity.getProperty(COLUMN_END), (String)entity.getProperty(COLUMN_CAPTION));
-            full_captions.add(single_line);
+            if (entity.getParent().getName().equals(videoID)) {
+                TimeRangedText single_line = new TimeRangedText((Long)entity.getProperty(COLUMN_START), (Long)entity.getProperty(COLUMN_END), (String)entity.getProperty(COLUMN_CAPTION));
+                full_captions.add(single_line);
+            }
         }
 
         return full_captions;
