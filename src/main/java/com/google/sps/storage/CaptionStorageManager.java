@@ -30,7 +30,9 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     private static final String COLUMN_TIMES = "timestamps";
     private static final String COLUMN_START = "start_time";
     private static final String COLUMN_END = "end_time";
-    
+    private static final String NO_VID_ERR = "Requested video does not exist";
+    private static final String NO_META_ERR = "Requested metadata does not exist";
+    private static final String NO_PHRASE_ERR = "Requested keyphrase does not exist in ";
 
     //================================================================================
     // Public Interface Functions (see DatabaseInterface.java for official descriptions)
@@ -76,7 +78,7 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException {
         Entity vidEnt;
         if ((vidEnt = getVideo(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
         }
 
         try {
@@ -104,13 +106,13 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     public void addMetadata(String videoID, String metadata, boolean overwrite) throws CaptionStorageException {
         Entity vidEnt;
         if ((vidEnt = getVideo(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
         }
         
         // need to find metadata already in the database
         Entity currMeta;
         if ((currMeta = getMetadata(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_META_EXISTS, "Requested metadata does not exist");
+            throw new CaptionStorageException(Reason.NO_META_EXISTS, NO_META_ERR);
         }
 
         Key metaKey = currMeta.getKey();
@@ -145,7 +147,7 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         Entity vidEnt;
         try {
             if ((vidEnt = getVideo(videoID)) == null) {
-                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
             }
         } catch (CaptionStorageException cse) {
             throw cse;
@@ -183,10 +185,10 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         try {
             result = clauseMap.get(keyword);
         } catch (Exception e) {
-            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, "Requested keyphrase does not exist in " + videoID);
+            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, NO_PHRASE_ERR + videoID);
         }
         if (result == null) {
-            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, "Requested keyphrase does not exist in " + videoID);
+            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, NO_PHRASE_ERR + videoID);
         }
 
         return result;
@@ -230,7 +232,7 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     public void deleteVideo(String videoID) throws CaptionStorageException {
         Entity vidEnt;
         if ((vidEnt = getVideo(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
         }
         Key vidKey = vidEnt.getKey();
         try {
