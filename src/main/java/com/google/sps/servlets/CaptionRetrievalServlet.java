@@ -27,7 +27,7 @@ import com.google.sps.data.TimeRangedText;
 import java.util.*;
 
 
-/** Servlet that interacts with Google's NLP API */
+/** Servlet to retrieve the full captions of a video from datastore */
 @WebServlet("/fullcaption")
 public class CaptionRetrievalServlet extends HttpServlet {
 
