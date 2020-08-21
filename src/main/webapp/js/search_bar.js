@@ -88,7 +88,7 @@ function compareTimestamps(a, b) {
  */
 function filterEntities() {
     var query = $('#entity-seachbar').val().toLowerCase().trim();
-    var entities = $('#output table tr td:first-child');
+    var entities = $('#keywords-output table tr td:first-child');
 
     // Case 1: Searchbar is empty, so all entities are displayed
     if (query == '') {
@@ -117,13 +117,13 @@ function sortEntities() {
 
     // Case 1: Sorts the table alphabetically
     if (optionSelected == 'alphabetical') {
-        var list = $('#output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
-        $('#output').html(styleEntitiesFromList(list));
+        var list = $('#keywords-output table tr td:first-child').sort(compareEntities).map((i, elem) => elem.textContent);
+        $('#keywords-output').html(styleEntitiesFromList(list));
 
     // Case 2: Sorts the table chronologically
     } else if (optionSelected == 'chronological') {
-        var list = $('#output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
-        $('#output').html(styleEntitiesFromList(list));   
+        var list = $('#keywords-output table tr td:first-child').sort(compareTimestamps).map((i, elem) => elem.textContent);
+        $('#keywords-output').html(styleEntitiesFromList(list));   
 
     // Case 3: Invalid selected option, so nothing happens   
     } else {
@@ -136,6 +136,26 @@ function sortEntities() {
     setClickableTimestamps();
 }
 
+function showSelectedSection(selected) {
+    switch(selected) {
+        case 'keywords':
+            $('#keywords-output').show();
+            $('#query-output').hide();
+            $('#bookmarks-output').hide();
+            break;
+        case 'query':
+            $('#keywords-output').hide();
+            $('#query-output').show();
+            $('#bookmarks-output').hide();
+            break;
+        case 'bookmarks':
+            $('#keywords-output').hide();
+            $('#query-output').hide();
+            $('#bookmarks-output').show();
+            break;
+    }
+}
+
 
 $(document).ready(function() {
 
@@ -144,6 +164,17 @@ $(document).ready(function() {
 
     // Select to sort entities
     $('#entity-sort').change(sortEntities);
+
+    $('#keywords-toggle-button').click(() => {
+        showSelectedSection('keywords');
+    });
+    $('#query-toggle-button').click(() => {
+        showSelectedSection('query');
+    });
+    $('#bookmarks-toggle-button').click(() => {
+        showSelectedSection('bookmarks');
+    });
+
 
 });
 

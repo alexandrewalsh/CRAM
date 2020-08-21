@@ -110,7 +110,7 @@ table {
 }
 
 #timestamp-timeline {
-    margin-right: auto;
+    justify-content: center;
 }
 
 #timestamp-timeline span, p {
@@ -118,7 +118,7 @@ table {
 }
 
 #player-pane {
-    flex: 2;
+    flex: 1;
 }
 
 /** Styles for the bookmark functionality */
@@ -244,9 +244,12 @@ table {
     }
 }
 
+/** Tabs for different searches */
+
+
+
+
 /** Bookmark display styling */
-
-
 .bg-primary {
     background-color: purple!important;
 }

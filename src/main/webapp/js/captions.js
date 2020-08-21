@@ -40,7 +40,9 @@ function submitFn(obj, evt){
 
     // delete all children
     $("#timestamp-timeline").empty();
-    $("#output").empty();
+    $("#keywords-output").empty();
+    $("#query-output").empty();
+    $("#bookmarks-output").empty();
 
     execute(value);
 }
@@ -117,10 +119,10 @@ function successfulDisplay(json) {
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
-            
-    document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-    $("#output").show();
 
+    document.getElementById('keywords-output').innerHTML = styleEntitiesFromJson(json);
+    $("#output").show();
+    $('.btn-group').css('display', 'block');
     // clickable entities and timestamps
     setClickableEntities();
     sortEntities();
@@ -310,7 +312,6 @@ function getIdFromUrl(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
-    // $('#output').html('<p>Loading...</p>');
 
     fetch('/caption', {
             method: 'POST',
