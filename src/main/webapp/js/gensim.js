@@ -8,6 +8,7 @@
  *          if some error occurs 
  */
 async function postGensim(url, data, query) {
+    console.log("POST gesim request to " + url + "...")
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -32,5 +33,7 @@ async function postGensim(url, data, query) {
  *                   500 otherwise
  */
 function handleGensimResponse(response) {
+    console.log("RESPONSE FROM GENSIM");
+    console.log(response);
     // perhaps `successfulDisplay` should be set here
 }

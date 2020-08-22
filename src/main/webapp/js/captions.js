@@ -88,9 +88,9 @@ function execute(url) {
     }).then((response) => response.json()).then((json) => {
         if (Object.keys(json).length > 0) {
             // send JSON to gensim server
-            postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json, TEST_QUERY).then(handleGensimResponse);
+            beginCaptionRequest(videoId, url); // TEMPORARY
             // Sets the results table
-            successfulDisplay(json);
+            // successfulDisplay(json);
             console.log("Fetching captions from database...");
         } else {
             // video id not found in db, fetching from Youtube API
