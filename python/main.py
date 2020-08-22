@@ -1,4 +1,4 @@
-# Copyright 2018 Google LLC
+# Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-import gensim_req as gen
+# import gensim_req as gen
+import gensim.downloader as api
+from gensim_req import query_phrase, create_model, download_resources
 
 
 app = Flask(__name__)
@@ -34,25 +36,29 @@ def root():
         # get url params: request.args.get(KEY)
         # {query: "...", "captions": "{...}"}
         # from captions create dictionary and model
-        
-        # Instantiates a client
-        # gen.hello(
-        
         # return jsonify(get_request)
+        # Load the model: this is a big file, can take a while to download and open
+        download_resources()
+
+
+        query = 'hello'
+        json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
+        res = query_phrase(query, json_in)
+        print("RES: " + str(res))
+        return jsonify({"indices": res})
 
     if request.method == 'POST':
         # get params from post: request.form[KEY]
         request_json = request.json
         query = request_json['query']
         json_in = request_json['ytCaptions']
-        print("query: " + str(query))
-        print("\n\n************************************\n\n")
-        print(json_in)
-        return _corsify_actual_response(jsonify(request_json))
 
-        # # for future
-        # response = jsonify({"indices": query_phrase(query, json_in, 3)})
-        # return _corsify_actual_response(response)
+        indices = query_phrase(query, json_in, 3)
+        ret = {"indices": indices}
+
+        print("GENSIM RETURNS: " + str(ret))
+        return _corsify_actual_response(jsonify(ret))
+
     
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -69,14 +75,7 @@ def _build_cors_prelight_response():
 def _corsify_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-    # method, origin
 
-
-def handlePost(json):
-    '''
-    Handle POST request
-    '''
-    return None
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
