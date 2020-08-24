@@ -431,7 +431,9 @@ function displayBookmarks(list) {
     var output = '<ul>';
     for (bookmark of list) {
         bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<li class="bookmark">' + bookmark.title + '<span class="close">&times;</span></li>';        
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
     }
     output += '</ul>';
     
