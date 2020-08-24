@@ -122,7 +122,7 @@ table {
 }
 
 /** Styles for the bookmark functionality */
-#add-bookmark-button {
+#add-bookmark-button #fullcap-button{
     align-self: start;
 }
 
