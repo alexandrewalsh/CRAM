@@ -2,19 +2,28 @@
  * Currently holds:
  * submitFn                 -- event handler for search bar query
  * execute                  -- execute a request to download captions from Youtube API
+ * successfulDisplay
  * displayVideo
  * beginCaptionRequest
  * getCaptions
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
- * resizeIFrame
  * styleEntitiesFromJson
+ * styleEntitiesFromList
+ * setClickableTimestamps
+ * setClickableEntities
+ * fetchBookmarks
+ * displayBookmarks
+ * clearBookmarkForm
+ * setBookmarkButton
  * document.ready
  */
 
 /** global variables holding the json response for timestamps */
+var currentVideoID;
 var timestamps;
+var bookmarks;
 
 /**
  * Event handler for search bar query, entry point
@@ -56,10 +65,14 @@ function execute(url) {
 
     try {
         videoId = getIdFromUrl(url);
+        currentVideoID = videoId;
     } catch {
         renderError("Invalid youtube url!");
         return;
     }
+
+    // hides the bookmarks for the previous video
+    $('#bookmark-display-div').html('');
 
     // displays the video in the front end
     displayVideo(videoId);
@@ -93,10 +106,14 @@ function execute(url) {
     });
 }
 
+/**
+ * Renders the entities of the video after a successful json fetch
+ * @param json The json of the entities fetched
+ */
 function successfulDisplay(json) {
     // display results
     $("#resultsHeader").text("Key Words in Video");
-    $('#entity-search-form').show(); // css('display', 'flex');
+    $('#entity-search-form').show();
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
@@ -107,6 +124,16 @@ function successfulDisplay(json) {
     // clickable entities and timestamps
     setClickableEntities();
     sortEntities();
+
+    const queryParams = new URLSearchParams(window.location.search);
+    var email = '';
+    if (queryParams.has('mockall')) {
+        email = 'MOCK';
+    } else {
+        email = getAuth().currentUser.get().getBasicProfile().getEmail();
+    }
+
+    fetchBookmarks(email, currentVideoID);
 }
 
 
@@ -122,7 +149,7 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += "&origin=" + location.origin;
 
     // display "Results" header
-    $("#resultsHeader").show(); //style.display = "inline";
+    $("#resultsHeader").show();
 
     // Display loading screen
     $("#resultsHeader").text("Loading...");
@@ -138,6 +165,9 @@ function displayVideo(videoId) {
     } else {
         player.loadVideoByUrl("http://www.youtube.com/v/"+videoId+"?version=3");
     }
+
+    // append bookmark button
+    setBookmarkButton();
 }
 
 
@@ -285,14 +315,9 @@ function sendJsonForm(json) {
     fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {
-            
-            // Sets the results table
-            
+        }).then((response) => response.json()).then((json) => {     
+            // Sets the results table            
             successfulDisplay(json);
-            // clickable entities and timestamps
-            // setClickableEntities();
-            // sortEntities();
         });
 }
 
@@ -330,11 +355,9 @@ function styleEntitiesFromJson(json) {
  */
 function styleEntitiesFromList(list) {
     var output = '<table>';
-
     for (entity of list) {
         output += '<tr><td><span class="word">' + entity + '</span></td></tr>';
     }
-
     output += '</table>'
     return output;
 }
@@ -354,11 +377,14 @@ function setClickableTimestamps() {
  * timestamps. Also makes the timestamps clickable.
  */
 function setClickableEntities() {
-    $('.word').bind("click", function(){
+    $('.word').bind("click", function() {
         const entity = this.innerText;
             
         // delete all children
         $("#timestamp-timeline").empty();
+
+        // append bookmark button
+        setBookmarkButton();
 
         // query json
         $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
@@ -376,6 +402,145 @@ function setClickableEntities() {
     });
 }
 
+/**
+ * Fetches and displays the bookmarks for the current user and video
+ * @param email - The email of the current user
+ * @param videoId - The videoId of the current video
+ */
+function fetchBookmarks(email, videoId) {
+    var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
+
+    fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
+        $('#bookmark-display-div').html('');
+        if (Array.isArray(json)) {
+            displayBookmarks(json);
+        } else if (typeof json === 'object' && json !== null) {
+            console.log(json.ERROR);
+            alert(json.ERROR);
+        }
+    });
+
+}
+
+/**
+ * Sets listeners for removing bookmarks on clicks
+ */
+function setRemoveBookmarkListener() {
+    // Removes click listeners from buttons to remove bookmarks to redefine click functionality
+    // Uses a fetch POST request to remove the current bookmark from the database
+    $('.remove-bookmark').off('click');
+    $('.remove-bookmark').click(function() {
+        const queryParams = new URLSearchParams(window.location.search)
+        var id = $(this).val();
+        var params = new URLSearchParams();
+        if (queryParams.has('mockall')) {
+            params.append('email', 'MOCK');
+        } else {
+            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        }
+        params.append('videoId', currentVideoID);
+        params.append('bookmarkId', id);
+        params.append('function', 'remove');
+        fetch('/bookmark', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.json()).then(json => {
+            displayBookmarks(json);
+        });
+    });
+}
+
+/**
+ * Sets listeners for viewing content on clicks
+ */
+function setContentBookmarkListener() {
+    // Removes click listeners from buttons to show bookmark content to redefine click functionality
+    // Toggles between showing and hiding the bookmark content
+    $('.view-bookmark').off('click');
+    $('.view-bookmark').click(function() {
+        if ($(this).text() == 'View') {
+            var id = $(this).val();
+            var timestamp = bookmarks[id].timestamp;
+            var content = bookmarks[id].content;
+            player.seekTo(timestamp);
+            $(this).parent().find('p')[0].innerText = content;
+            $(this).text('Hide');
+        } else if ($(this).text() == 'Hide') {
+            $(this).parent().find('p')[0].innerText = '';
+            $(this).text('View');
+        }
+    });
+}
+
+
+/**
+ * Renders bookmarks in HTML from a list of Bookmark objects
+ * @param list - The list of Bookmark objects
+ */
+function displayBookmarks(list) {
+    // Resets the global bookmarks variable to only store current bookmarks
+    bookmarks = {};
+
+    // Builds the HTML text to display on page
+    var output = '';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
+        output += bookmark.title;
+        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
+        output += bookmark.id;
+        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
+        output += bookmark.id;
+        output += '">Remove</button></div></div>'
+    }
+    
+    // Inserts the HTML text to the page
+    $('#bookmark-display-div').html(output);
+    setRemoveBookmarkListener();
+    setContentBookmarkListener();
+}
+
+/**
+ * Clears the contents of the bookmarks form
+ */
+function clearBookmarkForm() {
+    $('#bookmark-title').val('');
+    $('#bookmark-content').val('');
+    player.playVideo();
+}
+
+/**
+ * Adds button to add bookmarks and listeners
+ */
+function setBookmarkButton() {
+    // append bookmark button
+    $("#timestamp-timeline").append('<button id="add-bookmark-button"><i style="font-size:24px" class="fa">&#xf097;</i></button>');
+
+    // Displays modal for adding bookmark
+    $('#add-bookmark-button').click(() => {
+        $('#myModal').css('display', 'block');
+        $('.modal-body form').css('display', 'block');
+        player.pauseVideo();
+    });
+
+    // Closes modal when clicking close button
+    $('.modal-close').click(() => {
+        $('#myModal').css('display', 'none');
+        $('.modal-body form').css('display', 'none');
+        clearBookmarkForm();
+    });
+
+    // Closes modal when clicking outside the modal
+    $(window).click(function(event) {
+        // Must check if the modal is open before closing the modal
+        if (event.target == document.getElementById('myModal')) {
+            $('#myModal').css('display', 'none');
+            $('.modal-body form').css('display', 'none');
+            clearBookmarkForm();
+        }
+    });
+}
+
 
 $(document).ready(() => {
 
@@ -384,4 +549,35 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
+
+    // Adds a bookmark when clicking the 'add bookmark' button
+    $('#bookmark-add-button').click(() => {
+        // Creates the request parameters
+        const queryParams = new URLSearchParams(window.location.search)
+        var params = new URLSearchParams();
+        if (queryParams.has('mockall')) {
+            params.append('email', 'MOCK');
+        } else {
+            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+        }
+        params.append('videoId', currentVideoID);
+        params.append('timestamp', Math.floor(player.getCurrentTime()));
+        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
+        params.append('function', 'add');
+
+        // Sends the bookmark parameters to the servlet to process
+        fetch('/bookmark', {
+            method: 'POST',
+            body: params,
+        }).then((response) => response.json()).then(json => {
+            displayBookmarks(json);
+        });
+
+        // Hides the modal
+        $('#myModal').css('display', 'none');
+        $('.modal-body form').css('display', 'none');
+        clearBookmarkForm();
+    });
+
 });
