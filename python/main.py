@@ -38,8 +38,6 @@ def root():
         # from captions create dictionary and model
         # return jsonify(get_request)
         # Load the model: this is a big file, can take a while to download and open
-        download_resources()
-
 
         query = 'hello'
         json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'

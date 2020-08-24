@@ -58,14 +58,14 @@ def download_resources():
 
     # get stop words
     stop_words = set()
-    english_file = open('resources/corpora/stopwords/english', 'r')
+    english_file = open('static/resources/corpora/stopwords/english', 'r')
     for line in english_file:
         stop_words.add(line.strip())
     english_file.close()
     print(stop_words)
     print("STOP WORDS processed")
 
-    glove_fname = "resources/glove.gz"
+    glove_fname = "static/resources/glove/glove.gz"
 
     if os.path.isfile(glove_fname):
         print("about to try")
@@ -76,12 +76,6 @@ def download_resources():
         glove_model = api.load("glove-wiki-gigaword-50")
         glove_model.save(glove_fname)
     
-
-    # create a similary model index for the glove embeddings
-    # if os.path.isfile(glove_fname):
-
-    # else:
-
 
     print("glove model finished")
     return stop_words, glove_model
