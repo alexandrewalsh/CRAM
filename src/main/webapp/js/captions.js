@@ -561,4 +561,16 @@ $(document).ready(() => {
         clearBookmarkForm();
     });
 
+
+    $('.bookmark').click((event) => {
+        // Gets the target bookmark content
+        var targetContent = $(event.target).next();
+
+        // Hides all contents
+        $('.content').css('maxHeight', '0px');
+
+        // Finds the content of the clicked bookmark to display
+        $(event.target).next().css('')
+    })
+
 });
