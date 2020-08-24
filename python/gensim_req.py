@@ -30,12 +30,6 @@ def processInput(json_in):
 
     documents = [caption['text'] for caption in json_processed['captions']]
     return documents
-    # for caption in json_processed['captions']:
-    # # for caption in json_in[1]:
-    # #     print("caption: " + str(caption))
-    # #     documents.append(caption['text'])
-
-    # return documents
 
 
 def preprocess(doc, stop_words):
@@ -67,7 +61,7 @@ def download_resources():
 
     glove_fname = "static/resources/glove/glove.gz"
 
-    if os.path.isfile(glove_fname):
+    if os.path.isfile(glove_fname) and os.path.isfile():
         print("about to try")
         glove_model = KeyedVectors.load(glove_fname, mmap=None)
         print("glove model cached")
@@ -76,7 +70,6 @@ def download_resources():
         glove_model = api.load("glove-wiki-gigaword-50")
         glove_model.save(glove_fname)
     
-
     print("glove model finished")
     return stop_words, glove_model
 
