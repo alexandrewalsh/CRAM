@@ -419,10 +419,28 @@ function fetchBookmarks(email, videoId) {
 
 }
 
+
 /**
- * Sets listeners for removing bookmarks on clicks
+ * Renders bookmarks in HTML from a list of Bookmark objects
+ * @param list - The list of Bookmark objects
  */
-function setRemoveBookmarkListener() {
+function displayBookmarks(list) {
+    // Resets the global bookmarks variable to only store current bookmarks
+    bookmarks = {};
+
+    // Builds the HTML text to display on page
+    var output = '<ul>';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
+    }
+    output += '</ul>';
+    
+    // Inserts the HTML text to the page
+    $('#bookmarks-output').html(output);
+
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -470,32 +488,6 @@ function setContentBookmarkListener() {
 }
 
 
-/**
- * Renders bookmarks in HTML from a list of Bookmark objects
- * @param list - The list of Bookmark objects
- */
-function displayBookmarks(list) {
-    // Resets the global bookmarks variable to only store current bookmarks
-    bookmarks = {};
-
-    // Builds the HTML text to display on page
-    var output = '';
-    for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
-        output += bookmark.title;
-        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
-        output += bookmark.id;
-        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
-        output += bookmark.id;
-        output += '">Remove</button></div></div>'
-    }
-    
-    // Inserts the HTML text to the page
-    $('#bookmark-display-div').html(output);
-    setRemoveBookmarkListener();
-    setContentBookmarkListener();
-}
 
 /**
  * Clears the contents of the bookmarks form
