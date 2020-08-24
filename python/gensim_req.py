@@ -56,17 +56,6 @@ def preprocess(doc, stop_words):
 
 def download_resources():
 
-    # print("cwd(): " + str(os.getcwd()))
-    # print("filepath: " + str(os.path.split(__file__)[0]))
-    # print("path exists?: " + str(os.path.isfile("resources/glove.kv")))
-    # glove_model = KeyedVectors.load("resources/glove.kv", mmap='r')
-
-    # for root, dirs, files in os.walk("."):
-    #     for _dir in dirs:
-    #         print("dir: " + str(_dir)) 
-    #     for filename in files:
-    #         print("file: " + str(filename))
-
     # get stop words
     stop_words = set()
     english_file = open('resources/corpora/stopwords/english', 'r')
