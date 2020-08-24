@@ -43,6 +43,7 @@ public class BookmarkHandlerServlet extends HttpServlet {
     private static final String RESPONSE_JSON_CONTENT = "json";
 
     private BookmarkStorageInterface storage;
+    private Gson gson = new Gson();
 
     /**
      * Gets the bookmarks of the current video and user
@@ -68,7 +69,6 @@ public class BookmarkHandlerServlet extends HttpServlet {
         }
 
         // Converts the fetched database data and passes it to the front end
-        Gson gson = new Gson();
         String res = gson.toJson(bookmarks);
         response.getWriter().println(res);
     }
@@ -123,7 +123,6 @@ public class BookmarkHandlerServlet extends HttpServlet {
         }
 
         // Converts the fetched database results to JSON
-        Gson gson = new Gson();
         response.getWriter().println(gson.toJson(bookmarks));
 
     }

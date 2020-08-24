@@ -1,7 +1,6 @@
 /*
  * Implementation for DatabaseImpl class
  *  Current public functions at a glance:
- *  test()
  *  addVideo()
  *  addClause()
  *  addClauses()
@@ -9,7 +8,10 @@
  *  getAllKeywords()
  *  getTimesForKeyword()
  *  videoInDb()
- * 
+ *  metaInDb()
+ *  deleteVideo()
+ *  deleteClause()
+ *  deleteMetadata()
  */
 
 package com.google.sps.storage;
@@ -23,6 +25,12 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     private static final String COLUMN_METADATA = "metadata";
     private static final String COLUMN_CAPTION = "caption";
     private static final String COLUMN_TIMES = "timestamps";
+    private static final String COLUMN_TIMES = "timestamps";
+    private static final String NO_VID_ERR = "Requested video does not exist";
+    private static final String NO_META_ERR = "Requested metadata does not exist";
+    private static final String NO_PHRASE_ERR = "Requested keyphrase does not exist in ";
+    
+
 
     //================================================================================
     // Public Interface Functions (see DatabaseInterface.java for official descriptions)
@@ -53,7 +61,7 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     public void addClause(String videoID, String keyword, List<Long> timestamps) throws CaptionStorageException {
         Entity vidEnt;
         if ((vidEnt = getVideo(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
         }
 
         try {
@@ -81,13 +89,13 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     public void addMetadata(String videoID, String metadata, boolean overwrite) throws CaptionStorageException {
         Entity vidEnt;
         if ((vidEnt = getVideo(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
         }
         
         // need to find metadata already in the database
         Entity currMeta;
         if ((currMeta = getMetadata(videoID)) == null) {
-            throw new CaptionStorageException(Reason.NO_META_EXISTS, "Requested metadata does not exist");
+            throw new CaptionStorageException(Reason.NO_META_EXISTS, NO_META_ERR);
         }
 
         Key metaKey = currMeta.getKey();
@@ -122,7 +130,7 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         Entity vidEnt;
         try {
             if ((vidEnt = getVideo(videoID)) == null) {
-                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, "Requested video does not exist");
+                throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
             }
         } catch (CaptionStorageException cse) {
             throw cse;
@@ -160,10 +168,10 @@ public class CaptionStorageManager implements CaptionStorageInterface {
         try {
             result = clauseMap.get(keyword);
         } catch (Exception e) {
-            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, "Requested keyphrase does not exist in " + videoID);
+            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, NO_PHRASE_ERR + videoID);
         }
         if (result == null) {
-            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, "Requested keyphrase does not exist in " + videoID);
+            throw new CaptionStorageException(Reason.NO_KEYPHRASE_EXISTS, NO_PHRASE_ERR + videoID);
         }
 
         return result;
@@ -179,16 +187,75 @@ public class CaptionStorageManager implements CaptionStorageInterface {
 
     // return true if specified meta is the metadata for videoID
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException {
-        Entity data;
-        try {
-            data = getMetadata(videoID);
-        } catch (CaptionStorageException cse) {
-            throw cse;
-        }
+        Entity data = getMetadata(videoID);
         if (data.getKey().getName().equals(meta)) {
             return true;
-        } 
+        }
         return false;
+    }
+
+    // delete a video & all its children (metadata & captions) from the database
+    public void deleteVideo(String videoID) throws CaptionStorageException {
+        Entity vidEnt;
+        if ((vidEnt = getVideo(videoID)) == null) {
+            throw new CaptionStorageException(Reason.NO_VIDEO_EXISTS, NO_VID_ERR);
+        }
+        Key vidKey = vidEnt.getKey();
+        try {
+            datastore.delete(vidKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_VIDEO_ERR, e.getMessage(), e.getCause());
+        }
+    }
+
+    // delete a specific keyword from a video in the database
+    public void deleteClause(String videoID, String keyword) throws CaptionStorageException {
+        Query query = new Query(COLUMN_CAPTION);
+        PreparedQuery results = datastore.prepare(query);
+
+        Entity keywordEnt = null;
+        try {
+            for (Entity entity : results.asIterable()) {
+                if (entity.getKey().getName().equals(keyword)) {
+                    keywordEnt = entity;
+                }
+            }
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.GET_KEYPHRASE_ERR, e.getMessage(), e.getCause());
+        }
+
+        Key keywordKey = keywordEnt.getKey();
+        try {
+            datastore.delete(keywordKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_KEYPHRASE_ERR, e.getMessage(), e.getCause());
+        }
+        
+    }
+
+    // delete the metadata belonging to a specific video in the database
+    public void deleteMetadata(String metadata) throws CaptionStorageException {
+        Query query = new Query(COLUMN_METADATA);
+        PreparedQuery results = datastore.prepare(query);
+
+        Entity metaEnt = null;
+        try {
+            for (Entity entity : results.asIterable()) {
+                if (entity.getKey().getName().equals(metadata)) {
+                    metaEnt = entity;
+                }
+            }
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.GET_META_ERR, e.getMessage(), e.getCause());
+        }
+
+        Key metaKey = metaEnt.getKey();
+        try {
+            datastore.delete(metaKey);
+        } catch (Exception e) {
+            throw new CaptionStorageException(Reason.DELETE_META_ERR, e.getMessage(), e.getCause());
+        }
+        
     }
 
     //================================================================================

@@ -420,26 +420,9 @@ function fetchBookmarks(email, videoId) {
 }
 
 /**
- * Renders bookmarks in HTML from a list of Bookmark objects
- * @param list - The list of Bookmark objects
+ * Sets listeners for removing bookmarks on clicks
  */
-function displayBookmarks(list) {
-    // Resets the global bookmarks variable to only store current bookmarks
-    bookmarks = {};
-
-    // Builds the HTML text to display on page
-    var output = '<ul>';
-    for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
-        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
-        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
-    }
-    output += '</ul>';
-    
-    // Inserts the HTML text to the page
-    $('#bookmarks-output').html(output);
-
+function setRemoveBookmarkListener() {
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -462,7 +445,12 @@ function displayBookmarks(list) {
             displayBookmarks(json);
         });
     });
+}
 
+/**
+ * Sets listeners for viewing content on clicks
+ */
+function setContentBookmarkListener() {
     // Removes click listeners from buttons to show bookmark content to redefine click functionality
     // Toggles between showing and hiding the bookmark content
     $('.view-bookmark').off('click');
@@ -479,6 +467,34 @@ function displayBookmarks(list) {
             $(this).text('View');
         }
     });
+}
+
+
+/**
+ * Renders bookmarks in HTML from a list of Bookmark objects
+ * @param list - The list of Bookmark objects
+ */
+function displayBookmarks(list) {
+    // Resets the global bookmarks variable to only store current bookmarks
+    bookmarks = {};
+
+    // Builds the HTML text to display on page
+    var output = '';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
+        output += bookmark.title;
+        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
+        output += bookmark.id;
+        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
+        output += bookmark.id;
+        output += '">Remove</button></div></div>'
+    }
+    
+    // Inserts the HTML text to the page
+    $('#bookmark-display-div').html(output);
+    setRemoveBookmarkListener();
+    setContentBookmarkListener();
 }
 
 /**
