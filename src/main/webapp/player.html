@@ -86,7 +86,7 @@
                     <button type="button" id="query-toggle-button" class="btn btn-primary">Query</button>
                     <button type="button" id="bookmarks-toggle-button" class="btn btn-primary">Bookmarks</button>
                 </div>
-                <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
+                <form id="entity-search-form" class="entity-search" onsubmit="getSearchResults(this, event);" autocomplete="off">
                     <div>
                         <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
                         <button id="entity-searchbar-button" type="submit"><i class="fa fa-search"></i></button>

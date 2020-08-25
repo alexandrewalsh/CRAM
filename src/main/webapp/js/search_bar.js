@@ -183,6 +183,41 @@ function showSelectedSection(selected) {
     editTabSeachbar(selected);
 }
 
+/**
+ * Send a query request to the gensim server
+ * 
+ */
+ function getSearchResults(obj, evt) {
+     evt.preventDefault();
+     const query = $(obj).find('input').val()
+     // Here goes the post request, however, we must mock for now
+     gensim_callback('{"indices": [1, 2, 0]}')
+     console.log(obj, evt);
+ }
+
+
+/**
+ * Populate query search results returned from gensim
+ * @param res - the response JSON returned by the python server
+ */
+ function gensim_callback(res) {
+    $('#query-output').empty();
+    const obj = JSON.parse(res);
+
+    var output = '<table id="query-table">';
+    for (const index in obj['indices']){
+        // access global documents property
+        const line = documents[index].text;
+        output += "<tr><td><span class='query'>" + line + "</span></td></tr>";
+    }
+    output += "</table>"
+    
+    // display the query output
+    $('#query-output').html(output);
+
+    setClickableQueries();
+ }
+
 
 $(document).ready(function() {
 

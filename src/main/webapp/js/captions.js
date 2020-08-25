@@ -25,6 +25,9 @@ var currentVideoID;
 var timestamps;
 var bookmarks;
 
+/* global variable for holding the full captions */
+var documents;
+
 /**
  * Event handler for search bar query, entry point
  * @param obj - the button invoking the click
@@ -92,6 +95,13 @@ function execute(url) {
         return;
     }
 
+    // simulating DB fetch, statically setting documents
+    documents = {0: {"text": "This is a great line", "time": 3},
+                 1: {"text": "Fantstic line indeed", "time": 5},
+                 2: {"text": "This one is going to be really long to see if we can handle long times",
+                                                     "time": 1}
+                }
+    
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
         method: 'GET',
@@ -374,6 +384,8 @@ function setClickableTimestamps() {
  * timestamps. Also makes the timestamps clickable.
  */
 function setClickableEntities() {
+    $('.word').unbind('click');
+
     $('.word').bind("click", function() {
         const entity = this.innerText;
             
@@ -396,6 +408,33 @@ function setClickableEntities() {
         
         // clickable timestamps
         setClickableTimestamps();
+    });
+}
+
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
+}
+
+/**
+ * Adds click event listeners to word entities to show
+ * timestamps. Also makes the timestamps clickable.
+ */
+function setClickableQueries() {
+    $('.query').unbind('click');
+
+    $('.query').bind("click", function() {
+        const text = this.innerText;
+        const index = getKeyByValue(documents, text);
+        const time = documents[index].time;
+
+        // delete all children
+        $("#timestamp-timeline").empty();
+
+        // append bookmark button
+        setBookmarkButton();
+
+        // query json
+        $("#timestamp-timeline").append("<p>"+text+" appears at </p><span class='timestamps'>"+time+"</span>");
     });
 }
 
