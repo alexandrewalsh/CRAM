@@ -25,7 +25,6 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     private static final String COLUMN_METADATA = "metadata";
     private static final String COLUMN_CAPTION = "caption";
     private static final String COLUMN_TIMES = "timestamps";
-    private static final String COLUMN_TIMES = "timestamps";
     private static final String NO_VID_ERR = "Requested video does not exist";
     private static final String NO_META_ERR = "Requested metadata does not exist";
     private static final String NO_PHRASE_ERR = "Requested keyphrase does not exist in ";

@@ -312,11 +312,17 @@ ul li {
     }
 }
 
+
 .content {
   padding: 0 18px;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;
+  background-color: #9900ff;
+}
+
+.content p {
+    color: white;
+    font-size: 20px;
 }
 

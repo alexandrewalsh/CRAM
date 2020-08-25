@@ -419,28 +419,10 @@ function fetchBookmarks(email, videoId) {
 
 }
 
-
 /**
- * Renders bookmarks in HTML from a list of Bookmark objects
- * @param list - The list of Bookmark objects
+ * Sets listeners for deleting bookmarks on clicks
  */
-function displayBookmarks(list) {
-    // Resets the global bookmarks variable to only store current bookmarks
-    bookmarks = {};
-
-    // Builds the HTML text to display on page
-    var output = '<ul>';
-    for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
-        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
-        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
-    }
-    output += '</ul>';
-    
-    // Inserts the HTML text to the page
-    $('#bookmarks-output').html(output);
-
+function addRemoveBookmarkListeners() {
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -465,26 +447,48 @@ function displayBookmarks(list) {
     });
 }
 
+
 /**
  * Sets listeners for viewing content on clicks
  */
-function setContentBookmarkListener() {
+function addContentBookmarkListeners() {
     // Removes click listeners from buttons to show bookmark content to redefine click functionality
     // Toggles between showing and hiding the bookmark content
-    $('.view-bookmark').off('click');
-    $('.view-bookmark').click(function() {
-        if ($(this).text() == 'View') {
-            var id = $(this).val();
-            var timestamp = bookmarks[id].timestamp;
-            var content = bookmarks[id].content;
-            player.seekTo(timestamp);
-            $(this).parent().find('p')[0].innerText = content;
-            $(this).text('Hide');
-        } else if ($(this).text() == 'Hide') {
-            $(this).parent().find('p')[0].innerText = '';
-            $(this).text('View');
-        }
+    $('.bookmark').off('click');
+    $('.bookmark').click(function() {
+        var contentDiv = this.parentElement.nextSibling;
+        if (contentDiv.style.maxHeight && contentDiv.style.maxHeight != '0px') {
+            contentDiv.style.maxHeight = null;
+        } else {
+            $('.content').css('maxHeight', '0px');
+            contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
+        } 
     });
+}
+
+/**
+ * Renders bookmarks in HTML from a list of Bookmark objects
+ * @param list - The list of Bookmark objects
+ */
+function displayBookmarks(list) {
+    // Resets the global bookmarks variable to only store current bookmarks
+    bookmarks = {};
+
+    // Builds the HTML text to display on page
+    var output = '<ul>';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
+    }
+    output += '</ul>';
+    
+    // Inserts the HTML text to the page
+    $('#bookmarks-output').html(output);
+    addRemoveBookmarkListeners();
+    addContentBookmarkListeners();
+
 }
 
 
@@ -568,17 +572,5 @@ $(document).ready(() => {
         $('.modal-body form').css('display', 'none');
         clearBookmarkForm();
     });
-
-
-    $('.bookmark').click((event) => {
-        // Gets the target bookmark content
-        var targetContent = $(event.target).next();
-
-        // Hides all contents
-        $('.content').css('maxHeight', '0px');
-
-        // Finds the content of the clicked bookmark to display
-        $(event.target).next().css('')
-    })
 
 });
