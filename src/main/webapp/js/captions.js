@@ -25,6 +25,7 @@
 /** global variables holding the json response for timestamps */
 var currentVideoID;
 var timestamps;
+var current_vID;
 var bookmarks;
 var video_id;
 
@@ -94,7 +95,7 @@ function execute(url) {
         return;
     }
 
-    video_id = videoId;
+    current_vID = videoId;
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
         method: 'GET',
@@ -559,7 +560,7 @@ function setCaptionsButton() {
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
         if (document.getElementById("FullCap").innerHTML == "") {
-            fetch('/fullcaption?id=' + video_id, {
+            fetch('/fullcaption?id=' + current_vID, {
                 method: 'GET',
             }).then((response) => response.text()).then((text) => {
                 if (text.length > 0) {
