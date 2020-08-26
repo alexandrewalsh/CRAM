@@ -236,6 +236,7 @@ table {
 
     form.entity-search input[type=text] {
         padding: 0px;
+        padding-left: 10px;
     }
 }
 

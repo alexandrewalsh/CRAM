@@ -87,7 +87,7 @@ function compareTimestamps(a, b) {
  * Filters the entities based on the current text of the searchbar
  */
 function filterEntities() {
-    var query = $('#entity-seachbar').val().toLowerCase().trim();
+    var query = $('#entity-searchbar').val().toLowerCase().trim();
     var entities = $('#keywords-output table tr td:first-child');
 
     // Case 1: Searchbar is empty, so all entities are displayed
@@ -107,6 +107,44 @@ function filterEntities() {
         }
     });
 }
+
+/**
+ * Filters the bookmarks based on the current text of the searchbar
+ */
+function filterBookmarks() {
+    var query = $('#entity-searchbar').val().toLowerCase().trim();
+    var entities = $('#bookmarks-output ul li');
+    $('.content').css('maxHeight', '0px');
+
+    // Case 1: Searchbar is empty, so all entities are displayed
+    if (query == '') {
+        entities.each((i, elem) => {
+            $(elem).show();
+        });
+        return;
+    }
+
+    // Case 2: Searchbar has text, so only entities the include the query are displayed
+    entities.each((i, elem) => {
+        if ($(elem).children('.bookmark')[0].innerText.toLowerCase().includes(query)) {
+            $(elem).show();
+        } else {
+            $(elem).hide();
+        }
+    });
+}
+
+function filterSearch() {
+    if ($('#keywords-output').css('display') != 'none') {
+        filterEntities();
+        return;
+    }
+    if ($('#bookmarks-output').css('display') != 'none') {
+        filterBookmarks();
+    }
+}
+
+
 
 
 /**
@@ -136,24 +174,25 @@ function sortEntities() {
     setClickableTimestamps();
 }
 
-function editTabSeachbar(selected) {
+function editTabSearchbar(selected) {
     $('#entity-sort').css('margin-left', '5%');
     if (selected == 'query') {
-        $('#entity-seachbar').css('width', '80%');
-        $('#entity-seachbar').css('border-radius', '50px 0px 0px 50px');
+        $('#entity-searchbar').css('width', '80%');
+        $('#entity-searchbar').css('border-radius', '50px 0px 0px 50px');
         $('#entity-searchbar-button').css('width', '20%');
         $('#entity-searchbar-button').css('border-radius', '0px 50px 50px 0px');
         $('#entity-searchbar-button').show();
         $('#entity-sort').hide();
     } else {
-        $('#entity-seachbar').css('width', '100%');
-        $('#entity-seachbar').css('border-radius', '50px 50px 50px 50px');
+        $('#entity-searchbar').css('width', '100%');
+        $('#entity-searchbar').css('border-radius', '50px 50px 50px 50px');
         $('#entity-searchbar-button').hide(); 
         $('#entity-sort').show(); 
     }
 }
 
 function showSelectedSection(selected) {
+    $('#entity-searchbar').val('');
     switch(selected) {
         case 'keywords':
             $('#keywords-output').show();
@@ -162,6 +201,8 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
+            $('#keywords-output table tr').show();
+            $('.content').css('maxHeight', '0px');
             break;
         case 'query':
             $('#keywords-output').hide();
@@ -170,6 +211,7 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').addClass('active-tab');
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
+            $('.content').css('maxHeight', '0px');
             break;
         case 'bookmarks':
             $('#keywords-output').hide();
@@ -178,16 +220,17 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
+            $('#bookmarks-output ul li').show();
             break;
     }
-    editTabSeachbar(selected);
+    editTabSearchbar(selected);
 }
 
 
 $(document).ready(function() {
 
     // Searchbar to filter entities 
-    $('#entity-seachbar').on('keyup', filterEntities);
+    $('#entity-searchbar').on('keyup', filterSearch);
 
     // Select to sort entities
     $('#entity-sort').change(sortEntities);
