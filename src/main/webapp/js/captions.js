@@ -78,24 +78,24 @@ function execute(url) {
         return;
     }
 
-    postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/",
-            '{"captions": [{"text": "Whats up yall"}, {"text": "No can do here"}, {"text": "Trust the process"}]}',
-            'what is going on');
+    // postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/",
+    //         '{"captions": [{"text": "Whats up yall"}, {"text": "No can do here"}, {"text": "Trust the process"}]}',
+    //         'what is going on');
 
 
-    // // checks to see if captions already exist in the database
-    // fetch('/caption?id=' + videoId, {
-    //     method: 'GET',
-    // }).then((response) => response.json()).then((json) => {
-    //     if (Object.keys(json).length > 0) {
-    //         // Sets the results table
-    //         successfulDisplay(json);
-    //         console.log("Fetching captions from database...");
-    //     } else {
-    //         // video id not found in db, fetching from Youtube API
-    //         beginCaptionRequest(videoId, url);
-    //     }
-    // });
+    // checks to see if captions already exist in the database
+    fetch('/caption?id=' + videoId, {
+        method: 'GET',
+    }).then((response) => response.json()).then((json) => {
+        if (Object.keys(json).length > 0) {
+            // Sets the results table
+            successfulDisplay(json);
+            console.log("Fetching captions from database...");
+        } else {
+            // video id not found in db, fetching from Youtube API
+            beginCaptionRequest(videoId, url);
+        }
+    });
 
     // beginCaptionRequest("ncbb5B85sd0", "https://www.youtube.com/watch?v=ncbb5B85sd0")
 }
@@ -168,6 +168,7 @@ function beginCaptionRequest(videoId, url) {
             getCaptions(trackId, url).then(json => {
                 // send to backend
                 // GENSIM QUERY
+                postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/", json, "this is my best query");
                 sendJsonForm(json);
             });
         }
@@ -188,7 +189,7 @@ function getCaptions(trackId, url) {
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
-            "tlang": "en",
+            // "tlang": "en",
             "tfmt": "sbv"
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {

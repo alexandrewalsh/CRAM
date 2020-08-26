@@ -13,21 +13,11 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-# import gensim_req as gen
 import gensim.downloader as api
-from gensim_req import query_phrase, create_model, download_resources
+from gensim_req import query_phrase
 
 
 app = Flask(__name__)
-
-
-# def quickstart():
-#     import os
-#     credential_path = "client_secret.json"
-#     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
-
-
-
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def root():
@@ -51,7 +41,7 @@ def root():
         query = request_json['query']
         json_in = request_json['ytCaptions']
 
-        indices = query_phrase(query, json_in, 3)
+        indices = query_phrase(query, json_in)
         ret = {"indices": indices} #important
 
         print("GENSIM RETURNS: " + str(jsonify(ret)))

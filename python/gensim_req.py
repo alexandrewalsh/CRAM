@@ -63,29 +63,10 @@ def download_resources():
     print("STOP WORDS processed")
 
     glove_fname = "static/resources/glove/glove.gz"
-    # glove_vectors_fname = "static/resources/glove/glove.gz"
 
-    # here we assume there are chunks and try to join them
-    # f_handle = join_binary_files("static/resources/glove/split/", "static/resources/glove/glove.gz.vectors.npz")
-    # print("about to try")
-    # bin_data = f_handle.read()
-    # sio = StringIO(bin_data)
-    # glove_model = pickle.load(sio)
-    # glove_model = KeyedVectors.load("static/resources/glove/glove.gz", mmap=None)
-    # print("goteem")
-    # glove_model = api.load("text8")
     if os.path.isfile(glove_fname):
         print("about to try")
-        # glove_model = KeyedVectors.load(glove_fname, mmap=None)
         glove_vec = KeyedVectors.load(glove_fname, mmap='None')
-        # pickle myself
-        # pickling_on = open("vectors.pickle", "wb")
-        # pickle.dump(glove_model, pickling_on)
-        # print("glove model cached")
-
-        # in the future I can do 
-        # pickle_off = open("static/resources/glove/vectors.pickle", "rb")
-        # glove_model = pickle.load(pickle_off)
     else: 
         print("glove model downloading...")
         dataset = api.load("text8")
@@ -140,7 +121,7 @@ def create_model(json_in):
             similarity_matrix)
 
     print("index created")
-    return stop_words, dictionary, index
+    return stop_words, dictionary, index, documents
 
 
 def query_phrase(query_string, json_in, n=3):
@@ -160,7 +141,7 @@ def query_phrase(query_string, json_in, n=3):
     """
 
     # Get the Soft Cosime similarity model and dictionary 
-    stop_words, dictionary, index = create_model(json_in)
+    stop_words, dictionary, index, documents = create_model(json_in)
     print("MODEL CREATED")
 
     # Build the term dictionary, TF-idf model
@@ -172,7 +153,8 @@ def query_phrase(query_string, json_in, n=3):
     # index the model by the query
     doc_similarity_scores = index[query_tf]
     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
-    print("FINAL CREATED")
+
+    print("FINAL CREATED: " + str(sorted_indexes.tolist()))
 
     # maybe threshold
-    return sorted_indexes[:n].tolist()
+    return sorted_indexes.tolist()
