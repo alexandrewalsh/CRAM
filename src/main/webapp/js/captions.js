@@ -479,7 +479,7 @@ function displayBookmarks(list) {
     // Builds the HTML text to display on page
     var output = '<ul>';
     for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
         output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
         output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
         output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
@@ -488,11 +488,22 @@ function displayBookmarks(list) {
     
     // Inserts the HTML text to the page
     $('#bookmarks-output').html(output);
+    sortBookmarks();
     addRemoveBookmarkListeners();
     addContentBookmarkListeners();
 
 }
 
+function styleBookmarksFromList(list) {
+    var output = '<ul>';
+    for (bookmark of list) {
+        output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
+    }
+    output += '</ul>';
+    return output;
+}
 
 
 /**

@@ -83,6 +83,35 @@ function compareTimestamps(a, b) {
 }
 
 
+function compareBookmarkNames(a, b) {
+    var aText = $(a).children('.bookmark')[0].innerText;
+    var bText = $(b).children('.bookmark')[0].innerText;
+
+    if (aText > bText) {
+        return 1;
+    } 
+    if (aText < bText) {
+        return -1;
+    }
+    return 0;
+}
+
+function compareBookmarkTimestamps(a, b) {
+    var aId = $(a).children('.remove-bookmark')[0].value;
+    var bId = $(b).children('.remove-bookmark')[0].value;
+    var aTime = bookmarks[aId].timestamp;
+    var bTime = bookmarks[bId].timestamp;
+
+    if (aTime > bTime) {
+        return 1;
+    } 
+    if (aTime < bTime) {
+        return -1;
+    }
+    return compareBookmarkNames(a, b);
+}
+
+
 /**
  * Filters the entities based on the current text of the searchbar
  */
@@ -146,7 +175,6 @@ function filterSearch() {
 
 
 
-
 /**
  * Sorts the entities based on the current selector 
  */
@@ -172,6 +200,37 @@ function sortEntities() {
     filterEntities();
     setClickableEntities();
     setClickableTimestamps();
+}
+
+function sortBookmarks() {
+    var optionSelected = $("option:selected", '#entity-sort').val();
+    // Case 1: Sorts the table alphabetically
+    if (optionSelected == 'alphabetical') {
+        var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkNames), function(elem) {
+            return $(elem).children('.remove-bookmark')[0].value
+        });
+        $('#bookmarks-output').html(styleBookmarksFromList(list));
+    } else if (optionSelected == 'chronological') {
+        var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkTimestamps), function(elem) {
+            return $(elem).children('.remove-bookmark')[0].value
+        });        
+        $('#bookmarks-output').html(styleBookmarksFromList(list));        
+    }
+
+    filterBookmarks();
+    addContentBookmarkListeners();
+    addRemoveBookmarkListeners();
+}
+
+
+function sortList() {
+    if ($('#keywords-output').css('display') != 'none') {
+        sortEntities();
+        return;
+    }
+    if ($('#bookmarks-output').css('display') != 'none') {
+        sortBookmarks();
+    }
 }
 
 function editTabSearchbar(selected) {
@@ -233,7 +292,7 @@ $(document).ready(function() {
     $('#entity-searchbar').on('keyup', filterSearch);
 
     // Select to sort entities
-    $('#entity-sort').change(sortEntities);
+    $('#entity-sort').change(sortList);
 
     $('#keywords-toggle-button').click(() => {
         showSelectedSection('keywords');
