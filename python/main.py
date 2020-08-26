@@ -52,9 +52,9 @@ def root():
         json_in = request_json['ytCaptions']
 
         indices = query_phrase(query, json_in, 3)
-        ret = {"indices": indices}
+        ret = {"indices": indices} #important
 
-        print("GENSIM RETURNS: " + str(ret))
+        print("GENSIM RETURNS: " + str(jsonify(ret)))
         return _corsify_actual_response(jsonify(ret))
 
     

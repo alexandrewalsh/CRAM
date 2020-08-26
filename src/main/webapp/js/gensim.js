@@ -20,7 +20,8 @@ async function postGensim(url, data, query) {
                                 'ytCaptions': data})
         });
 
-        return response;
+        handleGensimResponse(response);
+        // return response;
     } catch(err) {
         console.log(err);
         return "{error: " + err + "}"
@@ -35,5 +36,8 @@ async function postGensim(url, data, query) {
 function handleGensimResponse(response) {
     console.log("RESPONSE FROM GENSIM");
     console.log(response);
+    response.json().then(data => {
+        console.log(data);
+    });
     // perhaps `successfulDisplay` should be set here
 }

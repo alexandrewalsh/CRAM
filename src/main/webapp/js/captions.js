@@ -67,36 +67,37 @@ function execute(url) {
     // checks to see if mock captions should be used
     const queryParams = new URLSearchParams(window.location.search)
     if (queryParams.has('mock')) {
-        // send JSON to gensim server
-        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS, TEST_QUERY).then(handleGensimResponse);
         sendJsonForm(JSON.stringify(MOCK_JSON_CAPTIONS));
         return;
     }
     
     // checks if mock nlp should be used
     if (queryParams.has('mockall')) {
-        // send JSON to gensim server
-        postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', MOCK_JSON_CAPTIONS, TEST_QUERY).then(handleGensimResponse);
         // Sets the results table
         successfulDisplay(MOCK_NLP_OUTPUT);
         return;
     }
 
-    // checks to see if captions already exist in the database
-    fetch('/caption?id=' + videoId, {
-        method: 'GET',
-    }).then((response) => response.json()).then((json) => {
-        if (Object.keys(json).length > 0) {
-            // send JSON to gensim server
-            beginCaptionRequest(videoId, url); // TEMPORARY
-            // Sets the results table
-            // successfulDisplay(json);
-            console.log("Fetching captions from database...");
-        } else {
-            // video id not found in db, fetching from Youtube API
-            beginCaptionRequest(videoId, url);
-        }
-    });
+    postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/",
+            '{"captions": [{"text": "Whats up yall"}, {"text": "No can do here"}, {"text": "Trust the process"}]}',
+            'what is going on');
+
+
+    // // checks to see if captions already exist in the database
+    // fetch('/caption?id=' + videoId, {
+    //     method: 'GET',
+    // }).then((response) => response.json()).then((json) => {
+    //     if (Object.keys(json).length > 0) {
+    //         // Sets the results table
+    //         successfulDisplay(json);
+    //         console.log("Fetching captions from database...");
+    //     } else {
+    //         // video id not found in db, fetching from Youtube API
+    //         beginCaptionRequest(videoId, url);
+    //     }
+    // });
+
+    // beginCaptionRequest("ncbb5B85sd0", "https://www.youtube.com/watch?v=ncbb5B85sd0")
 }
 
 function successfulDisplay(json) {
@@ -165,9 +166,8 @@ function beginCaptionRequest(videoId, url) {
             const trackId = response.result.items[0].id;
 
             getCaptions(trackId, url).then(json => {
-                // send asyncronous request to python server
-                postGensim('https://python-dot-step-intern-2020.wl.r.appspot.com', json, TEST_QUERY).then(handleGensimResponse);
                 // send to backend
+                // GENSIM QUERY
                 sendJsonForm(json);
             });
         }

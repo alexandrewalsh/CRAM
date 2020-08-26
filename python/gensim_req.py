@@ -12,6 +12,8 @@ from nltk.corpus import stopwords
 import numpy as np
 import json
 import os
+from binary_ops import join_binary_files
+from gensim.models import Word2Vec
 
 
 def processInput(json_in):
@@ -25,7 +27,8 @@ def processInput(json_in):
     """
 
     documents = []
-    json_processed = json.loads(json_in)
+    # if isinstance(json_in, dict):
+    json_processed = json_in if isinstance(json_in, dict) else json.loads(json_in)
     # print("RECIEVED FROM GENSIM: \n" + str(json_processed))
 
     documents = [caption['text'] for caption in json_processed['captions']]
@@ -60,18 +63,41 @@ def download_resources():
     print("STOP WORDS processed")
 
     glove_fname = "static/resources/glove/glove.gz"
+    # glove_vectors_fname = "static/resources/glove/glove.gz"
 
-    if os.path.isfile(glove_fname) and os.path.isfile():
+    # here we assume there are chunks and try to join them
+    # f_handle = join_binary_files("static/resources/glove/split/", "static/resources/glove/glove.gz.vectors.npz")
+    # print("about to try")
+    # bin_data = f_handle.read()
+    # sio = StringIO(bin_data)
+    # glove_model = pickle.load(sio)
+    # glove_model = KeyedVectors.load("static/resources/glove/glove.gz", mmap=None)
+    # print("goteem")
+    # glove_model = api.load("text8")
+    if os.path.isfile(glove_fname):
         print("about to try")
-        glove_model = KeyedVectors.load(glove_fname, mmap=None)
-        print("glove model cached")
+        # glove_model = KeyedVectors.load(glove_fname, mmap=None)
+        glove_vec = KeyedVectors.load(glove_fname, mmap='None')
+        # pickle myself
+        # pickling_on = open("vectors.pickle", "wb")
+        # pickle.dump(glove_model, pickling_on)
+        # print("glove model cached")
+
+        # in the future I can do 
+        # pickle_off = open("static/resources/glove/vectors.pickle", "rb")
+        # glove_model = pickle.load(pickle_off)
     else: 
         print("glove model downloading...")
-        glove_model = api.load("glove-wiki-gigaword-50")
-        glove_model.save(glove_fname)
+        dataset = api.load("text8")
+        print("training Word2Vec...")
+        glove_model = Word2Vec(dataset)
+        glove_vec = glove_model.wv
+
+        print(glove_vec)
+        glove_vec.save(glove_fname)
     
     print("glove model finished")
-    return stop_words, glove_model
+    return stop_words, glove_vec
 
 
 def create_model(json_in):
@@ -97,19 +123,23 @@ def create_model(json_in):
 
     # create a corpus from documents
     corpus = [preprocess(document, stop_words) for document in documents]
+    print("corpus created")
 
     # create dictionary from documents
     dictionary = Dictionary(corpus)
     tfidf = TfidfModel(dictionary=dictionary)
+    print("dictionary created")
 
     # create a term similarity matrix
     similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)
+    print("similarity_matrix created")
 
     # Compute Soft Cosine Measure between documents
     index = SoftCosineSimilarity(
             tfidf[[dictionary.doc2bow(document) for document in corpus]],
             similarity_matrix)
 
+    print("index created")
     return stop_words, dictionary, index
 
 
