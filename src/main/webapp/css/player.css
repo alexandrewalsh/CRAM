@@ -321,8 +321,9 @@ ul li {
   background-color: #9900ff;
 }
 
-.content p {
+.content pre {
     color: white;
     font-size: 20px;
+    text-align: left;
 }
 

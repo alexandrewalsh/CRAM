@@ -68,6 +68,8 @@ public class BookmarkHandlerServlet extends HttpServlet {
             return;
         }
 
+        bookmarks.add(new Bookmark("0", 0, line, "NULL"));
+
         // Converts the fetched database data and passes it to the front end
         String res = gson.toJson(bookmarks);
         response.getWriter().println(res);

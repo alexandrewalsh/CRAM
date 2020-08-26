@@ -17,6 +17,7 @@
     <project.http.version>1.20.0</project.http.version>
   </properties>
 
+
 <!-- Some of these dependencies aren't in use -->
   <dependencies>
     <dependency>
