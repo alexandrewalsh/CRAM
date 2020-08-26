@@ -504,6 +504,11 @@ function displayBookmarks(list) {
 
 }
 
+/**
+ * Builds the unordered list of bookmarks from the list of bookmark ids
+ * @param list The list of bookmark uuids 
+ * @return The HTML of an unordered list in the order of the list
+ */
 function styleBookmarksFromList(list) {
     var output = '<ul>';
     for (bookmark of list) {
@@ -558,6 +563,39 @@ function setBookmarkButton() {
 }
 
 
+/**
+ * Adds bookmark to database based on modal input
+ */
+function addBookmarkToDatabase() {
+    // Creates the request parameters
+    const queryParams = new URLSearchParams(window.location.search)
+    var params = new URLSearchParams();
+    if (queryParams.has('mockall')) {
+        params.append('email', 'MOCK');
+    } else {
+        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+    }
+    params.append('videoId', currentVideoID);
+    params.append('timestamp', Math.floor(player.getCurrentTime()));
+    params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+    params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
+    params.append('function', 'add');
+
+    // Sends the bookmark parameters to the servlet to process
+    fetch('/bookmark', {
+        method: 'POST',
+        body: params,
+    }).then((response) => response.json()).then(json => {
+        displayBookmarks(json);
+    });
+
+    // Hides the modal
+    $('#myModal').css('display', 'none');
+    $('.modal-body form').css('display', 'none');
+    clearBookmarkForm();
+}
+
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -567,33 +605,6 @@ $(document).ready(() => {
     });
 
     // Adds a bookmark when clicking the 'add bookmark' button
-    $('#bookmark-add-button').click(() => {
-        // Creates the request parameters
-        const queryParams = new URLSearchParams(window.location.search)
-        var params = new URLSearchParams();
-        if (queryParams.has('mockall')) {
-            params.append('email', 'MOCK');
-        } else {
-            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        }
-        params.append('videoId', currentVideoID);
-        params.append('timestamp', Math.floor(player.getCurrentTime()));
-        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
-        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
-        params.append('function', 'add');
-
-        // Sends the bookmark parameters to the servlet to process
-        fetch('/bookmark', {
-            method: 'POST',
-            body: params,
-        }).then((response) => response.json()).then(json => {
-            displayBookmarks(json);
-        });
-
-        // Hides the modal
-        $('#myModal').css('display', 'none');
-        $('.modal-body form').css('display', 'none');
-        clearBookmarkForm();
-    });
+    $('#bookmark-add-button').click(() => {addBookmarkToDatabase()});
 
 });

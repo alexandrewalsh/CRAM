@@ -83,10 +83,20 @@ function compareTimestamps(a, b) {
 }
 
 
+/**
+ * Comparator function that compares two bookmarks alphabetically
+ * @param a - a <li> tag to compare the text of
+ * @param b - a <li> tag to compare the text of
+ * @return  - positive if 'a' is larger than 'b'
+ *          - negative if 'a' is smaller than 'b'
+ *          - zero if 'a' equals 'b'
+ */
 function compareBookmarkNames(a, b) {
+    // Gets the text of the HTML tags
     var aText = $(a).children('.bookmark')[0].innerText;
     var bText = $(b).children('.bookmark')[0].innerText;
 
+    // Returns the numerical value of the parameters' comparison
     if (aText > bText) {
         return 1;
     } 
@@ -96,12 +106,23 @@ function compareBookmarkNames(a, b) {
     return 0;
 }
 
+
+/**
+ * Comparator function that compares two bookmarks alphabetically
+ * @param a - a <li> tag to compare the text of
+ * @param b - a <li> tag to compare the text of
+ * @return  - positive if 'a' is larger than 'b'
+ *          - negative if 'a' is smaller than 'b'
+ *          - zero if 'a' equals 'b'
+ */
 function compareBookmarkTimestamps(a, b) {
+    // Gets the id and timestamps of the bookmark referenced by HTML tags
     var aId = $(a).children('.remove-bookmark')[0].value;
     var bId = $(b).children('.remove-bookmark')[0].value;
     var aTime = bookmarks[aId].timestamp;
     var bTime = bookmarks[bId].timestamp;
 
+    // Returns a numerical value of the parameters' comparison
     if (aTime > bTime) {
         return 1;
     } 
@@ -163,6 +184,9 @@ function filterBookmarks() {
     });
 }
 
+/**
+ * Filters based on the current state of the output
+ */
 function filterSearch() {
     if ($('#keywords-output').css('display') != 'none') {
         filterEntities();
@@ -172,7 +196,6 @@ function filterSearch() {
         filterBookmarks();
     }
 }
-
 
 
 /**
@@ -202,19 +225,29 @@ function sortEntities() {
     setClickableTimestamps();
 }
 
+/**
+ * Sorts the entities based on the current selector
+ */
 function sortBookmarks() {
     var optionSelected = $("option:selected", '#entity-sort').val();
+
     // Case 1: Sorts the table alphabetically
     if (optionSelected == 'alphabetical') {
         var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkNames), function(elem) {
             return $(elem).children('.remove-bookmark')[0].value
         });
         $('#bookmarks-output').html(styleBookmarksFromList(list));
+
+    // Case 2: Sorts the table chronologically
     } else if (optionSelected == 'chronological') {
         var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkTimestamps), function(elem) {
             return $(elem).children('.remove-bookmark')[0].value
         });        
-        $('#bookmarks-output').html(styleBookmarksFromList(list));        
+        $('#bookmarks-output').html(styleBookmarksFromList(list)); 
+
+    // Case 3: Invalid selected option, so nothing happens       
+    } else {
+        return;
     }
 
     filterBookmarks();
@@ -223,6 +256,9 @@ function sortBookmarks() {
 }
 
 
+/**
+ * Sorts based on the current state of the output
+ */
 function sortList() {
     if ($('#keywords-output').css('display') != 'none') {
         sortEntities();
@@ -233,8 +269,15 @@ function sortList() {
     }
 }
 
+
+/**
+ * Changes the display of the searchbar based on the current output state
+ * @param selected The string of the current output state
+ */
 function editTabSearchbar(selected) {
     $('#entity-sort').css('margin-left', '5%');
+
+    // Changes the searchbar display to include button when in the 'query' state
     if (selected == 'query') {
         $('#entity-searchbar').css('width', '80%');
         $('#entity-searchbar').css('border-radius', '50px 0px 0px 50px');
@@ -242,6 +285,8 @@ function editTabSearchbar(selected) {
         $('#entity-searchbar-button').css('border-radius', '0px 50px 50px 0px');
         $('#entity-searchbar-button').show();
         $('#entity-sort').hide();
+
+    // Changes the searchbar display to include filtering and sorting otherwise
     } else {
         $('#entity-searchbar').css('width', '100%');
         $('#entity-searchbar').css('border-radius', '50px 50px 50px 50px');
@@ -250,8 +295,16 @@ function editTabSearchbar(selected) {
     }
 }
 
+
+/**
+ * Changes the display of the output based on the current output state
+ * @param selected The string of the current output state
+ */
 function showSelectedSection(selected) {
+    // Resets the searchbar on state change
     $('#entity-searchbar').val('');
+
+    // Displays the output based on the selected state
     switch(selected) {
         case 'keywords':
             $('#keywords-output').show();
@@ -282,6 +335,8 @@ function showSelectedSection(selected) {
             $('#bookmarks-output ul li').show();
             break;
     }
+
+    // Edits the searchbar display based on the selected state
     editTabSearchbar(selected);
 }
 

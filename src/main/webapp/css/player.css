@@ -117,7 +117,7 @@ table {
 }
 
 #timestamp-timeline {
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 #timestamp-timeline span, p {
