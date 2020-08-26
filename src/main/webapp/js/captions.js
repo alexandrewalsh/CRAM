@@ -196,12 +196,12 @@ function beginCaptionRequest(videoId, url) {
             
             if (trackId === "") { // no english track found
                 renderError("No English Captions Track for this Video");
-            } else {
-                getCaptions(trackId, url).then(json => {
-                    // send to backend
-                    sendJsonForm(json);
-                });
+                return;
             }
+            getCaptions(trackId, url).then(json => {
+                // send to backend
+                sendJsonForm(json);
+            });
         }
     }, function(err) {
         // top level error handler
@@ -220,7 +220,6 @@ function getCaptions(trackId, url) {
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
-            //"tlang": "en",
             "tfmt": "sbv"
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {
