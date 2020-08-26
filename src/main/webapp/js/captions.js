@@ -191,6 +191,7 @@ function beginCaptionRequest(videoId, url) {
             for (i = 0; i < response.result.items.length; i++) {
                 if (response.result.items[i].snippet.language === "en") {
                     trackId = response.result.items[i].id;
+                    break;
                 }
             }
             
