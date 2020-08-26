@@ -462,6 +462,8 @@ function addContentBookmarkListeners() {
         } else {
             $('.content').css('maxHeight', '0px');
             contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
+            var bookmarkId = $(this).next().val();
+            player.seekTo(bookmarks[bookmarkId].timestamp, true);
         } 
     });
 }
