@@ -110,7 +110,7 @@ table {
 }
 
 #timestamp-timeline {
-    justify-content: center;
+    margin-right: auto;
 }
 
 #timestamp-timeline span, p {
@@ -120,6 +120,83 @@ table {
 #player-pane {
     flex: 2;
 }
+
+/** Styles for the bookmark functionality */
+#add-bookmark-button {
+    align-self: start;
+}
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.modal-close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #888;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #974BE0;
+    color: white;
+}
+
+.modal-body {
+    padding: 2px 16px;
+}
+
+.modal-body form {
+    display: none;
+}
+
 
 /** Styles dependent on width of screen */
 @media screen and (max-width: 1000px) {
@@ -164,5 +241,52 @@ table {
 @media screen and (max-width: 380px) {
     #searchbar-div {
         margin-top: 20%;
+    }
+}
+
+/** Bookmark display styling */
+
+
+.bg-primary {
+    background-color: purple!important;
+}
+
+.card-title {
+    color: white!important;
+}
+
+.card-text {
+    font-size: inherit;
+}
+
+.view-bookmark {
+    margin-right: 1em;
+}
+
+.remove-bookmark {
+    margin-left: 1em;
+}
+
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 4;
+    }
+}
+
+@media (min-width: 1200px) {
+    .card-columns {
+        column-count: 5;
     }
 }

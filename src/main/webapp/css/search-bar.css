@@ -223,6 +223,10 @@
 
 
 /** Entity Search Bar */
+#entity-searchbar {
+    padding-left: 10px;
+}
+
 form.entity-search input[type=text] {
     padding: 5px;
     width: 80%;

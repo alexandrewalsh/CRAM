@@ -104,12 +104,12 @@ def create_model(json_in):
 
     # create a corpus from documents
     corpus = [preprocess(document, stop_words) for document in documents]
-    print("corpus created")
+    print("corpus created: " + str(corpus))
 
     # create dictionary from documents
     dictionary = Dictionary(corpus)
     tfidf = TfidfModel(dictionary=dictionary)
-    print("dictionary created")
+    print("dictionary created: " + str(dictionary))
 
     # create a term similarity matrix
     similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)
@@ -148,13 +148,15 @@ def query_phrase(query_string, json_in, n=3):
     tfidf = TfidfModel(dictionary=dictionary)
     query = preprocess(query_string, stop_words)
     query_tf = tfidf[dictionary.doc2bow(query)]
-    print("DICT CREATED")
+    print("query CREATED")
 
     # index the model by the query
     doc_similarity_scores = index[query_tf]
     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
 
+    print(doc_similarity_scores)
     print("FINAL CREATED: " + str(sorted_indexes.tolist()))
+    print("doc0: " + str(documents[0]))
 
     # maybe threshold
     return sorted_indexes.tolist()
