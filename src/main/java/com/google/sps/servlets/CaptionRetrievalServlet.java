@@ -57,15 +57,15 @@ public class CaptionRetrievalServlet extends HttpServlet {
         String captionText = "";
 
         try {
-            if (videoID != null && dbi.videoInDb(videoID)) {
-                List<TimeRangedText> full_captions = dbi.getFullCaptions(videoID);
-                for (TimeRangedText trt : full_captions) {
-                    captionText += " " + trt.getText();
-                }
-                response.getWriter().println(captionText);
-            } else {
+            if (videoID == null || !(dbi.videoInDb(videoID))) {
                 response.getWriter().println(RESPONSE_VIDEO_ID_NOT_IN_DB);
+                return;
             }
+            List<TimeRangedText> full_captions = dbi.getFullCaptions(videoID);
+            for (TimeRangedText trt : full_captions) {
+                captionText += " " + trt.getText();
+            }
+            response.getWriter().println(captionText);
         } catch (CaptionStorageException e) {
             String exceptionString = EXCEPTION_JSON_START + e.getReason().toString() + EXCEPTION_JSON_END;
             response.getWriter().println(exceptionString);
