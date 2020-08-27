@@ -561,13 +561,15 @@ function setCaptionsButton() {
         if (document.getElementById("FullCap").innerHTML == "") {
             fetch('/fullcaption?id=' + current_vID, {
                 method: 'GET',
-            }).then((response) => response.text()).then((text) => {
-                if (text.length > 0) {
+            })
+            .then((response) => response.text())
+            .then((text) => {
+                if (text != null && text.trim() != '') {
                     // Sets the results table
                     document.getElementById("FullCap").innerHTML = text;
-                    console.log("Fetching full captions from database...");
                 }
-            });
+            })
+            .catch(err => renderError(err));
         } else {
             document.getElementById("FullCap").innerHTML = "";
         }
