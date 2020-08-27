@@ -38,6 +38,7 @@ function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
     // hide results and search form
     $('#entity-search-form').hide();
+    $('#tab-container').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
 
