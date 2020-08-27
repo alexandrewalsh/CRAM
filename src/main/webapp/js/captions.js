@@ -113,6 +113,7 @@ function execute(url) {
  */
 function successfulDisplay(json) {
     // display results
+    $('#loading-text').hide();
     $('#entity-search-form').show();
     $('#entity-search-form').css('display', 'flex');
     $('#entity-search-form').css('justify-content', 'center');
@@ -197,6 +198,7 @@ function beginCaptionRequest(videoId, url) {
                 renderError("No English Captions Track for this Video");
                 return;
             }
+            $('#loading-text').show();
             getCaptions(trackId, url).then(json => {
                 // send to backend
                 sendJsonForm(json);
