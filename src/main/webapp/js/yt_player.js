@@ -19,6 +19,7 @@ var done = false;
 function onPlayerReady(event) {
   event.target.playVideo();
   document.getElementById("theater-button").style.display = "inline-block";
+  document.getElementById("fullcap-button").style.display = "inline-block";
 }
 
 // The API calls this function when the player's state changes.

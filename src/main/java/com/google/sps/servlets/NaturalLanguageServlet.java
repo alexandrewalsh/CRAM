@@ -122,7 +122,7 @@ public class NaturalLanguageServlet extends HttpServlet {
             }
 
             try {
-                db.addVideo(videoID, DB_NO_METADATA);
+                db.addVideo(videoID, DB_NO_METADATA, youtubeCaptions.getCaptions());
             } catch (CaptionStorageException e) {
                 // TODO: report problem in metadataList at the end of this function
             }

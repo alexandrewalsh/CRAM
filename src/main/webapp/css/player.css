@@ -107,7 +107,7 @@ table {
   margin: auto;
 }
 
-.theater-toggle {
+.theater-toggle .fullcapBtn {
   margin: auto;
   display: none;
 }
@@ -129,7 +129,7 @@ table {
 }
 
 /** Styles for the bookmark functionality */
-#add-bookmark-button {
+#add-bookmark-button #fullcap-button{
     align-self: start;
 }
 
