@@ -7,8 +7,6 @@ from gensim.models import TfidfModel
 from gensim.models import WordEmbeddingSimilarityIndex
 from gensim.similarities import SparseTermSimilarityMatrix
 from gensim.similarities import SoftCosineSimilarity
-import nltk
-from nltk.corpus import stopwords
 import numpy as np
 import json
 import os
@@ -60,14 +58,14 @@ def download_resources():
 
     if os.path.isfile(glove_fname):
         glove_vec = KeyedVectors.load(glove_fname, mmap='None')
-    else: 
+    else:
         dataset = api.load("text8")
         glove_model = Word2Vec(dataset)
         glove_vec = glove_model.wv
 
         print(glove_vec)
         glove_vec.save(glove_fname)
-    
+
     return stop_words, glove_vec
 
 

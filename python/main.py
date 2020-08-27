@@ -18,6 +18,7 @@ from gensim_req import query_phrase
 
 app = Flask(__name__)
 
+
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def root():
 
