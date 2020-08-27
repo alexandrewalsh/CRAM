@@ -564,24 +564,25 @@ function setBookmarkButton() {
 function setCaptionsButton() {
     // append full-captions button
     $("#timestamp-timeline").append('<button id="fullcap-button"><i style="font-size:24px" class="fa fa-cc"></i></button>');
-    document.getElementById("FullCap").innerHTML = "";
+    $('#FullCap').empty();
 
     // Display captions on click
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
-        if (document.getElementById("FullCap").innerHTML == "") {
+        if ($('#FullCap').is(':empty')) {
             fetch('/fullcaption?id=' + current_vID, {
                 method: 'GET',
             })
-            .then((response) => {
-                if (response.text() != null && response.text().trim() != '') {
+            .then((response) => response.text())
+            .then ((text) => {
+                if (text != null && text.trim() != '') {
                     // Sets the results table
-                    document.getElementById("FullCap").innerHTML = response.text();
+                    document.getElementById("FullCap").innerHTML = text;
                 }
             })
             .catch(err => renderError(err));
         } else {
-            document.getElementById("FullCap").innerHTML = "";
+            $('#FullCap').empty();
         }
     });
 }
