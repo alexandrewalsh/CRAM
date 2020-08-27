@@ -562,11 +562,10 @@ function setCaptionsButton() {
             fetch('/fullcaption?id=' + current_vID, {
                 method: 'GET',
             })
-            .then((response) => response.text())
-            .then((text) => {
-                if (text != null && text.trim() != '') {
+            .then((response) => {
+                if (response.text() != null && response.text().trim() != '') {
                     // Sets the results table
-                    document.getElementById("FullCap").innerHTML = text;
+                    document.getElementById("FullCap").innerHTML = response.text();
                 }
             })
             .catch(err => renderError(err));
