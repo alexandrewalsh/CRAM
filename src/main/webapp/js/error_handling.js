@@ -21,7 +21,9 @@ function renderError(error) {
     $('.search-input')[0].placeholder = msg || error;
 
     // empty output if any exists
-    $("output").empty();
+    $("#keywords-output").empty();
+    $("#query-output").empty();
+    $("#bookmarks-output").empty();
     $('#entity-search-form').hide();
 
     // display error message

@@ -33,14 +33,15 @@ var bookmarks;
 function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
     // hide results and search form
-    $('#resultsHeader').hide(); //style = "display: unset;"
     $('#entity-search-form').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
 
     // delete all children
     $("#timestamp-timeline").empty();
-    $("#output").empty();
+    $("#keywords-output").empty();
+    $("#query-output").empty();
+    $("#bookmarks-output").empty();
 
     execute(value);
 }
@@ -119,15 +120,19 @@ function execute(url) {
  */
 function successfulDisplay(json) {
     // display results
-    $("#resultsHeader").text("Key Words in Video");
+    $('#loading-text').hide();
     $('#entity-search-form').show();
+    $('#entity-search-form').css('display', 'flex');
+    $('#entity-search-form').css('justify-content', 'center');
+
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
-            
-    document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
-    $("#output").show();
 
+    document.getElementById('keywords-output').innerHTML = styleEntitiesFromJson(json);
+    $('#keywords-toggle-button').trigger('click');
+    $("#output").show();
+    $('.btn-group').css('display', 'block');
     // clickable entities and timestamps
     setClickableEntities();
     sortEntities();
@@ -154,12 +159,6 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += videoId
     youtubeSourceBuilder += "?enablejsapi=1"
     youtubeSourceBuilder += "&origin=" + location.origin;
-
-    // display "Results" header
-    $("#resultsHeader").show();
-
-    // Display loading screen
-    $("#resultsHeader").text("Loading...");
 
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
@@ -206,6 +205,7 @@ function beginCaptionRequest(videoId, url) {
                 renderError("No English Captions Track for this Video");
                 return;
             }
+            $('#loading-text').show();
             getCaptions(trackId, url).then(json => {
                 // send to backend
                 // GENSIM QUERY
@@ -329,7 +329,6 @@ function getIdFromUrl(url) {
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
-    // $('#output').html('<p>Loading...</p>');
 
     fetch('/caption', {
             method: 'POST',
@@ -430,7 +429,7 @@ function fetchBookmarks(email, videoId) {
     var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
 
     fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
-        $('#bookmark-display-div').html('');
+        $('#bookmarks-output').html('');
         if (Array.isArray(json)) {
             displayBookmarks(json);
         } else if (typeof json === 'object' && json !== null) {
@@ -442,9 +441,9 @@ function fetchBookmarks(email, videoId) {
 }
 
 /**
- * Sets listeners for removing bookmarks on clicks
+ * Sets listeners for deleting bookmarks on clicks
  */
-function setRemoveBookmarkListener() {
+function addRemoveBookmarkListeners() {
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -469,28 +468,26 @@ function setRemoveBookmarkListener() {
     });
 }
 
+
 /**
  * Sets listeners for viewing content on clicks
  */
-function setContentBookmarkListener() {
+function addContentBookmarkListeners() {
     // Removes click listeners from buttons to show bookmark content to redefine click functionality
     // Toggles between showing and hiding the bookmark content
-    $('.view-bookmark').off('click');
-    $('.view-bookmark').click(function() {
-        if ($(this).text() == 'View') {
-            var id = $(this).val();
-            var timestamp = bookmarks[id].timestamp;
-            var content = bookmarks[id].content;
-            player.seekTo(timestamp);
-            $(this).parent().find('p')[0].innerText = content;
-            $(this).text('Hide');
-        } else if ($(this).text() == 'Hide') {
-            $(this).parent().find('p')[0].innerText = '';
-            $(this).text('View');
-        }
+    $('.bookmark').off('click');
+    $('.bookmark').click(function() {
+        var contentDiv = this.parentElement.nextSibling;
+        if (contentDiv.style.maxHeight && contentDiv.style.maxHeight != '0px') {
+            contentDiv.style.maxHeight = null;
+        } else {
+            $('.content').css('maxHeight', '0px');
+            contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
+            var bookmarkId = $(this).next().val();
+            player.seekTo(bookmarks[bookmarkId].timestamp, true);
+        } 
     });
 }
-
 
 /**
  * Renders bookmarks in HTML from a list of Bookmark objects
@@ -501,23 +498,39 @@ function displayBookmarks(list) {
     bookmarks = {};
 
     // Builds the HTML text to display on page
-    var output = '';
+    var output = '<ul>';
     for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
-        output += bookmark.title;
-        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
-        output += bookmark.id;
-        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
-        output += bookmark.id;
-        output += '">Remove</button></div></div>'
+        bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
     }
+    output += '</ul>';
     
     // Inserts the HTML text to the page
-    $('#bookmark-display-div').html(output);
-    setRemoveBookmarkListener();
-    setContentBookmarkListener();
+    $('#bookmarks-output').html(output);
+    sortBookmarks();
+    addRemoveBookmarkListeners();
+    addContentBookmarkListeners();
+
 }
+
+/**
+ * Builds the unordered list of bookmarks from the list of bookmark ids
+ * @param list The list of bookmark uuids 
+ * @return The HTML of an unordered list in the order of the list
+ */
+function styleBookmarksFromList(list) {
+    var output = '<ul>';
+    for (bookmark of list) {
+        output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
+    }
+    output += '</ul>';
+    return output;
+}
+
 
 /**
  * Clears the contents of the bookmarks form
@@ -561,6 +574,39 @@ function setBookmarkButton() {
 }
 
 
+/**
+ * Adds bookmark to database based on modal input
+ */
+function addBookmarkToDatabase() {
+    // Creates the request parameters
+    const queryParams = new URLSearchParams(window.location.search)
+    var params = new URLSearchParams();
+    if (queryParams.has('mockall')) {
+        params.append('email', 'MOCK');
+    } else {
+        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+    }
+    params.append('videoId', currentVideoID);
+    params.append('timestamp', Math.floor(player.getCurrentTime()));
+    params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+    params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
+    params.append('function', 'add');
+
+    // Sends the bookmark parameters to the servlet to process
+    fetch('/bookmark', {
+        method: 'POST',
+        body: params,
+    }).then((response) => response.json()).then(json => {
+        displayBookmarks(json);
+    });
+
+    // Hides the modal
+    $('#myModal').css('display', 'none');
+    $('.modal-body form').css('display', 'none');
+    clearBookmarkForm();
+}
+
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -570,33 +616,6 @@ $(document).ready(() => {
     });
 
     // Adds a bookmark when clicking the 'add bookmark' button
-    $('#bookmark-add-button').click(() => {
-        // Creates the request parameters
-        const queryParams = new URLSearchParams(window.location.search)
-        var params = new URLSearchParams();
-        if (queryParams.has('mockall')) {
-            params.append('email', 'MOCK');
-        } else {
-            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        }
-        params.append('videoId', currentVideoID);
-        params.append('timestamp', Math.floor(player.getCurrentTime()));
-        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
-        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
-        params.append('function', 'add');
-
-        // Sends the bookmark parameters to the servlet to process
-        fetch('/bookmark', {
-            method: 'POST',
-            body: params,
-        }).then((response) => response.json()).then(json => {
-            displayBookmarks(json);
-        });
-
-        // Hides the modal
-        $('#myModal').css('display', 'none');
-        $('.modal-body form').css('display', 'none');
-        clearBookmarkForm();
-    });
+    $('#bookmark-add-button').click(() => {addBookmarkToDatabase()});
 
 });
