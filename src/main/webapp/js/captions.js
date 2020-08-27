@@ -584,7 +584,6 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
-
     // Adds a bookmark when clicking the 'add bookmark' button
     $('#bookmark-add-button').click(() => {
         // Creates the request parameters

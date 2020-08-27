@@ -28,11 +28,11 @@ public class CaptionStorageManager implements CaptionStorageInterface {
     private static final String COLUMN_CAPTION = "caption";
     private static final String COLUMN_FULL_CAPTIONS = "full_captions";
     private static final String COLUMN_TIMES = "timestamps";
+    private static final String COLUMN_START = "start_time";
+    private static final String COLUMN_END = "end_time";
     private static final String NO_VID_ERR = "Requested video does not exist";
     private static final String NO_META_ERR = "Requested metadata does not exist";
     private static final String NO_PHRASE_ERR = "Requested keyphrase does not exist in ";
-    private static final String COLUMN_START = "start_time";
-    private static final String COLUMN_END = "end_time";
 
     //================================================================================
     // Public Interface Functions (see DatabaseInterface.java for official descriptions)
