@@ -96,9 +96,17 @@ a .headerBtn:hover {
     margin-top: 10%;
 }
 
-.container div, h1, p {
+.container div, h1, p, .FullCap{
     font-family: 'Raleway', sans-serif;
     color: white;
+}
+
+.FullCap {
+    font-size: 24px;
+    margin-left: 3pc;
+    margin-right: 3pc;
+    overflow: auto;
+    height: 25vh;
 }
 
 .ground {

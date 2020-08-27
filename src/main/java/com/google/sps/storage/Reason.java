@@ -7,9 +7,10 @@ package com.google.sps.storage;
 public enum Reason {
     ADD_VIDEO_ERR,
     ADD_META_ERR,
+    ADD_FULL_CAPTIONS_ERR,
+    ADD_KEYPHRASE_ERR,
     GET_VIDEO_ERR,
     GET_META_ERR,
-    ADD_KEYPHRASE_ERR,
     GET_KEYPHRASE_ERR,
     OVERWRITE_META_ERR,
     APPEND_META_ERR,

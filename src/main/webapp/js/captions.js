@@ -16,14 +16,18 @@
  * fetchBookmarks
  * displayBookmarks
  * clearBookmarkForm
+ * setButtons
  * setBookmarkButton
+ * setCaptionsButton
  * document.ready
  */
 
 /** global variables holding the json response for timestamps */
 var currentVideoID;
 var timestamps;
+var current_vID;
 var bookmarks;
+var video_id;
 
 /**
  * Event handler for search bar query, entry point
@@ -91,6 +95,7 @@ function execute(url) {
         return;
     }
 
+    current_vID = videoId;
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
         method: 'GET',
@@ -167,7 +172,7 @@ function displayVideo(videoId) {
     }
 
     // append bookmark button
-    setBookmarkButton();
+    setButtons();
 }
 
 
@@ -394,7 +399,7 @@ function setClickableEntities() {
         $("#timestamp-timeline").empty();
 
         // append bookmark button
-        setBookmarkButton();
+        setButtons();
 
         // query json
         $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
@@ -519,6 +524,11 @@ function clearBookmarkForm() {
     player.playVideo();
 }
 
+function setButtons() {
+    setBookmarkButton();
+    setCaptionsButton();
+}
+
 /**
  * Adds button to add bookmarks and listeners
  */
@@ -551,6 +561,32 @@ function setBookmarkButton() {
     });
 }
 
+function setCaptionsButton() {
+    // append full-captions button
+    $("#timestamp-timeline").append('<button id="fullcap-button"><i style="font-size:24px" class="fa fa-cc"></i></button>');
+    $('#FullCap').empty();
+
+    // Display captions on click
+    $('#fullcap-button').click(function() {
+        // checks to see if captions already exist in the database
+        if ($('#FullCap').is(':empty')) {
+            fetch('/fullcaption?id=' + current_vID, {
+                method: 'GET',
+            })
+            .then((response) => response.text())
+            .then ((text) => {
+                if (text != null && text.trim() != '') {
+                    // Sets the results table
+                    document.getElementById("FullCap").innerHTML = text;
+                }
+            })
+            .catch(err => renderError(err));
+        } else {
+            $('#FullCap').empty();
+        }
+    });
+}
+
 
 $(document).ready(() => {
 
@@ -559,7 +595,6 @@ $(document).ready(() => {
     $(window).resize(() => {
         resizeIFrame();
     });
-
     // Adds a bookmark when clicking the 'add bookmark' button
     $('#bookmark-add-button').click(() => {
         // Creates the request parameters
@@ -589,5 +624,4 @@ $(document).ready(() => {
         $('.modal-body form').css('display', 'none');
         clearBookmarkForm();
     });
-
 });
