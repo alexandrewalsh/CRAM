@@ -342,14 +342,25 @@ function showSelectedSection(selected) {
 
 /**
  * Send a query request to the gensim server
- * 
+ * @param obj - the search bar
+ * @param evt - the click event
  */
  function getSearchResults(obj, evt) {
-     evt.preventDefault();
-     const query = $(obj).find('input').val()
-     // Here goes the post request, however, we must mock for now
-     gensim_callback('{"indices": [1, 2, 0]}')
-     console.log(obj, evt);
+    evt.preventDefault();
+    $('#query-output').empty();
+
+    const query = $(obj).find('input').val();
+
+    if (ytCaptions == "") {
+        console.log("YT Captions not yet set!");
+        return;
+    }
+
+    // Here goes the post request
+    postGensim(PYTHON_SERVER,
+               ytCaptions,
+               query,
+               gensim_callback)
  }
 
 
@@ -358,21 +369,26 @@ function showSelectedSection(selected) {
  * @param res - the response JSON returned by the python server
  */
  function gensim_callback(res) {
-    $('#query-output').empty();
-    const obj = JSON.parse(res);
 
-    var output = '<table id="query-table">';
-    for (const index in obj['indices']){
-        // access global documents property
-        const line = documents[index].text;
-        output += "<tr><td><span class='query'>" + line + "</span></td></tr>";
+    if (res.status != 200) {
+        alert("gensim response failed!");
+        return;
     }
-    output += "</table>"
-    
-    // display the query output
-    $('#query-output').html(output);
 
-    setClickableQueries();
+    res.json().then(obj => {
+        console.log(obj);
+        var output = '<table id="query-table">';
+        obj['indices'].forEach(index => {
+            // access global documents property
+            const line = documents[index].text;
+            const time = documents[index].timestamp;
+            output += "<tr><td><span class='query' data-time='" + time + "'>" 
+                        + line + "</span></td></tr>";
+        });
+
+        $('#query-output').html(output);
+        setClickableQueries();
+    });
  }
 
 

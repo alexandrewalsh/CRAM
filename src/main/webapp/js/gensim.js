@@ -7,7 +7,7 @@
  *          completes its POST processes, and 505 
  *          if some error occurs 
  */
-async function postGensim(url, data, query) {
+async function postGensim(url, data, query, callback=handleGensimResponse) {
     console.log("POST gesim request to " + url + "...")
     try {
         const response = await fetch(url, {
@@ -20,7 +20,7 @@ async function postGensim(url, data, query) {
                                 'ytCaptions': data})
         });
 
-        handleGensimResponse(response);
+        callback(response);
         // return response;
     } catch(err) {
         console.log(err);
@@ -29,9 +29,8 @@ async function postGensim(url, data, query) {
 }
 
 /**
- * Callback for when gensim finishes POST operations
- * @param response - a 200 code if gensim operations were successful
- *                   500 otherwise
+ * default callback for when gensim finishes POST operations
+ * @param response - json in the form '{"indices": [2, 1, ..]}'
  */
 function handleGensimResponse(response) {
     console.log("RESPONSE FROM GENSIM");

@@ -4,8 +4,8 @@
  * execute                  -- execute a request to download captions from Youtube API
  * successfulDisplay
  * displayVideo
- * beginCaptionRequest
- * getCaptions
+ * getTrackId
+ * getYTCaptions
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
@@ -27,6 +27,7 @@ var bookmarks;
 
 /* global variable for holding the full captions */
 var documents;
+var ytCaptions;
 
 /**
  * Event handler for search bar query, entry point
@@ -76,7 +77,7 @@ function execute(url) {
     }
 
     // hides the bookmarks for the previous video
-    $('#bookmark-display-div').html('');
+    $('#bookmark-display-div').html('');    // @nathan, can this be moved to submitFn?
 
     // displays the video in the front end
     displayVideo(videoId);
@@ -95,21 +96,18 @@ function execute(url) {
         return;
     }
 
-// <<<<<<< HEAD
-//     // simulating DB fetch, statically setting documents
-//     documents = {0: {"text": "This is a great line", "time": 3},
-//                  1: {"text": "Fantstic line indeed", "time": 5},
-//                  2: {"text": "This one is going to be really long to see if we can handle long times",
-//                                                      "time": 1}
-//                 }
-    
-// =======
-//     postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/",
-//             '{"captions": [{"text": "Whats up yall"}, {"text": "No can do here"}, {"text": "Trust the process"}]}',
-//             'what is going on');
+    // launch yt captions request (needed for gensim in no-db model)
+    ytCaptions = "";
+    getTrackId(videoId)
+        .then(trackId => getYTCaptions(trackId))
+        .then(captions => parseCaptionsIntoJson(captions))
+        .then(parsed_captions => {
+            ytCaptions = parsed_captions;
+            documents = createDocuments(parsed_captions);
+        });
 
-
-// >>>>>>> 6641b029a6285745d1321b2ef11f2828e57f5c58
+    // show loading text
+    $('#loading-text').show();
 
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
@@ -121,12 +119,32 @@ function execute(url) {
             console.log("Fetching captions from database...");
         } else {
             // video id not found in db, fetching from Youtube API
-            beginCaptionRequest(videoId, url);
+            getTrackId(videoId)
+            .then(trackId => getYTCaptions(trackId))
+            .then(captions => parseCaptionsIntoJson(captions, url))
+            .then(parsed_captions => sendJsonForm(parsed_captions))
+            .then(nlp_json => successfulDisplay(nlp_json));
         }
     });
-
-    // beginCaptionRequest("ncbb5B85sd0", "https://www.youtube.com/watch?v=ncbb5B85sd0")
 }
+
+/**
+ * Parse YoutTube Caption JSON into documents
+ * @param ytCaptions - Processed JSON returned from the YT cap downloader
+ * @returns an array of caption objects of the format {text, timestamp}  
+ */
+function createDocuments(ytCaptions) {
+    const documents = []
+    const caption_json = JSON.parse(ytCaptions);
+
+    caption_json['captions'].forEach(cap => {
+        documents.push({'text': cap['text'],
+                        'timestamp': cap['startTime']});
+    });
+    
+    return documents;
+}
+
 
 /**
  * Renders the entities of the video after a successful json fetch
@@ -139,7 +157,6 @@ function successfulDisplay(json) {
     $('#entity-search-form').css('display', 'flex');
     $('#entity-search-form').css('justify-content', 'center');
 
-
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
 
@@ -147,6 +164,7 @@ function successfulDisplay(json) {
     $('#keywords-toggle-button').trigger('click');
     $("#output").show();
     $('.btn-group').css('display', 'block');
+
     // clickable entities and timestamps
     setClickableEntities();
     sortEntities();
@@ -192,68 +210,55 @@ function displayVideo(videoId) {
 
 
 /**
- * Sets up the caption request call
- * @param videoId - the Youtube video id to find the captions of
- * @param url - the Youtube video url
+ * Get a trackID for a given videoID
+ * @param videoId - the Youtube video id
  */
-function beginCaptionRequest(videoId, url) {
-    gapi.client.youtube.captions.list({
-      "videoId": videoId,
-      "part": [
-        "snippet"
-      ]
-    }).then(function(response) {
-        if (response.result != null & response.result.items != null &
-            response.result.items.length > 0) {
-            
-            var i;
-            var trackId = "";
-            for (i = 0; i < response.result.items.length; i++) {
-                if (response.result.items[i].snippet.language === "en") {
-                    trackId = response.result.items[i].id;
-                    break;
+function getTrackId(videoId) {
+    return new Promise((resolve, reject) => {
+        gapi.client.youtube.captions.list({
+            "videoId": videoId,
+            "part": [
+                "snippet"
+            ]
+        }).then(function(response) {
+            if (response.result != null & response.result.items != null &
+                response.result.items.length > 0) {
+                    
+                var i;
+                var trackId = "";
+                for (i = 0; i < response.result.items.length; i++) {
+                    if (response.result.items[i].snippet.language === "en") {
+                        trackId = response.result.items[i].id;
+                        break;
+                    }
                 }
-            }
-            
-            if (trackId === "") { // no english track found
-                renderError("No English Captions Track for this Video");
-                return;
-            }
-            $('#loading-text').show();
-            getCaptions(trackId, url).then(json => {
-                // send to backend
-                // GENSIM QUERY
-                postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/", json, "this is my best query");
-                sendJsonForm(json);
+                    
+                if (trackId === "") { // no english track found
+                    renderError("No English Captions Track for this Video");
+                    reject("No English Captions Track for this Video");
+                }
+
+                // return track id
+                resolve(trackId);
+                }
             });
-        }
-    }, function(err) {
-        // top level error handler
-        console.error("Execute error", err); 
-    });
+    }).catch(alert);
 }
+
 
 /** 
  * Get the captions and timestamps for a video with a given `trackId`
  * @param trackId - a String representing the track id for a caption
- * @param url - the url of the YouTube video
  * @returns a promise which upon success returns a JSON 
  *         string encoding the captions and timestamps 
  */
-function getCaptions(trackId, url) {
-    return new Promise((success, failure) => {
+function getYTCaptions(trackId) {
+    return new Promise((resolve, reject) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
             "tfmt": "sbv"
-        }).then(function(response){
-            parseCaptionsIntoJson(response, url).then(json => {
-                success(json);
-            });
-        }, function(err) { 
-            renderError(err.status);
-            failure(err);
-        });
-    });
+        }).then(resolve);  
+    }).catch(console.error);
 }
 
 
@@ -266,7 +271,7 @@ function getCaptions(trackId, url) {
  *          string encoding the captions and timestamps 
  */
 function parseCaptionsIntoJson(response, url){
-    return new Promise((success, failure) => {
+    return new Promise((resolve, reject) => {
         var json = {
             url: url,
             captions: []    
@@ -305,17 +310,14 @@ function parseCaptionsIntoJson(response, url){
             }   
 
             // successfully parsed response
-            success(JSON.stringify(json));
+            resolve(JSON.stringify(json));
         };
 
         reader.readAsText(new Blob([response.body], {
             type: 'text/plain'
         }));
 
-    }).catch(function(error) {
-        // stop processing lines, rethrow error
-        throw error;
-    });
+    }).catch(console.error);
 }
 
 /**
@@ -333,24 +335,25 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+
 /**
  * Create and send a form with the captions JSON. May need 
  * to authenticate users here too to prevent malicious requests. @enriqueavina
  * @param json - the JSON string representing the 
  *               parsed captions response
- * @return - HTML containing formatted captions and timestamps 
+ * @return - a Promise, which resolves to HTML containing formatted captions and timestamps 
+            in JSON format from NLP
  */
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
 
-    fetch('/caption', {
+    return new Promise((resolve, reject) => {
+        fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {     
-            // Sets the results table            
-            successfulDisplay(json);
-        });
+        }).then(response => resolve(response.json()));
+    }).catch(console.error);
 }
 
 
@@ -436,31 +439,13 @@ function setClickableEntities() {
     });
 }
 
-function getKeyByValue(object, value) {
-  return Object.keys(object).find(key => object[key] === value);
-}
 
 /**
- * Adds click event listeners to word entities to show
- * timestamps. Also makes the timestamps clickable.
+ * Make queries clickeable
  */
 function setClickableQueries() {
     $('.query').unbind('click');
-
-    $('.query').bind("click", function() {
-        const text = this.innerText;
-        const index = getKeyByValue(documents, text);
-        const time = documents[index].time;
-
-        // delete all children
-        $("#timestamp-timeline").empty();
-
-        // append bookmark button
-        setBookmarkButton();
-
-        // query json
-        $("#timestamp-timeline").append("<p>"+text+" appears at </p><span class='timestamps'>"+time+"</span>");
-    });
+    $('.query').bind("click", onTimeClick_query);
 }
 
 /**

@@ -280,4 +280,23 @@ form.entity-search::after {
 #query-table {
     border-spacing: 12px;
     border-collapse: separate;
+    color: white;
+    font-size: 20px;
+}
+
+.query {
+    color: white;
+    cursor:pointer;
+}
+
+.query:hover {
+    color: darkgrey;
+}
+
+.active-el {
+    color: orange;
+}
+
+.active-el:hover {
+    color: darkorange;
 }

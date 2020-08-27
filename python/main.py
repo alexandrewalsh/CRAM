@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-import gensim.downloader as api
 from gensim_req import query_phrase
 
 
@@ -24,10 +23,7 @@ def root():
 
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
-        # {query: "...", "captions": "{...}"}
-        # from captions create dictionary and model
-        # return jsonify(get_request)
-        # Load the model: this is a big file, can take a while to download and open
+        # This request is currently not being used
 
         query = 'hello'
         json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
@@ -42,17 +38,16 @@ def root():
         json_in = request_json['ytCaptions']
 
         indices = query_phrase(query, json_in)
-        ret = {"indices": indices} #important
+        ret = {"indices": indices} 
 
-        print("GENSIM RETURNS: " + str(jsonify(ret)))
         return _corsify_actual_response(jsonify(ret))
 
-    
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
 
 
 def _build_cors_prelight_response():
+    # Send the correct headers in an OPTIONS preflight request
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add('Access-Control-Allow-Headers', "*")
@@ -61,6 +56,7 @@ def _build_cors_prelight_response():
 
 
 def _corsify_actual_response(response):
+    # Send the correct headers for a POST request
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
