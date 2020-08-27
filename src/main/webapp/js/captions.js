@@ -95,13 +95,22 @@ function execute(url) {
         return;
     }
 
-    // simulating DB fetch, statically setting documents
-    documents = {0: {"text": "This is a great line", "time": 3},
-                 1: {"text": "Fantstic line indeed", "time": 5},
-                 2: {"text": "This one is going to be really long to see if we can handle long times",
-                                                     "time": 1}
-                }
+// <<<<<<< HEAD
+//     // simulating DB fetch, statically setting documents
+//     documents = {0: {"text": "This is a great line", "time": 3},
+//                  1: {"text": "Fantstic line indeed", "time": 5},
+//                  2: {"text": "This one is going to be really long to see if we can handle long times",
+//                                                      "time": 1}
+//                 }
     
+// =======
+//     postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/",
+//             '{"captions": [{"text": "Whats up yall"}, {"text": "No can do here"}, {"text": "Trust the process"}]}',
+//             'what is going on');
+
+
+// >>>>>>> 6641b029a6285745d1321b2ef11f2828e57f5c58
+
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
         method: 'GET',
@@ -115,6 +124,8 @@ function execute(url) {
             beginCaptionRequest(videoId, url);
         }
     });
+
+    // beginCaptionRequest("ncbb5B85sd0", "https://www.youtube.com/watch?v=ncbb5B85sd0")
 }
 
 /**
@@ -211,6 +222,8 @@ function beginCaptionRequest(videoId, url) {
             $('#loading-text').show();
             getCaptions(trackId, url).then(json => {
                 // send to backend
+                // GENSIM QUERY
+                postGensim("https://python-dot-step-intern-2020.wl.r.appspot.com/", json, "this is my best query");
                 sendJsonForm(json);
             });
         }
