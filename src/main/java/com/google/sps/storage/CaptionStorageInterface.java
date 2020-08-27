@@ -75,5 +75,23 @@ public interface CaptionStorageInterface {
      * @return              true if meta is the metadata for videoID, false otherwise
      */
     public boolean metaInDb(String videoID, String meta) throws CaptionStorageException;
+
+    /*
+     * delete a video & all its children (metadata & captions) from the database
+     * @param videoID       Youtube ID of video in database to be deleted
+     */
+    public void deleteVideo(String videoID) throws CaptionStorageException;
+
+    /*
+     * delete a specific keyword from a video in the database
+     * @param videoID       Youtube ID of video in database
+     * @param keyword       clause belonging to videoID in the db to be deleted
+     */
+    public void deleteClause(String videoID, String keyword) throws CaptionStorageException;
+
+    /*
+     * delete the metadata belonging to a specific video in the database
+     * @param metadata      Metadata in the database to be deleted
+     */
+    public void deleteMetadata(String metadata) throws CaptionStorageException;
 }
-  

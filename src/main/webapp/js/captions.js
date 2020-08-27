@@ -123,6 +123,7 @@ function execute(url) {
  */
 function successfulDisplay(json) {
     // display results
+    $('#loading-text').hide();
     $('#entity-search-form').show();
     $('#entity-search-form').css('display', 'flex');
     $('#entity-search-form').css('justify-content', 'center');
@@ -188,14 +189,26 @@ function beginCaptionRequest(videoId, url) {
     gapi.client.youtube.captions.list({
       "videoId": videoId,
       "part": [
-        "id"
+        "snippet"
       ]
     }).then(function(response) {
         if (response.result != null & response.result.items != null &
             response.result.items.length > 0) {
-
-            const trackId = response.result.items[0].id;
-
+            
+            var i;
+            var trackId = "";
+            for (i = 0; i < response.result.items.length; i++) {
+                if (response.result.items[i].snippet.language === "en") {
+                    trackId = response.result.items[i].id;
+                    break;
+                }
+            }
+            
+            if (trackId === "") { // no english track found
+                renderError("No English Captions Track for this Video");
+                return;
+            }
+            $('#loading-text').show();
             getCaptions(trackId, url).then(json => {
                 // send to backend
                 sendJsonForm(json);
@@ -218,7 +231,6 @@ function getCaptions(trackId, url) {
     return new Promise((success, failure) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
-            "tlang": "en",
             "tfmt": "sbv"
         }).then(function(response){
             parseCaptionsIntoJson(response, url).then(json => {
@@ -459,26 +471,9 @@ function fetchBookmarks(email, videoId) {
 }
 
 /**
- * Renders bookmarks in HTML from a list of Bookmark objects
- * @param list - The list of Bookmark objects
+ * Sets listeners for deleting bookmarks on clicks
  */
-function displayBookmarks(list) {
-    // Resets the global bookmarks variable to only store current bookmarks
-    bookmarks = {};
-
-    // Builds the HTML text to display on page
-    var output = '<ul>';
-    for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
-        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
-        output += '<div class="content"><p>' + bookmark.content + '</p></div>'
-    }
-    output += '</ul>';
-    
-    // Inserts the HTML text to the page
-    $('#bookmarks-output').html(output);
-
+function addRemoveBookmarkListeners() {
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -501,24 +496,71 @@ function displayBookmarks(list) {
             displayBookmarks(json);
         });
     });
+}
 
+
+/**
+ * Sets listeners for viewing content on clicks
+ */
+function addContentBookmarkListeners() {
     // Removes click listeners from buttons to show bookmark content to redefine click functionality
     // Toggles between showing and hiding the bookmark content
-    $('.view-bookmark').off('click');
-    $('.view-bookmark').click(function() {
-        if ($(this).text() == 'View') {
-            var id = $(this).val();
-            var timestamp = bookmarks[id].timestamp;
-            var content = bookmarks[id].content;
-            player.seekTo(timestamp);
-            $(this).parent().find('p')[0].innerText = content;
-            $(this).text('Hide');
-        } else if ($(this).text() == 'Hide') {
-            $(this).parent().find('p')[0].innerText = '';
-            $(this).text('View');
-        }
+    $('.bookmark').off('click');
+    $('.bookmark').click(function() {
+        var contentDiv = this.parentElement.nextSibling;
+        if (contentDiv.style.maxHeight && contentDiv.style.maxHeight != '0px') {
+            contentDiv.style.maxHeight = null;
+        } else {
+            $('.content').css('maxHeight', '0px');
+            contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
+            var bookmarkId = $(this).next().val();
+            player.seekTo(bookmarks[bookmarkId].timestamp, true);
+        } 
     });
 }
+
+/**
+ * Renders bookmarks in HTML from a list of Bookmark objects
+ * @param list - The list of Bookmark objects
+ */
+function displayBookmarks(list) {
+    // Resets the global bookmarks variable to only store current bookmarks
+    bookmarks = {};
+
+    // Builds the HTML text to display on page
+    var output = '<ul>';
+    for (bookmark of list) {
+        bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
+    }
+    output += '</ul>';
+    
+    // Inserts the HTML text to the page
+    $('#bookmarks-output').html(output);
+    sortBookmarks();
+    addRemoveBookmarkListeners();
+    addContentBookmarkListeners();
+
+}
+
+/**
+ * Builds the unordered list of bookmarks from the list of bookmark ids
+ * @param list The list of bookmark uuids 
+ * @return The HTML of an unordered list in the order of the list
+ */
+function styleBookmarksFromList(list) {
+    var output = '<ul>';
+    for (bookmark of list) {
+        output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
+    }
+    output += '</ul>';
+    return output;
+}
+
 
 /**
  * Clears the contents of the bookmarks form
@@ -562,6 +604,39 @@ function setBookmarkButton() {
 }
 
 
+/**
+ * Adds bookmark to database based on modal input
+ */
+function addBookmarkToDatabase() {
+    // Creates the request parameters
+    const queryParams = new URLSearchParams(window.location.search)
+    var params = new URLSearchParams();
+    if (queryParams.has('mockall')) {
+        params.append('email', 'MOCK');
+    } else {
+        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+    }
+    params.append('videoId', currentVideoID);
+    params.append('timestamp', Math.floor(player.getCurrentTime()));
+    params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+    params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
+    params.append('function', 'add');
+
+    // Sends the bookmark parameters to the servlet to process
+    fetch('/bookmark', {
+        method: 'POST',
+        body: params,
+    }).then((response) => response.json()).then(json => {
+        displayBookmarks(json);
+    });
+
+    // Hides the modal
+    $('#myModal').css('display', 'none');
+    $('.modal-body form').css('display', 'none');
+    clearBookmarkForm();
+}
+
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -571,33 +646,6 @@ $(document).ready(() => {
     });
 
     // Adds a bookmark when clicking the 'add bookmark' button
-    $('#bookmark-add-button').click(() => {
-        // Creates the request parameters
-        const queryParams = new URLSearchParams(window.location.search)
-        var params = new URLSearchParams();
-        if (queryParams.has('mockall')) {
-            params.append('email', 'MOCK');
-        } else {
-            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        }
-        params.append('videoId', currentVideoID);
-        params.append('timestamp', Math.floor(player.getCurrentTime()));
-        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
-        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
-        params.append('function', 'add');
-
-        // Sends the bookmark parameters to the servlet to process
-        fetch('/bookmark', {
-            method: 'POST',
-            body: params,
-        }).then((response) => response.json()).then(json => {
-            displayBookmarks(json);
-        });
-
-        // Hides the modal
-        $('#myModal').css('display', 'none');
-        $('.modal-body form').css('display', 'none');
-        clearBookmarkForm();
-    });
+    $('#bookmark-add-button').click(() => {addBookmarkToDatabase()});
 
 });

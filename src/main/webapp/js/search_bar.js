@@ -84,10 +84,60 @@ function compareTimestamps(a, b) {
 
 
 /**
+ * Comparator function that compares two bookmarks alphabetically
+ * @param a - a <li> tag to compare the text of
+ * @param b - a <li> tag to compare the text of
+ * @return  - positive if 'a' is larger than 'b'
+ *          - negative if 'a' is smaller than 'b'
+ *          - zero if 'a' equals 'b'
+ */
+function compareBookmarkNames(a, b) {
+    // Gets the text of the HTML tags
+    var aText = $(a).children('.bookmark')[0].innerText;
+    var bText = $(b).children('.bookmark')[0].innerText;
+
+    // Returns the numerical value of the parameters' comparison
+    if (aText > bText) {
+        return 1;
+    } 
+    if (aText < bText) {
+        return -1;
+    }
+    return 0;
+}
+
+
+/**
+ * Comparator function that compares two bookmarks alphabetically
+ * @param a - a <li> tag to compare the text of
+ * @param b - a <li> tag to compare the text of
+ * @return  - positive if 'a' is larger than 'b'
+ *          - negative if 'a' is smaller than 'b'
+ *          - zero if 'a' equals 'b'
+ */
+function compareBookmarkTimestamps(a, b) {
+    // Gets the id and timestamps of the bookmark referenced by HTML tags
+    var aId = $(a).children('.remove-bookmark')[0].value;
+    var bId = $(b).children('.remove-bookmark')[0].value;
+    var aTime = bookmarks[aId].timestamp;
+    var bTime = bookmarks[bId].timestamp;
+
+    // Returns a numerical value of the parameters' comparison
+    if (aTime > bTime) {
+        return 1;
+    } 
+    if (aTime < bTime) {
+        return -1;
+    }
+    return compareBookmarkNames(a, b);
+}
+
+
+/**
  * Filters the entities based on the current text of the searchbar
  */
 function filterEntities() {
-    var query = $('#entity-seachbar').val().toLowerCase().trim();
+    var query = $('#entity-searchbar').val().toLowerCase().trim();
     var entities = $('#keywords-output table tr td:first-child');
 
     // Case 1: Searchbar is empty, so all entities are displayed
@@ -106,6 +156,45 @@ function filterEntities() {
             $(elem).parent().hide();
         }
     });
+}
+
+/**
+ * Filters the bookmarks based on the current text of the searchbar
+ */
+function filterBookmarks() {
+    var query = $('#entity-searchbar').val().toLowerCase().trim();
+    var entities = $('#bookmarks-output ul li');
+    $('.content').css('maxHeight', '0px');
+
+    // Case 1: Searchbar is empty, so all entities are displayed
+    if (query == '') {
+        entities.each((i, elem) => {
+            $(elem).show();
+        });
+        return;
+    }
+
+    // Case 2: Searchbar has text, so only entities the include the query are displayed
+    entities.each((i, elem) => {
+        if ($(elem).children('.bookmark')[0].innerText.toLowerCase().includes(query)) {
+            $(elem).show();
+        } else {
+            $(elem).hide();
+        }
+    });
+}
+
+/**
+ * Filters based on the current state of the output
+ */
+function filterSearch() {
+    if ($('#keywords-output').css('display') != 'none') {
+        filterEntities();
+        return;
+    }
+    if ($('#bookmarks-output').css('display') != 'none') {
+        filterBookmarks();
+    }
 }
 
 
@@ -136,24 +225,86 @@ function sortEntities() {
     setClickableTimestamps();
 }
 
-function editTabSeachbar(selected) {
+/**
+ * Sorts the entities based on the current selector
+ */
+function sortBookmarks() {
+    var optionSelected = $("option:selected", '#entity-sort').val();
+
+    // Case 1: Sorts the table alphabetically
+    if (optionSelected == 'alphabetical') {
+        var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkNames), function(elem) {
+            return $(elem).children('.remove-bookmark')[0].value
+        });
+        $('#bookmarks-output').html(styleBookmarksFromList(list));
+
+    // Case 2: Sorts the table chronologically
+    } else if (optionSelected == 'chronological') {
+        var list = $.map($('#bookmarks-output ul li').sort(compareBookmarkTimestamps), function(elem) {
+            return $(elem).children('.remove-bookmark')[0].value
+        });        
+        $('#bookmarks-output').html(styleBookmarksFromList(list)); 
+
+    // Case 3: Invalid selected option, so nothing happens       
+    } else {
+        return;
+    }
+
+    filterBookmarks();
+    addContentBookmarkListeners();
+    addRemoveBookmarkListeners();
+}
+
+
+/**
+ * Sorts based on the current state of the output
+ */
+function sortList() {
+    if ($('#keywords-output').css('display') != 'none') {
+        sortEntities();
+        return;
+    }
+    if ($('#bookmarks-output').css('display') != 'none') {
+        sortBookmarks();
+    }
+}
+
+
+/**
+ * Changes the display of the searchbar based on the current output state
+ * @param selected The string of the current output state
+ */
+function editTabSearchbar(selected) {
     $('#entity-sort').css('margin-left', '5%');
+
+    // Changes the searchbar display to include button when in the 'query' state
     if (selected == 'query') {
-        $('#entity-seachbar').css('width', '80%');
-        $('#entity-seachbar').css('border-radius', '50px 0px 0px 50px');
+        $('#entity-searchbar').css('width', '80%');
+        $('#entity-searchbar').css('border-radius', '50px 0px 0px 50px');
         $('#entity-searchbar-button').css('width', '20%');
         $('#entity-searchbar-button').css('border-radius', '0px 50px 50px 0px');
         $('#entity-searchbar-button').show();
         $('#entity-sort').hide();
+
+    // Changes the searchbar display to include filtering and sorting otherwise
     } else {
-        $('#entity-seachbar').css('width', '100%');
-        $('#entity-seachbar').css('border-radius', '50px 50px 50px 50px');
+        $('#entity-searchbar').css('width', '100%');
+        $('#entity-searchbar').css('border-radius', '50px 50px 50px 50px');
         $('#entity-searchbar-button').hide(); 
         $('#entity-sort').show(); 
     }
 }
 
+
+/**
+ * Changes the display of the output based on the current output state
+ * @param selected The string of the current output state
+ */
 function showSelectedSection(selected) {
+    // Resets the searchbar on state change
+    $('#entity-searchbar').val('');
+
+    // Displays the output based on the selected state
     switch(selected) {
         case 'keywords':
             $('#keywords-output').show();
@@ -162,6 +313,8 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
+            $('#keywords-output table tr').show();
+            $('.content').css('maxHeight', '0px');
             break;
         case 'query':
             $('#keywords-output').hide();
@@ -170,6 +323,7 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').addClass('active-tab');
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
+            $('.content').css('maxHeight', '0px');
             break;
         case 'bookmarks':
             $('#keywords-output').hide();
@@ -178,9 +332,12 @@ function showSelectedSection(selected) {
             $('#query-toggle-button').removeClass('active-tab');
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
+            $('#bookmarks-output ul li').show();
             break;
     }
-    editTabSeachbar(selected);
+
+    // Edits the searchbar display based on the selected state
+    editTabSearchbar(selected);
 }
 
 /**
@@ -222,10 +379,10 @@ function showSelectedSection(selected) {
 $(document).ready(function() {
 
     // Searchbar to filter entities 
-    $('#entity-seachbar').on('keyup', filterEntities);
+    $('#entity-searchbar').on('keyup', filterSearch);
 
     // Select to sort entities
-    $('#entity-sort').change(sortEntities);
+    $('#entity-sort').change(sortList);
 
     $('#keywords-toggle-button').click(() => {
         showSelectedSection('keywords');
