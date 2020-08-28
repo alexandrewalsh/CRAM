@@ -147,6 +147,7 @@ table {
 
 #keywordquery-button {
     align-self: flex-start;
+    margin-right: 30px;
 }
 
 #keywordquery-button:hover {
