@@ -108,13 +108,15 @@ def create_model(json_in):
     return stop_words, dictionary, index, documents
 
 
-def query_phrase(query_string, json_in, n=3):
+def query_phrase(query_string, json_in, threshold=0.2, n=8):
     """ Get the top `n` closest caption lines to a `query`
 
     Keywords arguments:
-    query   -- an input query to search in the video
-    json_in -- json returned from the YouTube Captions API
-    n       -- the number of documents to return 
+    query     -- an input query to search in the video
+    json_in   -- json returned from the YouTube Captions API
+    threshold -- the similarity threshold between a document
+                 and a query
+    n         -- the maximum number of elements to return
 
     Returns:
     An array of indices of the closest line number matches to
@@ -134,11 +136,22 @@ def query_phrase(query_string, json_in, n=3):
 
     # index the model by the query
     doc_similarity_scores = index[query_tf]
+
+    if doc_similarity_scores.ndim <= 0:
+        print("No non-zero similarities")
+        return []
+
     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
+
+    # for diagnostics, print similarity scores
+    debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
+    print("Doc similarity scores: \n{}".format(debug))
 
     # maybe threshold
     res = sorted_indexes.tolist()
-    if len(res) > 3:
+    res = [el for el in res if doc_similarity_scores[el] > threshold]
+
+    if len(res) > n:
         return res[:n]
     else:
         return res

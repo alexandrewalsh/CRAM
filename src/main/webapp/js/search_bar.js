@@ -371,8 +371,16 @@ function showSelectedSection(selected) {
  function gensim_callback(res) {
 
     if (res.status != 200) {
-        alert("gensim response failed!");
-        return;
+        // try to print error
+        try {
+            res.json().then(obj => {
+                console.err(obj);
+            })
+        } catch(err) {
+            console.err("Unhandled error from gensim response");
+        } finally {
+            return;
+        }
     }
 
     res.json().then(obj => {

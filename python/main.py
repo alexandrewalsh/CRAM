@@ -14,6 +14,7 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
+import json
 
 
 app = Flask(__name__)
@@ -26,22 +27,27 @@ def root():
         # get url params: request.args.get(KEY)
         # This request is currently not being used
 
-        query = 'hello'
-        json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
-        res = query_phrase(query, json_in)
-        print("RES: " + str(res))
+        # query = 'unrelated'
+        while True:
+            query = input('input query: ')
+            json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
+            res = query_phrase(query, json_in)
+            print("RES: " + str(res))
         return jsonify({"indices": res})
 
     if request.method == 'POST':
-        # get params from post: request.form[KEY]
-        request_json = request.json
-        query = request_json['query']
-        json_in = request_json['ytCaptions']
+        try:
+            # get params from post: request.form[KEY]
+            request_json = request.json
+            query = request_json['query']
+            json_in = request_json['ytCaptions']
 
-        indices = query_phrase(query, json_in)
-        ret = {"indices": indices} 
+            indices = query_phrase(query, json_in)
+            ret = {"indices": indices} 
 
-        return _corsify_actual_response(jsonify(ret))
+            return _corsify_actual_response(jsonify(ret))
+        except Exception as e:
+            return _corsify_actual_response(jsonify({'error': str(e)})), 201, {'ContentType':'application/json'}
 
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
