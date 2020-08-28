@@ -391,10 +391,14 @@ function showSelectedSection(selected) {
         } else {
             obj['indices'].forEach(index => {
                 // access global documents property
-                const line = documents[index].text;
+                // get 3 lines of context
+                const lines = documents.slice(index,
+                    Math.min(documents.length, index+LINES_OF_QUERY_CONTEXT)).map(el => el.text);
+                
+                // get the timestamp of the first line
                 const time = documents[index].timestamp;
                 output += "<tr><td><span class='query' data-time='" + time + "'>" 
-                            + line + "</span></td></tr>";
+                            + lines.join(' ') + "</span></td></tr>";
             });
         }
 
