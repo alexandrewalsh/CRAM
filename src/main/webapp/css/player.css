@@ -208,6 +208,10 @@ table {
     display: none;
 }
 
+#bookmarks-output {
+    width: 70%;
+}
+
 
 /** Styles dependent on width of screen */
 @media screen and (max-width: 1000px) {
@@ -292,6 +296,9 @@ ul {
 ul li {
   display: block;
   position: relative;
+  padding-bottom: 5px;
+  border: 2px solid #974BE0;
+  border-bottom: 1px solid #974BE0;
 }
 
 .remove-bookmark {
@@ -299,16 +306,22 @@ ul li {
     position: absolute;
     top: 50%;
     right: 0%;
-    transform: translate(0%, -50%);
+    transform: translate(0%, -80%);
     font-size: 24px;
     color: white;
-    padding: 0;
     border: none;
     background: none;
 }
 
 .remove-bookmark:hover {
     color: #bbb;
+}
+
+.bookmark-timestamp {
+    color: white;
+    float: right;
+    transform: translate(0%, 100%);
+    font-size: 12px;
 }
 
 @media screen and (max-width: 900px) {

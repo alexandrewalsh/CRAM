@@ -333,6 +333,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
             $('#bookmarks-output ul li').show();
+            $('#bookmarks-output').css('display', 'inline-block');
             break;
     }
 
