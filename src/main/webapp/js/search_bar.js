@@ -346,6 +346,9 @@ function showSelectedSection(selected) {
  * @param evt - the click event
  */
  function getSearchResults(obj, evt) {
+    if ($('#query-output').css('dispaly') == 'none') {
+        return;
+    }
     evt.preventDefault();
     $('#query-output table').remove();
     $('#query-loading-text').show();

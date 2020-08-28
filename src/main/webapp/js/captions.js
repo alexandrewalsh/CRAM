@@ -98,12 +98,23 @@ function execute(url) {
 
     // launch yt captions request (needed for gensim in no-db model)
     ytCaptions = "";
-    getTrackId(videoId)
-        .then(trackId => getYTCaptions(trackId))
-        .then(captions => parseCaptionsIntoJson(captions))
-        .then(parsed_captions => {
-            ytCaptions = parsed_captions;
-            documents = createDocuments(parsed_captions);
+    fetch('/fullcaption?id=' + videoId, {
+            method: 'GET',
+        }).then((response) => response.json()).then(json => {
+            if (Array.isArray(json) && json.length > 0) {
+                ytCaptions = JSON.stringify({'captions': json});
+                documents = createDocuments(ytCaptions);
+                console.log("Got ytCaptions from DB")
+            } else {
+                console.log("Got ytCaptions from YT API")
+                getTrackId(videoId)
+                    .then(trackId => getYTCaptions(trackId))
+                    .then(captions => parseCaptionsIntoJson(captions))
+                    .then(parsed_captions => {
+                        ytCaptions = parsed_captions;
+                        documents = createDocuments(parsed_captions);
+                    });
+            }
         });
 
     // show loading text
