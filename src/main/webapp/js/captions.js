@@ -212,6 +212,7 @@ function displayVideo(videoId) {
 /**
  * Get a trackID for a given videoID
  * @param videoId - the Youtube video id
+ * @returns a Promise yielding a trackId
  */
 function getTrackId(videoId) {
     return new Promise((resolve, reject) => {
@@ -267,7 +268,7 @@ function getYTCaptions(trackId) {
  * @param response - a String in SBV format representing the captions
  *                   and their respective timestamps
  * @param url - the url of the YouTube video
- * @returns a promise which upon success returns a JSON 
+ * @returns a Promise which upon success returns a JSON 
  *          string encoding the captions and timestamps 
  */
 function parseCaptionsIntoJson(response, url){

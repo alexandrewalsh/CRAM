@@ -384,15 +384,21 @@ function showSelectedSection(selected) {
     }
 
     res.json().then(obj => {
-        console.log(obj);
         var output = '<table id="query-table">';
-        obj['indices'].forEach(index => {
-            // access global documents property
-            const line = documents[index].text;
-            const time = documents[index].timestamp;
-            output += "<tr><td><span class='query' data-time='" + time + "'>" 
-                        + line + "</span></td></tr>";
-        });
+
+        if (obj['indices'].length == 0) {
+            output += "<tr><td>No results found</tr></td>";
+        } else {
+            obj['indices'].forEach(index => {
+                // access global documents property
+                const line = documents[index].text;
+                const time = documents[index].timestamp;
+                output += "<tr><td><span class='query' data-time='" + time + "'>" 
+                            + line + "</span></td></tr>";
+            });
+        }
+
+        output += "</table>";
 
         $('#query-output').html(output);
         setClickableQueries();

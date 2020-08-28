@@ -14,7 +14,6 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
-import json
 
 
 app = Flask(__name__)

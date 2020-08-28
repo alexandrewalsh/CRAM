@@ -46,6 +46,12 @@ def preprocess(doc, stop_words):
 
 
 def download_resources():
+    """ Download stop words and the corpus KeyedVectors
+
+    Returns:
+    - A set of stop words
+    - KeyedVectors representing Wiki word embeddings
+    """
 
     # get stop words
     stop_words = set()
