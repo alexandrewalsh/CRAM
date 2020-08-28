@@ -133,12 +133,24 @@ table {
     align-self: flex-start;
 }
 
+#add-bookmark-button:hover { 
+    cursor: pointer;
+}
+
 #fullcap-button {
     align-self: flex-start;
 }
 
+#fullcap-button:hover {
+    cursor:pointer;
+}
+
 #keywordquery-button {
     align-self: flex-start;
+}
+
+#keywordquery-button:hover {
+    cursor:pointer;
 }
 
 
