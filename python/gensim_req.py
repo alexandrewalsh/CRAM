@@ -11,6 +11,7 @@ import numpy as np
 import json
 import os
 from gensim.models import Word2Vec
+import lemmatizer
 
 
 def processInput(json_in):
@@ -22,7 +23,8 @@ def processInput(json_in):
     Returns:
     An array of caption strings
     """
-
+    print(lemmatizer.lemmatize_sentence("Try lemmitizing this sentence if you can"))
+    
     json_processed = json_in if isinstance(json_in, dict) else json.loads(json_in)
 
     documents = [caption['text'] for caption in json_processed['captions']]

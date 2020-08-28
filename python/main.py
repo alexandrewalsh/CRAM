@@ -25,11 +25,12 @@ def root():
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
         # This request is currently not being used
+        json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
+        sentance = "this is a really cool sentance to analyze"
 
         # query = 'unrelated'
         while True:
             query = input('input query: ')
-            json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
             res = query_phrase(query, json_in)
             print("RES: " + str(res))
         return jsonify({"indices": res})

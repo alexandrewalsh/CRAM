@@ -18,13 +18,16 @@ async function postGensim(url, data, query, callback=handleGensimResponse) {
             },
             body: JSON.stringify({'query': query,
                                 'ytCaptions': data})
-        });
+        }).catch(error => { throw error });
 
         callback(response);
-        // return response;
+
     } catch(err) {
         console.log(err);
-        return "{error: " + err + "}"
+        $('#query-output table').empty();
+        $('#query-output table').append("<tr><td>Server error encountered</tr></td>");
+        $('#query-loading-text').hide();
+        return new Response("Error: " + err.toString(), {'status': 500}); 
     }
 }
 
