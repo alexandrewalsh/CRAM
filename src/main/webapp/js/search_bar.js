@@ -347,7 +347,8 @@ function showSelectedSection(selected) {
  */
  function getSearchResults(obj, evt) {
     evt.preventDefault();
-    $('#query-output').empty();
+    $('#query-output table').remove();
+    $('#query-loading-text').show();
 
     const query = $(obj).find('input').val();
 
@@ -369,7 +370,6 @@ function showSelectedSection(selected) {
  * @param res - the response JSON returned by the python server
  */
  function gensim_callback(res) {
-
     if (res.status != 200) {
         // try to print error
         try {
@@ -400,7 +400,10 @@ function showSelectedSection(selected) {
 
         output += "</table>";
 
-        $('#query-output').html(output);
+        // keep the loading text, but hide it
+        $('#query-loading-text').hide();
+
+        $('#query-output').append(output);
         setClickableQueries();
     });
  }
