@@ -137,6 +137,10 @@ table {
     align-self: flex-start;
 }
 
+#keywordquery-button {
+    align-self: flex-start;
+}
+
 
 /* The Modal (background) */
 .modal {
