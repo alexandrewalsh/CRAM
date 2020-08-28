@@ -129,8 +129,12 @@ table {
 }
 
 /** Styles for the bookmark functionality */
-#add-bookmark-button #fullcap-button{
-    align-self: start;
+#add-bookmark-button {
+    align-self: flex-start;
+}
+
+#fullcap-button {
+    align-self: flex-start;
 }
 
 

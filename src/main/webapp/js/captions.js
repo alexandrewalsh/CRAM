@@ -79,9 +79,6 @@ function execute(url) {
         return;
     }
 
-    // hides the bookmarks for the previous video
-    $('#bookmark-display-div').html('');    // @nathan, can this be moved to submitFn?
-
     // displays the video in the front end
     displayVideo(videoId);
 
