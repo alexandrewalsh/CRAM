@@ -20,6 +20,7 @@ const MOCK_NLP_OUTPUT = {
     banana: [0]
 }
 
+const PYTHON_SERVER = "https://python-dot-step-intern-2020.wl.r.appspot.com/";
 const GAPI_CLIENT = 'https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest';
 
 const PLAYER_URL = 'https://' + window.location.hostname + '/player.html';
@@ -38,5 +39,5 @@ const ESCAPE_HTML = (text) => {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; }).trim();
 }

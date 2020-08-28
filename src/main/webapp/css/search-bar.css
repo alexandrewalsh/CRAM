@@ -272,3 +272,31 @@ form.entity-search::after {
     justify-content: center;
     padding-bottom: 4%;
 }
+
+#entity-search-form div {
+    display: flex;
+}
+
+#query-table {
+    border-spacing: 12px;
+    border-collapse: separate;
+    color: white;
+    font-size: 20px;
+}
+
+.query {
+    color: white;
+    cursor:pointer;
+}
+
+.query:hover {
+    color: darkgrey;
+}
+
+.active-el {
+    color: orange;
+}
+
+.active-el:hover {
+    color: darkorange;
+}

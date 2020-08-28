@@ -4,8 +4,8 @@
  * execute                  -- execute a request to download captions from Youtube API
  * successfulDisplay
  * displayVideo
- * beginCaptionRequest
- * getCaptions
+ * getTrackId
+ * getYTCaptions
  * parseCaptionsIntoJson
  * getIdFromUrl
  * sendJsonForm
@@ -25,9 +25,11 @@
 /** global variables holding the json response for timestamps */
 var currentVideoID;
 var timestamps;
-var current_vID;
 var bookmarks;
-var video_id;
+
+/* global variable for holding the full captions */
+var documents;
+var ytCaptions;
 
 /**
  * Event handler for search bar query, entry point
@@ -37,14 +39,16 @@ var video_id;
 function submitFn(obj, evt){
     $("#search-wrapper").addClass('search-wrapper-active');
     // hide results and search form
-    $('#resultsHeader').hide(); //style = "display: unset;"
     $('#entity-search-form').hide();
+    $('#tab-container').hide();
     value = $(obj).find('.search-input').val().trim();
     evt.preventDefault();
 
     // delete all children
     $("#timestamp-timeline").empty();
-    $("#output").empty();
+    $("#keywords-output").empty();
+    $("#query-output").empty();
+    $("#bookmarks-output").empty();
 
     execute(value);
 }
@@ -75,9 +79,6 @@ function execute(url) {
         return;
     }
 
-    // hides the bookmarks for the previous video
-    $('#bookmark-display-div').html('');
-
     // displays the video in the front end
     displayVideo(videoId);
 
@@ -95,7 +96,19 @@ function execute(url) {
         return;
     }
 
-    current_vID = videoId;
+    // launch yt captions request (needed for gensim in no-db model)
+    ytCaptions = "";
+    getTrackId(videoId)
+        .then(trackId => getYTCaptions(trackId))
+        .then(captions => parseCaptionsIntoJson(captions))
+        .then(parsed_captions => {
+            ytCaptions = parsed_captions;
+            documents = createDocuments(parsed_captions);
+        });
+
+    // show loading text
+    $('#loading-text').show();
+
     // checks to see if captions already exist in the database
     fetch('/caption?id=' + videoId, {
         method: 'GET',
@@ -106,10 +119,32 @@ function execute(url) {
             console.log("Fetching captions from database...");
         } else {
             // video id not found in db, fetching from Youtube API
-            beginCaptionRequest(videoId, url);
+            getTrackId(videoId)
+            .then(trackId => getYTCaptions(trackId))
+            .then(captions => parseCaptionsIntoJson(captions, url))
+            .then(parsed_captions => sendJsonForm(parsed_captions))
+            .then(nlp_json => successfulDisplay(nlp_json));
         }
     });
 }
+
+/**
+ * Parse YoutTube Caption JSON into documents
+ * @param ytCaptions - Processed JSON returned from the YT cap downloader
+ * @returns an array of caption objects of the format {text, timestamp}  
+ */
+function createDocuments(ytCaptions) {
+    const documents = []
+    const caption_json = JSON.parse(ytCaptions);
+
+    caption_json['captions'].forEach(cap => {
+        documents.push({'text': cap['text'],
+                        'timestamp': cap['startTime']});
+    });
+    
+    return documents;
+}
+
 
 /**
  * Renders the entities of the video after a successful json fetch
@@ -117,14 +152,18 @@ function execute(url) {
  */
 function successfulDisplay(json) {
     // display results
-    $("#resultsHeader").text("Key Words in Video");
+    $('#loading-text').hide();
     $('#entity-search-form').show();
+    $('#entity-search-form').css('display', 'flex');
+    $('#entity-search-form').css('justify-content', 'center');
 
     // valid YT Url, clear error status if one exists
     $('.search-input').removeClass("error-placeholder");
-            
-    document.getElementById('output').innerHTML = styleEntitiesFromJson(json);
+
+    document.getElementById('keywords-output').innerHTML = styleEntitiesFromJson(json);
+    $('#keywords-toggle-button').trigger('click');
     $("#output").show();
+    $('.btn-group').css('display', 'block');
 
     // clickable entities and timestamps
     setClickableEntities();
@@ -153,12 +192,6 @@ function displayVideo(videoId) {
     youtubeSourceBuilder += "?enablejsapi=1"
     youtubeSourceBuilder += "&origin=" + location.origin;
 
-    // display "Results" header
-    $("#resultsHeader").show();
-
-    // Display loading screen
-    $("#resultsHeader").text("Loading...");
-
     // set player source
     $('#player').attr('src', youtubeSourceBuilder);  
     resizeIFrame();  
@@ -177,65 +210,55 @@ function displayVideo(videoId) {
 
 
 /**
- * Sets up the caption request call
- * @param videoId - the Youtube video id to find the captions of
- * @param url - the Youtube video url
+ * Get a trackID for a given videoID
+ * @param videoId - the Youtube video id
  */
-function beginCaptionRequest(videoId, url) {
-    gapi.client.youtube.captions.list({
-      "videoId": videoId,
-      "part": [
-        "snippet"
-      ]
-    }).then(function(response) {
-        if (response.result != null & response.result.items != null &
-            response.result.items.length > 0) {
-            
-            var i;
-            var trackId = "";
-            for (i = 0; i < response.result.items.length; i++) {
-                if (response.result.items[i].snippet.language === "en") {
-                    trackId = response.result.items[i].id;
-                    break;
+function getTrackId(videoId) {
+    return new Promise((resolve, reject) => {
+        gapi.client.youtube.captions.list({
+            "videoId": videoId,
+            "part": [
+                "snippet"
+            ]
+        }).then(function(response) {
+            if (response.result != null & response.result.items != null &
+                response.result.items.length > 0) {
+                    
+                var i;
+                var trackId = "";
+                for (i = 0; i < response.result.items.length; i++) {
+                    if (response.result.items[i].snippet.language === "en") {
+                        trackId = response.result.items[i].id;
+                        break;
+                    }
                 }
-            }
-            
-            if (trackId === "") { // no english track found
-                renderError("No English Captions Track for this Video");
-                return;
-            }
-            getCaptions(trackId, url).then(json => {
-                // send to backend
-                sendJsonForm(json);
+                    
+                if (trackId === "") { // no english track found
+                    renderError("No English Captions Track for this Video");
+                    reject("No English Captions Track for this Video");
+                }
+
+                // return track id
+                resolve(trackId);
+                }
             });
-        }
-    }, function(err) {
-        // top level error handler
-        console.error("Execute error", err); 
-    });
+    }).catch(alert);
 }
+
 
 /** 
  * Get the captions and timestamps for a video with a given `trackId`
  * @param trackId - a String representing the track id for a caption
- * @param url - the url of the YouTube video
  * @returns a promise which upon success returns a JSON 
  *         string encoding the captions and timestamps 
  */
-function getCaptions(trackId, url) {
-    return new Promise((success, failure) => {
+function getYTCaptions(trackId) {
+    return new Promise((resolve, reject) => {
         gapi.client.youtube.captions.download({
             "id": trackId,
             "tfmt": "sbv"
-        }).then(function(response){
-            parseCaptionsIntoJson(response, url).then(json => {
-                success(json);
-            });
-        }, function(err) { 
-            renderError(err.status);
-            failure(err);
-        });
-    });
+        }).then(resolve);  
+    }).catch(console.error);
 }
 
 
@@ -248,7 +271,7 @@ function getCaptions(trackId, url) {
  *          string encoding the captions and timestamps 
  */
 function parseCaptionsIntoJson(response, url){
-    return new Promise((success, failure) => {
+    return new Promise((resolve, reject) => {
         var json = {
             url: url,
             captions: []    
@@ -287,17 +310,14 @@ function parseCaptionsIntoJson(response, url){
             }   
 
             // successfully parsed response
-            success(JSON.stringify(json));
+            resolve(JSON.stringify(json));
         };
 
         reader.readAsText(new Blob([response.body], {
             type: 'text/plain'
         }));
 
-    }).catch(function(error) {
-        // stop processing lines, rethrow error
-        throw error;
-    });
+    }).catch(console.error);
 }
 
 /**
@@ -315,25 +335,25 @@ function getIdFromUrl(url) {
     return video_id;
 }
 
+
 /**
  * Create and send a form with the captions JSON. May need 
  * to authenticate users here too to prevent malicious requests. @enriqueavina
  * @param json - the JSON string representing the 
  *               parsed captions response
- * @return - HTML containing formatted captions and timestamps 
+ * @return - a Promise, which resolves to HTML containing formatted captions and timestamps 
+            in JSON format from NLP
  */
 function sendJsonForm(json) {
     var params = new URLSearchParams();
     params.append('json', json);
-    // $('#output').html('<p>Loading...</p>');
 
-    fetch('/caption', {
+    return new Promise((resolve, reject) => {
+        fetch('/caption', {
             method: 'POST',
             body: params,
-        }).then((response) => response.json()).then((json) => {     
-            // Sets the results table            
-            successfulDisplay(json);
-        });
+        }).then(response => resolve(response.json()));
+    }).catch(console.error);
 }
 
 
@@ -392,6 +412,8 @@ function setClickableTimestamps() {
  * timestamps. Also makes the timestamps clickable.
  */
 function setClickableEntities() {
+    $('.word').unbind('click');
+
     $('.word').bind("click", function() {
         const entity = this.innerText;
             
@@ -417,6 +439,15 @@ function setClickableEntities() {
     });
 }
 
+
+/**
+ * Make queries clickeable
+ */
+function setClickableQueries() {
+    $('.query').unbind('click');
+    $('.query').bind("click", onTimeClick_query);
+}
+
 /**
  * Fetches and displays the bookmarks for the current user and video
  * @param email - The email of the current user
@@ -426,7 +457,7 @@ function fetchBookmarks(email, videoId) {
     var fetchUrlBuilder = '/bookmark?email=' + email + '&videoId=' + videoId;
 
     fetch(fetchUrlBuilder).then(response => response.json()).then(json => {
-        $('#bookmark-display-div').html('');
+        $('#bookmarks-output').html('');
         if (Array.isArray(json)) {
             displayBookmarks(json);
         } else if (typeof json === 'object' && json !== null) {
@@ -438,9 +469,9 @@ function fetchBookmarks(email, videoId) {
 }
 
 /**
- * Sets listeners for removing bookmarks on clicks
+ * Sets listeners for deleting bookmarks on clicks
  */
-function setRemoveBookmarkListener() {
+function addRemoveBookmarkListeners() {
     // Removes click listeners from buttons to remove bookmarks to redefine click functionality
     // Uses a fetch POST request to remove the current bookmark from the database
     $('.remove-bookmark').off('click');
@@ -465,28 +496,26 @@ function setRemoveBookmarkListener() {
     });
 }
 
+
 /**
  * Sets listeners for viewing content on clicks
  */
-function setContentBookmarkListener() {
+function addContentBookmarkListeners() {
     // Removes click listeners from buttons to show bookmark content to redefine click functionality
     // Toggles between showing and hiding the bookmark content
-    $('.view-bookmark').off('click');
-    $('.view-bookmark').click(function() {
-        if ($(this).text() == 'View') {
-            var id = $(this).val();
-            var timestamp = bookmarks[id].timestamp;
-            var content = bookmarks[id].content;
-            player.seekTo(timestamp);
-            $(this).parent().find('p')[0].innerText = content;
-            $(this).text('Hide');
-        } else if ($(this).text() == 'Hide') {
-            $(this).parent().find('p')[0].innerText = '';
-            $(this).text('View');
-        }
+    $('.bookmark').off('click');
+    $('.bookmark').click(function() {
+        var contentDiv = this.parentElement.nextSibling;
+        if (contentDiv.style.maxHeight && contentDiv.style.maxHeight != '0px') {
+            contentDiv.style.maxHeight = null;
+        } else {
+            $('.content').css('maxHeight', '0px');
+            contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
+            var bookmarkId = $(this).next().val();
+            player.seekTo(bookmarks[bookmarkId].timestamp, true);
+        } 
     });
 }
-
 
 /**
  * Renders bookmarks in HTML from a list of Bookmark objects
@@ -497,23 +526,39 @@ function displayBookmarks(list) {
     bookmarks = {};
 
     // Builds the HTML text to display on page
-    var output = '';
+    var output = '<ul>';
     for (bookmark of list) {
-        bookmarks[bookmark.id] = {'timestamp': bookmark.timestamp, 'content': bookmark.content};
-        output += '<div class="card bg-purple"><div class="card-body text-center bg-primary"><h5 class="card-title">';
-        output += bookmark.title;
-        output += '</h5><p class="card-text"></p><button type="button" class="btn btn-primary view-bookmark" value="';
-        output += bookmark.id;
-        output += '">View</button><button type="button" class="btn btn-danger remove-bookmark" value="';
-        output += bookmark.id;
-        output += '">Remove</button></div></div>'
+        bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
+        output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
     }
+    output += '</ul>';
     
     // Inserts the HTML text to the page
-    $('#bookmark-display-div').html(output);
-    setRemoveBookmarkListener();
-    setContentBookmarkListener();
+    $('#bookmarks-output').html(output);
+    sortBookmarks();
+    addRemoveBookmarkListeners();
+    addContentBookmarkListeners();
+
 }
+
+/**
+ * Builds the unordered list of bookmarks from the list of bookmark ids
+ * @param list The list of bookmark uuids 
+ * @return The HTML of an unordered list in the order of the list
+ */
+function styleBookmarksFromList(list) {
+    var output = '<ul>';
+    for (bookmark of list) {
+        output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
+        output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
+    }
+    output += '</ul>';
+    return output;
+}
+
 
 /**
  * Clears the contents of the bookmarks form
@@ -570,7 +615,7 @@ function setCaptionsButton() {
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
         if ($('#FullCap').is(':empty')) {
-            fetch('/fullcaption?id=' + current_vID, {
+            fetch('/fullcaption?id=' + currentVideoID, {
                 method: 'GET',
             })
             .then((response) => response.text())
@@ -588,6 +633,39 @@ function setCaptionsButton() {
 }
 
 
+/**
+ * Adds bookmark to database based on modal input
+ */
+function addBookmarkToDatabase() {
+    // Creates the request parameters
+    const queryParams = new URLSearchParams(window.location.search)
+    var params = new URLSearchParams();
+    if (queryParams.has('mockall')) {
+        params.append('email', 'MOCK');
+    } else {
+        params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
+    }
+    params.append('videoId', currentVideoID);
+    params.append('timestamp', Math.floor(player.getCurrentTime()));
+    params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
+    params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
+    params.append('function', 'add');
+
+    // Sends the bookmark parameters to the servlet to process
+    fetch('/bookmark', {
+        method: 'POST',
+        body: params,
+    }).then((response) => response.json()).then(json => {
+        displayBookmarks(json);
+    });
+
+    // Hides the modal
+    $('#myModal').css('display', 'none');
+    $('.modal-body form').css('display', 'none');
+    clearBookmarkForm();
+}
+
+
 $(document).ready(() => {
 
     // Resizes the video whenever the window resizes
@@ -596,32 +674,6 @@ $(document).ready(() => {
         resizeIFrame();
     });
     // Adds a bookmark when clicking the 'add bookmark' button
-    $('#bookmark-add-button').click(() => {
-        // Creates the request parameters
-        const queryParams = new URLSearchParams(window.location.search)
-        var params = new URLSearchParams();
-        if (queryParams.has('mockall')) {
-            params.append('email', 'MOCK');
-        } else {
-            params.append('email', getAuth().currentUser.get().getBasicProfile().getEmail());
-        }
-        params.append('videoId', currentVideoID);
-        params.append('timestamp', Math.floor(player.getCurrentTime()));
-        params.append('title', ESCAPE_HTML($('#bookmark-title').val()));
-        params.append('content', ESCAPE_HTML($('#bookmark-content').val()));
-        params.append('function', 'add');
+    $('#bookmark-add-button').click(() => {addBookmarkToDatabase()});
 
-        // Sends the bookmark parameters to the servlet to process
-        fetch('/bookmark', {
-            method: 'POST',
-            body: params,
-        }).then((response) => response.json()).then(json => {
-            displayBookmarks(json);
-        });
-
-        // Hides the modal
-        $('#myModal').css('display', 'none');
-        $('.modal-body form').css('display', 'none');
-        clearBookmarkForm();
-    });
 });

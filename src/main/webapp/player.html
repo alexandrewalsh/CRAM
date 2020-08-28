@@ -25,6 +25,7 @@
         <script defer src="js/search_bar.js"></script>
         <script defer src="js/error_handling.js"></script>
         <script defer src="js/yt_player.js"></script>
+        <script defer src="js/gensim.js"></script>
         <script defer src="js/captions.js"></script>
     </head>
     <body>
@@ -80,22 +81,40 @@
                 </div>
             </div>
             <div id="flex-item-output" class="container-column text-center">
-                <h1 id="resultsHeader" class="text-center hide">Keywords in Video</h1>
-                <form id="entity-search-form" class="entity-search" onsubmit="return false;" autocomplete="off">
+                <div id="loading-text" class="hide">
+                    <div id="inTurnFadingTextG">
+                        <div id="inTurnFadingTextG_1" class="inTurnFadingTextG">L</div>
+                        <div id="inTurnFadingTextG_2" class="inTurnFadingTextG">o</div>
+                        <div id="inTurnFadingTextG_3" class="inTurnFadingTextG">a</div>
+                        <div id="inTurnFadingTextG_4" class="inTurnFadingTextG">d</div>
+                        <div id="inTurnFadingTextG_5" class="inTurnFadingTextG">i</div>
+                        <div id="inTurnFadingTextG_6" class="inTurnFadingTextG">n</div>
+                        <div id="inTurnFadingTextG_7" class="inTurnFadingTextG">g</div>
+                    </div>
+                </div>
+                <div id="tab-container" class="btn-group hide">
+                    <button type="button" id="keywords-toggle-button" class="btn btn-primary">Keywords</button>
+                    <button type="button" id="query-toggle-button" class="btn btn-primary">Query</button>
+                    <button type="button" id="bookmarks-toggle-button" class="btn btn-primary">Bookmarks</button>
+                </div>
+                <form id="entity-search-form" class="entity-search" onsubmit="getSearchResults(this, event);" autocomplete="off">
                     <div>
-                        <input id="entity-seachbar" type="text" placeholder="Search.." name="query">
-                        <!-- NOTE: Button will be used for semantic similarity with python server -->
-                        <!--<button type="submit"><i class="fa fa-search"></i></button>-->
+                        <input id="entity-searchbar" type="text" placeholder="Search.." name="query">
+                        <button id="entity-searchbar-button" type="submit"><i class="fa fa-search"></i></button>
                     </div>
                     <select id="entity-sort" name="sort-option">
                         <option value="alphabetical">A-Z</option>
                         <option value="chronological">Time</option>
                     </select>
                 </form>
-                <div id="output"></div>
+                <div id="output">
+                    <div id="keywords-output"></div>
+                    <div id="query-output"></div>
+                    <div id="bookmarks-output"></div>
+                </div>
             </div>
         </div>
-        <div id="bookmark-display-div" class="card-columns"></div>
+        
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

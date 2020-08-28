@@ -26,10 +26,6 @@
     margin: 0 auto;
 }
 
-#resultsHeader {
-    padding-bottom: 3%;
-}
-
 .container-row {
     display: flex;
     flex-direction: row;
@@ -43,6 +39,7 @@
     flex: 1;
     justify-content: space-between;
     margin: 0 auto;
+    margin-left: 5%;
 }
 
 table {
@@ -85,6 +82,16 @@ table {
     color: darkgrey;
 }
 
+.bookmark {
+    color: white;
+    font-size: 24px;
+}
+
+.bookmark:hover {
+    cursor: pointer;
+    color: darkgray;
+}
+
 .timestamps {
     cursor: pointer;
     color: #FFFFFF;
@@ -110,7 +117,7 @@ table {
 }
 
 #timestamp-timeline {
-    margin-right: auto;
+    justify-content: flex-start;
 }
 
 #timestamp-timeline span, p {
@@ -118,12 +125,16 @@ table {
 }
 
 #player-pane {
-    flex: 2;
+    flex: 1;
 }
 
 /** Styles for the bookmark functionality */
-#add-bookmark-button #fullcap-button{
-    align-self: start;
+#add-bookmark-button {
+    align-self: flex-start;
+}
+
+#fullcap-button {
+    align-self: flex-start;
 }
 
 
@@ -218,17 +229,18 @@ table {
     #timestamp-timeline span, p {
         font-size: inherit;
     }
-    
-    #resultsHeader {
-        font-size: 30px;
-    }
 
     .word {
         font-size: 20px;
     }
 
+    .bookmark {
+        font-size: 20px;
+    }
+
     form.entity-search input[type=text] {
         padding: 0px;
+        padding-left: 10px;
     }
 }
 
@@ -244,49 +256,220 @@ table {
     }
 }
 
+/** Tabs for different searches */
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#tab-container {
+    padding-bottom: 3%;
+}
+
+.btn:hover {
+	color:black;
+    background-color: white;
+}
+
+.btn-primary {
+    background-color: #00000000;
+    border-color: white;
+}
+
+.active-tab {
+  background-color: white;
+  color: black;
+}
+
+
 /** Bookmark display styling */
-
-
-.bg-primary {
-    background-color: purple!important;
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
-.card-title {
-    color: white!important;
-}
-
-.card-text {
-    font-size: inherit;
-}
-
-.view-bookmark {
-    margin-right: 1em;
+ul li {
+  display: block;
+  position: relative;
 }
 
 .remove-bookmark {
-    margin-left: 1em;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    right: 0%;
+    transform: translate(0%, -50%);
+    font-size: 24px;
+    color: white;
+    padding: 0;
+    border: none;
+    background: none;
 }
 
-@media (min-width: 576px) {
-    .card-columns {
-        column-count: 2;
+.remove-bookmark:hover {
+    color: #bbb;
+}
+
+@media screen and (max-width: 900px) {
+    .remove-bookmark {
+        font-size: 20px;
     }
 }
 
-@media (min-width: 768px) {
-    .card-columns {
-        column-count: 3;
-    }
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #9900ff;
 }
 
-@media (min-width: 992px) {
-    .card-columns {
-        column-count: 4;
-    }
+.content pre {
+    color: white;
+    font-size: 20px;
+    text-align: left;
 }
 
-@media (min-width: 1200px) {
-    .card-columns {
-        column-count: 5;
-    }
+
+/** Loading Screen */
+#inTurnFadingTextG{
+	width:234px;
+	margin:auto;
 }
+
+.inTurnFadingTextG{
+	color:rgb(0,0,0);
+	font-family:Arial;
+	font-size:24px;
+	text-decoration:none;
+	font-weight:normal;
+	font-style:normal;
+	float:left;
+	animation-name:bounce_inTurnFadingTextG;
+		-o-animation-name:bounce_inTurnFadingTextG;
+		-ms-animation-name:bounce_inTurnFadingTextG;
+		-webkit-animation-name:bounce_inTurnFadingTextG;
+		-moz-animation-name:bounce_inTurnFadingTextG;
+	animation-duration:2.09s;
+		-o-animation-duration:2.09s;
+		-ms-animation-duration:2.09s;
+		-webkit-animation-duration:2.09s;
+		-moz-animation-duration:2.09s;
+	animation-iteration-count:infinite;
+		-o-animation-iteration-count:infinite;
+		-ms-animation-iteration-count:infinite;
+		-webkit-animation-iteration-count:infinite;
+		-moz-animation-iteration-count:infinite;
+	animation-direction:normal;
+		-o-animation-direction:normal;
+		-ms-animation-direction:normal;
+		-webkit-animation-direction:normal;
+		-moz-animation-direction:normal;
+}
+
+#inTurnFadingTextG_1{
+	animation-delay:0.75s;
+		-o-animation-delay:0.75s;
+		-ms-animation-delay:0.75s;
+		-webkit-animation-delay:0.75s;
+		-moz-animation-delay:0.75s;
+}
+#inTurnFadingTextG_2{
+	animation-delay:0.9s;
+		-o-animation-delay:0.9s;
+		-ms-animation-delay:0.9s;
+		-webkit-animation-delay:0.9s;
+		-moz-animation-delay:0.9s;
+}
+#inTurnFadingTextG_3{
+	animation-delay:1.05s;
+		-o-animation-delay:1.05s;
+		-ms-animation-delay:1.05s;
+		-webkit-animation-delay:1.05s;
+		-moz-animation-delay:1.05s;
+}
+#inTurnFadingTextG_4{
+	animation-delay:1.2s;
+		-o-animation-delay:1.2s;
+		-ms-animation-delay:1.2s;
+		-webkit-animation-delay:1.2s;
+		-moz-animation-delay:1.2s;
+}
+#inTurnFadingTextG_5{
+	animation-delay:1.35s;
+		-o-animation-delay:1.35s;
+		-ms-animation-delay:1.35s;
+		-webkit-animation-delay:1.35s;
+		-moz-animation-delay:1.35s;
+}
+#inTurnFadingTextG_6{
+	animation-delay:1.5s;
+		-o-animation-delay:1.5s;
+		-ms-animation-delay:1.5s;
+		-webkit-animation-delay:1.5s;
+		-moz-animation-delay:1.5s;
+}
+#inTurnFadingTextG_7{
+	animation-delay:1.64s;
+		-o-animation-delay:1.64s;
+		-ms-animation-delay:1.64s;
+		-webkit-animation-delay:1.64s;
+		-moz-animation-delay:1.64s;
+}
+
+@keyframes bounce_inTurnFadingTextG{
+	0%{
+		color:#9933ff;
+	}
+
+	100%{
+		color:rgb(255,255,255);
+	}
+}
+
+@-o-keyframes bounce_inTurnFadingTextG{
+	0%{
+		color:rgb(0,0,0);
+	}
+
+	100%{
+		color:rgb(255,255,255);
+	}
+}
+
+@-ms-keyframes bounce_inTurnFadingTextG{
+	0%{
+		color:rgb(0,0,0);
+	}
+
+	100%{
+		color:rgb(255,255,255);
+	}
+}
+
+@-webkit-keyframes bounce_inTurnFadingTextG{
+	0%{
+		color:rgb(0,0,0);
+	}
+
+	100%{
+		color:rgb(255,255,255);
+	}
+}
+
+@-moz-keyframes bounce_inTurnFadingTextG{
+	0%{
+		color:rgb(0,0,0);
+	}
+
+	100%{
+		color:rgb(255,255,255);
+	}
+}
+
+#inTurnFadingTextG {
+    display: flex;
+    justify-content: center;
+}
+

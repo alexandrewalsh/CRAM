@@ -112,27 +112,35 @@ function signOut() {
 function loginBoxAnimation() {
     // Sets necessary objects and initial parameters
     var elem = document.getElementsByClassName("wrapper")[0];   
+    var accel = 0.05; // Acceleration constant for the login box
     var pos = 0; // Initial position of 0vh
     var targetPos = 30; // Final position is 30vh
+    var time = 0; // Initial time of 0
+    var totalSteps = Math.sqrt(targetPos / accel); // Number of steps necessary to reach targetPos
     var opacity = 0; // Initial opacity of 0
-    var opacityStep = 1 / targetPos; // The increase of opacity per frame to reach final opacity of 1
+    var opacityStep = 1 / totalSteps; // The change in opacity per frame to reach final opacity of 1
 
-    // Changes frame animation every 25 milliseconds
-    var id = setInterval(frame, 25);
+    // Changes frame animation every 30 milliseconds
+    var id = setInterval(frame, 30);
 
     /**
-     * Performs a single frame of the login box animation
+     * Performs a single frame change of the login box animation
      */
     function frame() {
-        // Changes position and opacity until target position is reached
+        // Computes the change in position with each change in time
+        pos = accel*time*time;
+        time += 1;
+
+        // Sets the new position and opacity of login box
         if (pos >= targetPos) {
             clearInterval(id);
             elem.style.opacity = 1;
+            elem.style.top = targetPos + 'vh';
         } else {
-            pos++; 
-            elem.style.top = pos + 'vh'; 
+            elem.style.top = pos + 'vh';
             opacity += opacityStep;
             elem.style.opacity = opacity;
         }
+
     }
 }

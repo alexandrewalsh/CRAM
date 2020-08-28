@@ -51,3 +51,15 @@ var onTimeClick = function() {
     var time = text.match(numPattern);
     player.seekTo(time[0]);
 };
+
+// called when query is clicked on
+var onTimeClick_query = function() {
+    // highlight current element
+    $('.query').removeClass("active-el");
+    $(this).addClass("active-el");
+
+    var text = $(this).attr('data-time');
+    var numPattern = /\d+/g;
+    var time = text.match(numPattern);
+    player.seekTo(time[0]);
+}
