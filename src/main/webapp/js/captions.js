@@ -105,6 +105,9 @@ function execute(url) {
         }).then((response) => response.json()).then(json => {
             if (Array.isArray(json) && json.length > 0) {
                 fullCaptions = getFullCaptionsText(json);
+                json.forEach((item, index) => {
+                    json[index].text = item.text.replace(/\[.*?\]/g, '');
+                });
                 ytCaptions = JSON.stringify({'captions': json});
                 documents = createDocuments(ytCaptions);
                 console.log("Got ytCaptions from DB")
