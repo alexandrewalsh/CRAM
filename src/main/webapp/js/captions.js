@@ -16,9 +16,11 @@
  * fetchBookmarks
  * displayBookmarks
  * clearBookmarkForm
- * setButtons
+ * setAllButtons
  * setBookmarkButton
  * setCaptionsButton
+ * setKwToQueryButton
+ * addBookmarkToDatabase
  * document.ready
  */
 
@@ -608,6 +610,9 @@ function setBookmarkButton() {
     });
 }
 
+/**
+ * Adds button to display full captions and listeners
+ */
 function setCaptionsButton() {
     // append full-captions button
     $("#timestamp-timeline").append('<button id="fullcap-button"><i style="font-size:24px" class="fa fa-cc"></i></button>');
@@ -634,6 +639,10 @@ function setCaptionsButton() {
     });
 }
 
+/**
+ * Adds button to create query search and listeners
+ * @param entity        keyword to search up in the query tab
+ */
 function setKwToQueryButton(entity) {
     // append keyword-to-query button
     $("#timestamp-timeline").append('<button id="keywordquery-button"><i style="font-size:24px" class="fa fa-search"></i></button>');
