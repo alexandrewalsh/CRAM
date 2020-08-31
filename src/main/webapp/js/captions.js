@@ -511,7 +511,7 @@ function addContentBookmarkListeners() {
         } else {
             $('.content').css('maxHeight', '0px');
             contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
-            var bookmarkId = $(this).next().val();
+            var bookmarkId = $(this).next().next().val();
             player.seekTo(bookmarks[bookmarkId].timestamp, true);
         } 
     });
@@ -530,6 +530,7 @@ function displayBookmarks(list) {
     for (bookmark of list) {
         bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
         output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<span class="bookmark-timestamp">' + epochToTimestamp(bookmark.timestamp) + '</span>';
         output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
         output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
     }
@@ -552,6 +553,7 @@ function styleBookmarksFromList(list) {
     var output = '<ul>';
     for (bookmark of list) {
         output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<span class="bookmark-timestamp">' + epochToTimestamp(bookmarks[bookmark].timestamp) + '</span>';
         output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
         output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
     }
