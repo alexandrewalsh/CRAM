@@ -14,9 +14,13 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
+import os
+import pickle
+from google.cloud import datastore
 
 
 app = Flask(__name__)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'static/resources/lecture-buddy-service.json'
 
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
@@ -26,13 +30,28 @@ def root():
         # get url params: request.args.get(KEY)
         # This request is currently not being used
         json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
-        sentance = "this is a really cool sentance to analyze"
+        # datastore_client = datastore.Client()
+        # # The kind for the new entity
+        # kind = 'Model'
+        # # The name/ID for the new entity
+        # name = 'model1'
+        # # The Cloud Datastore key for the new entity
+        # task_key = datastore_client.key(kind, name)
+
+        # # Prepares the new entity
+        # task = datastore.Entity(key=task_key)
 
         # query = 'unrelated'
-        while True:
-            query = input('input query: ')
-            res = query_phrase(query, json_in)
-            print("RES: " + str(res))
+        # while True:
+        #     query = 'input query'
+        print("about to query")
+        res = query_phrase('hello', json_in)
+        print("DONEEE")
+        #     print()
+        #     binary_model = pickle.dumps(res)
+        #     task['description'] = binary_model
+        #     print('Saved {}: {}'.format(task.key.name, task['description']))
+
         return jsonify({"indices": res})
 
     if request.method == 'POST':

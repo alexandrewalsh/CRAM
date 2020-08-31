@@ -3,3 +3,4 @@ src/main/webapp/js/config.js
 src/main/webapp/WEB-INF/appengine-web.xml
 python/env/*
 __pycache__/
+python/static/resources/lecture-buddy-service.json
