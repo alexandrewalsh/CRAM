@@ -23,8 +23,8 @@ def processInput(json_in):
     Returns:
     An array of caption strings
     """
-    print(lemmatizer.lemmatize_sentence("Try lemmitizing this sentence if you can"))
-    
+    # print(lemmatizer.lemmatize_sentence("Try lemmitizing this sentence if you can"))
+
     json_processed = json_in if isinstance(json_in, dict) else json.loads(json_in)
 
     documents = [caption['text'] for caption in json_processed['captions']]
@@ -44,7 +44,8 @@ def preprocess(doc, stop_words):
     doc = sub(r'<[^<>]+(>|$)', " ", doc)
     doc = sub(r'\[img_assist[^]]*?\]', " ", doc)
     doc = sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', " url_token ", doc)
-    return [token for token in simple_preprocess(doc, min_len=0, max_len=float("inf")) if token not in stop_words]
+
+    return [token for token in lemmatizer.lemmatize_sentence(doc) if token not in stop_words]
 
 
 def download_resources():
@@ -90,7 +91,7 @@ def create_model(json_in):
 
     # download stop_words and glove
     stop_words, glove = download_resources()
-    # print("WE DOWNLOADED THE RESOURCES HELL YEAH")
+
     # Create Glove similarity Index
     similarity_index = WordEmbeddingSimilarityIndex(glove)
 
@@ -99,7 +100,6 @@ def create_model(json_in):
 
     # create a corpus from documents
     corpus = [preprocess(document, stop_words) for document in documents]
-    # print("corpus created: " + str(corpus))
 
     # create dictionary from documents
     dictionary = Dictionary(corpus)
@@ -140,6 +140,7 @@ def query_phrase(query_string, json_in, threshold=0.2, n=8):
     # Build the term dictionary, TF-idf model
     tfidf = TfidfModel(dictionary=dictionary)
     query = preprocess(query_string, stop_words)
+
     query_tf = tfidf[dictionary.doc2bow(query)]
 
     # index the model by the query

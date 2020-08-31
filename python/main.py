@@ -43,7 +43,7 @@ def root():
             json_in = request_json['ytCaptions']
 
             indices = query_phrase(query, json_in)
-            ret = {"indices": indices} 
+            ret = {"indices": indices}
 
             return _corsify_actual_response(jsonify(ret))
         except Exception as e:

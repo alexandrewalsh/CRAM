@@ -16,6 +16,7 @@ Stemming and Lemmatization both generate the root form of the inflected words.
 The difference is that stem might not be an actual word whereas, lemma is an actual language word.
 '''
 
+
 def lemmatize(ambiguous_word, pos=None, neverstem=True, 
               lemmatizer=wnl, stemmer=porter):
     """
