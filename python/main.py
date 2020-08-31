@@ -14,6 +14,7 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
+from google.cloud import storage
 
 
 app = Flask(__name__)
@@ -28,12 +29,15 @@ def root():
         json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
         sentance = "this is a really cool sentance to analyze"
 
-        # query = 'unrelated'
-        while True:
-            query = input('input query: ')
-            res = query_phrase(query, json_in)
-            print("RES: " + str(res))
-        return jsonify({"indices": res})
+        bucket_name = 'lecture-buddy-287518.appspot.com'
+        destination_blob_name = 'Nathan_Test'
+
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_string('tsldkfjsl asdlkfjaskldf slfkdjsladkfj lksfdlkasdfj klsfjalksadjflk kasjlksdjflkasf safksjdafl ksdfjalsdfjlksaf aksldfjslakdfj')
+
+        return jsonify({"indices": [0, 0, 0]})
 
     if request.method == 'POST':
         try:
