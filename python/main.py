@@ -14,13 +14,10 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
-<<<<<<< HEAD
 from google.cloud import storage
-=======
 import os
 import pickle
 from google.cloud import datastore
->>>>>>> 2c65c8480e6ddab9327d283596092c815d9cb760
 
 
 app = Flask(__name__)
@@ -45,7 +42,6 @@ def root():
         # # Prepares the new entity
         # task = datastore.Entity(key=task_key)
 
-<<<<<<< HEAD
         bucket_name = 'lecture-buddy-287518.appspot.com'
         destination_blob_name = 'Nathan_Test'
 
@@ -54,8 +50,7 @@ def root():
         blob = bucket.blob(destination_blob_name)
         blob.upload_from_string('tsldkfjsl asdlkfjaskldf slfkdjsladkfj lksfdlkasdfj klsfjalksadjflk kasjlksdjflkasf safksjdafl ksdfjalsdfjlksaf aksldfjslakdfj')
 
-        return jsonify({"indices": [0, 0, 0]})
-=======
+
         # query = 'unrelated'
         # while True:
         #     query = 'input query'
@@ -67,8 +62,8 @@ def root():
         #     task['description'] = binary_model
         #     print('Saved {}: {}'.format(task.key.name, task['description']))
 
-        return jsonify({"indices": res})
->>>>>>> 2c65c8480e6ddab9327d283596092c815d9cb760
+        return jsonify({"indices": [0, 0, 0]})
+
 
     if request.method == 'POST':
         try:
