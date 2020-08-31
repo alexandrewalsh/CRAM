@@ -14,6 +14,10 @@ from gensim.models import Word2Vec
 import lemmatizer
 
 
+# flag that toggles debug messages
+debug_messages = False
+
+
 def processInput(json_in):
     """ format input JSON to a document format
 
@@ -71,8 +75,6 @@ def download_resources():
         dataset = api.load("text8")
         glove_model = Word2Vec(dataset)
         glove_vec = glove_model.wv
-
-        print(glove_vec)
         glove_vec.save(glove_fname)
 
     return stop_words, glove_vec
@@ -153,8 +155,9 @@ def query_phrase(query_string, json_in, threshold=0.2, n=8):
     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
 
     # for diagnostics, print similarity scores
-    debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
-    print("Doc similarity scores: \n{}".format(debug))
+    if debug_messages:
+        debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
+        print("Doc similarity scores: \n{}".format(debug))
 
     # maybe threshold
     res = sorted_indexes.tolist()
