@@ -30,6 +30,7 @@ var bookmarks;
 /* global variable for holding the full captions */
 var documents;
 var ytCaptions;
+var fullCaptions;
 
 /**
  * Event handler for search bar query, entry point
@@ -98,12 +99,28 @@ function execute(url) {
 
     // launch yt captions request (needed for gensim in no-db model)
     ytCaptions = "";
-    getTrackId(videoId)
-        .then(trackId => getYTCaptions(trackId))
-        .then(captions => parseCaptionsIntoJson(captions))
-        .then(parsed_captions => {
-            ytCaptions = parsed_captions;
-            documents = createDocuments(parsed_captions);
+    fullCaptions = "";
+    fetch('/fullcaption?id=' + videoId, {
+            method: 'GET',
+        }).then((response) => response.json()).then(json => {
+            if (Array.isArray(json) && json.length > 0) {
+                fullCaptions = getFullCaptionsText(json);
+                json.forEach((item, index) => {
+                    json[index].text = item.text.replace(/\[.*?\]/g, '');
+                });
+                ytCaptions = JSON.stringify({'captions': json});
+                documents = createDocuments(ytCaptions);
+                console.log("Got ytCaptions from DB")
+            } else {
+                console.log("Got ytCaptions from YT API")
+                getTrackId(videoId)
+                    .then(trackId => getYTCaptions(trackId))
+                    .then(captions => parseCaptionsIntoJson(captions))
+                    .then(parsed_captions => {
+                        ytCaptions = parsed_captions;
+                        documents = createDocuments(parsed_captions);
+                    });
+            }
         });
 
     // show loading text
@@ -126,6 +143,15 @@ function execute(url) {
             .then(nlp_json => successfulDisplay(nlp_json));
         }
     });
+}
+
+
+function getFullCaptionsText(timeRangedText) {
+    var text = '';
+    timeRangedText.forEach((item, index) => {
+        text += item.text + ' ';
+    });
+    return text;
 }
 
 /**
@@ -616,17 +642,26 @@ function setCaptionsButton() {
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
         if ($('#FullCap').is(':empty')) {
-            fetch('/fullcaption?id=' + currentVideoID, {
-                method: 'GET',
-            })
-            .then((response) => response.text())
-            .then ((text) => {
-                if (text != null && text.trim() != '') {
-                    // Sets the results table
-                    document.getElementById("FullCap").innerHTML = text;
-                }
-            })
-            .catch(err => renderError(err));
+            if (fullCaptions == '') {
+                fetch('/fullcaption?id=' + currentVideoID, {
+                    method: 'GET',
+                })
+                    .then((response) => response.json())
+                    .then ((list) => {
+                    if (list != null) {
+                        // Creates the text from a list of time ranged texts
+                        var text = '';
+                        list.forEach((item, index) => {
+                            text += item.text + ' ';
+                        });
+                        // Sets the results table
+                        document.getElementById("FullCap").innerText = text.replace(/\[.*?\] /g, '');
+                    }
+                })
+                .catch(err => renderError(err));
+            } else {
+                $('#FullCap').text(fullCaptions.replace(/\[.*?\] /g, ''));
+            }
         } else {
             $('#FullCap').empty();
         }

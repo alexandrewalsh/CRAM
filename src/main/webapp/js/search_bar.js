@@ -315,6 +315,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-toggle-button').removeClass('active-tab');
             $('#keywords-output table tr').show();
             $('.content').css('maxHeight', '0px');
+            $('#entity-search-form').attr('onsubmit', 'return false;');
             break;
         case 'query':
             $('#keywords-output').hide();
@@ -324,6 +325,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
             $('.content').css('maxHeight', '0px');
+            $('#entity-search-form').attr('onsubmit', 'getSearchResults(this, event);');
             break;
         case 'bookmarks':
             $('#keywords-output').hide();
@@ -333,6 +335,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
             $('#bookmarks-output ul li').show();
+            $('#entity-search-form').attr('onsubmit', 'return false;');
             break;
     }
 
@@ -354,7 +357,7 @@ function showSelectedSection(selected) {
 
     if (ytCaptions == "") {
         console.log("YT Captions not yet set!");
-        return;
+        return false;
     }
 
     // Here goes the post request
