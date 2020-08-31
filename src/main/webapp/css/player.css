@@ -133,8 +133,25 @@ table {
     align-self: flex-start;
 }
 
+#add-bookmark-button:hover { 
+    cursor: pointer;
+}
+
 #fullcap-button {
     align-self: flex-start;
+}
+
+#fullcap-button:hover {
+    cursor:pointer;
+}
+
+#keywordquery-button {
+    align-self: flex-start;
+    margin-right: 30px;
+}
+
+#keywordquery-button:hover {
+    cursor:pointer;
 }
 
 
@@ -206,6 +223,10 @@ table {
 
 .modal-body form {
     display: none;
+}
+
+#bookmarks-output {
+    width: 70%;
 }
 
 
@@ -292,6 +313,9 @@ ul {
 ul li {
   display: block;
   position: relative;
+  padding-bottom: 5px;
+  border: 2px solid #974BE0;
+  border-bottom: 1px solid #974BE0;
 }
 
 .remove-bookmark {
@@ -299,16 +323,22 @@ ul li {
     position: absolute;
     top: 50%;
     right: 0%;
-    transform: translate(0%, -50%);
+    transform: translate(0%, -80%);
     font-size: 24px;
     color: white;
-    padding: 0;
     border: none;
     background: none;
 }
 
 .remove-bookmark:hover {
     color: #bbb;
+}
+
+.bookmark-timestamp {
+    color: white;
+    float: right;
+    transform: translate(0%, 100%);
+    font-size: 12px;
 }
 
 @media screen and (max-width: 900px) {
