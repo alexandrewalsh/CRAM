@@ -14,10 +14,17 @@
 
 from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase
+<<<<<<< HEAD
 from google.cloud import storage
+=======
+import os
+import pickle
+from google.cloud import datastore
+>>>>>>> 2c65c8480e6ddab9327d283596092c815d9cb760
 
 
 app = Flask(__name__)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'static/resources/lecture-buddy-service.json'
 
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
@@ -27,8 +34,18 @@ def root():
         # get url params: request.args.get(KEY)
         # This request is currently not being used
         json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
-        sentance = "this is a really cool sentance to analyze"
+        # datastore_client = datastore.Client()
+        # # The kind for the new entity
+        # kind = 'Model'
+        # # The name/ID for the new entity
+        # name = 'model1'
+        # # The Cloud Datastore key for the new entity
+        # task_key = datastore_client.key(kind, name)
 
+        # # Prepares the new entity
+        # task = datastore.Entity(key=task_key)
+
+<<<<<<< HEAD
         bucket_name = 'lecture-buddy-287518.appspot.com'
         destination_blob_name = 'Nathan_Test'
 
@@ -38,6 +55,20 @@ def root():
         blob.upload_from_string('tsldkfjsl asdlkfjaskldf slfkdjsladkfj lksfdlkasdfj klsfjalksadjflk kasjlksdjflkasf safksjdafl ksdfjalsdfjlksaf aksldfjslakdfj')
 
         return jsonify({"indices": [0, 0, 0]})
+=======
+        # query = 'unrelated'
+        # while True:
+        #     query = 'input query'
+        print("about to query")
+        res = query_phrase('hello', json_in)
+        print("DONEEE")
+        #     print()
+        #     binary_model = pickle.dumps(res)
+        #     task['description'] = binary_model
+        #     print('Saved {}: {}'.format(task.key.name, task['description']))
+
+        return jsonify({"indices": res})
+>>>>>>> 2c65c8480e6ddab9327d283596092c815d9cb760
 
     if request.method == 'POST':
         try:

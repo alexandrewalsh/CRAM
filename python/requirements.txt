@@ -1,4 +1,9 @@
 Flask==1.1.2
 gensim
 nltk
+pickle-mixin
+google-api-python-client
+google-cloud-datastore
+grpcio
+google-cloud
 google-cloud-storage

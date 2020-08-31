@@ -12,11 +12,16 @@ import json
 import os
 from gensim.models import Word2Vec
 import lemmatizer
+import pickle
+import os
+from google.cloud import datastore
 
 
 # flag that toggles debug messages
 debug_messages = False
 
+def save_model(model):
+    binary_model = pickle.dumps(model)
 
 def processInput(json_in):
     """ format input JSON to a document format
@@ -138,6 +143,29 @@ def query_phrase(query_string, json_in, threshold=0.2, n=8):
 
     # Get the Soft Cosime similarity model and dictionary 
     stop_words, dictionary, index, documents = create_model(json_in)
+
+    print("About to send to db")
+    datastore_client = datastore.Client()
+
+    # The kind for the new entity
+    kind = 'Model'
+    # The name/ID for the new entity
+    name = 'model1'
+
+    # The Cloud Datastore key for the new entity
+    task_key = datastore_client.key(kind, name)
+    # Prepares the new entity
+    task = datastore.Entity(key=task_key)
+    
+    index = pickle.loads(pickle.dumps(index))
+    # index = pickle.loads(binary_model)
+
+    # task['model'] = binary_model
+    # datastore_client.put(task)
+
+    # print('Saved {}: {}'.format(task.key.name, task['model']))
+
+    # return index
 
     # Build the term dictionary, TF-idf model
     tfidf = TfidfModel(dictionary=dictionary)
