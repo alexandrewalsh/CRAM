@@ -31,6 +31,7 @@ var bookmarks;
 var documents;
 var ytCaptions;
 var fullCaptions;
+var global_vid;
 
 /**
  * Event handler for search bar query, entry point
@@ -80,6 +81,9 @@ function execute(url) {
         return;
     }
 
+    // create a global reference for the video ID
+    global_vid = videoId;
+
     // displays the video in the front end
     displayVideo(videoId);
 
@@ -121,28 +125,31 @@ function execute(url) {
                         documents = createDocuments(parsed_captions);
                     });
             }
+
+            // send the gensim POST request
+            postGensim(PYTHON_SERVER, videoId, ytCaptions, ()=>{
+                // show loading text
+                $('#loading-text').show();
+
+                // checks to see if captions already exist in the database
+                fetch('/caption?id=' + videoId, {
+                    method: 'GET',
+                }).then((response) => response.json()).then((json) => {
+                    if (Object.keys(json).length > 0) {
+                        // Sets the results table
+                        successfulDisplay(json);
+                        console.log("Fetching captions from database...");
+                    } else {
+                        // video id not found in db, fetching from Youtube API
+                        getTrackId(videoId)
+                        .then(trackId => getYTCaptions(trackId))
+                        .then(captions => parseCaptionsIntoJson(captions, url))
+                        .then(parsed_captions => sendJsonForm(parsed_captions))
+                        .then(nlp_json => successfulDisplay(nlp_json));
+                    }
+                });
+            });
         });
-
-    // show loading text
-    $('#loading-text').show();
-
-    // checks to see if captions already exist in the database
-    fetch('/caption?id=' + videoId, {
-        method: 'GET',
-    }).then((response) => response.json()).then((json) => {
-        if (Object.keys(json).length > 0) {
-            // Sets the results table
-            successfulDisplay(json);
-            console.log("Fetching captions from database...");
-        } else {
-            // video id not found in db, fetching from Youtube API
-            getTrackId(videoId)
-            .then(trackId => getYTCaptions(trackId))
-            .then(captions => parseCaptionsIntoJson(captions, url))
-            .then(parsed_captions => sendJsonForm(parsed_captions))
-            .then(nlp_json => successfulDisplay(nlp_json));
-        }
-    });
 }
 
 

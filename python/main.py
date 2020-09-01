@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-from gensim_req import query_phrase
+from gensim_req import query_phrase, create_model
 from google.cloud import storage
 import os
 import pickle
 from google.cloud import datastore
+import traceback
 
 
 app = Flask(__name__)
@@ -29,56 +30,29 @@ def root():
 
     if request.method == 'GET':
         # get url params: request.args.get(KEY)
-        # This request is currently not being used
-        json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
-        # datastore_client = datastore.Client()
-        # # The kind for the new entity
-        # kind = 'Model'
-        # # The name/ID for the new entity
-        # name = 'model1'
-        # # The Cloud Datastore key for the new entity
-        # task_key = datastore_client.key(kind, name)
 
-        # # Prepares the new entity
-        # task = datastore.Entity(key=task_key)
+        storage_client = storage.Client()
 
-        bucket_name = 'lecture-buddy-287518.appspot.com'
-        destination_blob_name = 'Nathan_Test'
+        # make sure these keys are present 
+        query = request.headers.get("query")
+        v_id = request.headers.get("vid")
+        print("v_id: {}\nquery: {}".format(v_id, query))
 
-        storage_client = storage.Client().from_service_account_json('static/resources/lecture-buddy-service.json')
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(destination_blob_name)
-
-        # query = 'unrelated'
-        # while True:
-        #     query = 'input query'
-        print("about to query")
-        res = query_phrase('hello', json_in)
-        print("DONEEE")
-        
-        binary_model = pickle.dumps(res)
-        #task['description'] = binary_model
-        #     print('Saved {}: {}'.format(task.key.name, task['description']))
-        blob.upload_from_string(binary_model)
-
-        print("TEST")
-
-        return jsonify({"indices": [0, 0, 0]})
-
+        indices = query_phrase(storage_client, query, v_id)
+        return _corsify_actual_response(jsonify({"indices": indices}))
 
     if request.method == 'POST':
+        storage_client = storage.Client()
+
         try:
             # get params from post: request.form[KEY]
             request_json = request.json
-            query = request_json['query']
-            json_in = request_json['ytCaptions']
-
-            indices = query_phrase(query, json_in)
-            ret = {"indices": indices}
-
-            return _corsify_actual_response(jsonify(ret))
+            json_in = request_json['data']
+            v_id = request_json['v_id']
+            create_model(storage_client, json_in, v_id)
+            return _corsify_actual_response(jsonify("Success"))
         except Exception as e:
-            return _corsify_actual_response(jsonify({'error': str(e)})), 201, {'ContentType':'application/json'}
+            return _corsify_actual_response(jsonify({'error': str(e)})), 500, {'ContentType':'application/json'}
 
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()

@@ -356,14 +356,19 @@ function showSelectedSection(selected) {
     const query = $(obj).find('input').val();
 
     if (ytCaptions == "") {
-        console.log("YT Captions not yet set!");
+        console.error("YT Captions not yet set!");
         return false;
     }
 
-    // Here goes the post request
-    postGensim(PYTHON_SERVER,
-               ytCaptions,
+    if (global_vid == "") {
+        console.error("YT VID not set!");
+        return false;
+    }
+
+    // Here goes the GET request
+    getGensim(PYTHON_SERVER,
                query,
+               global_vid,
                gensim_callback)
  }
 

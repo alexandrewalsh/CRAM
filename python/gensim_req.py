@@ -14,11 +14,13 @@ from gensim.models import Word2Vec
 import lemmatizer
 import pickle
 import os
-from google.cloud import datastore
+from google.cloud import datastore, storage
 
 
 # flag that toggles debug messages
 debug_messages = False
+bucket_name = 'lecture-buddy-287518.appspot.com'
+
 
 def save_model(model):
     binary_model = pickle.dumps(model)
@@ -37,6 +39,7 @@ def processInput(json_in):
     json_processed = json_in if isinstance(json_in, dict) else json.loads(json_in)
 
     documents = [caption['text'] for caption in json_processed['captions']]
+
     return documents
 
 
@@ -85,7 +88,15 @@ def download_resources():
     return stop_words, glove_vec
 
 
-def create_model(json_in):
+def blob_exists(storage_client, blob_name):
+    blobs = storage_client.list_blobs(bucket_name)
+    for blob in blobs:
+        if blob.name == blob_name:
+            return True
+    return False
+
+
+def create_model(storage_client, json_in, video_id):
     """ Create soft cosine similarity model
 
     Keywords arguments:
@@ -95,6 +106,19 @@ def create_model(json_in):
     - A Soft Cosine Measure model
     - The dictionary of terms computed
     """
+
+    video_id = video_id.lower()
+
+    # check if bucket exists
+    if blob_exists(storage_client, video_id):
+        # retrieve blob from bucket
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(video_id)    # The blob's name is the video ID
+
+        # download the storage pickle as a binary string
+        blob_str = blob.download_as_string()
+        dictionary, index = pickle.loads(blob_str)
+        return dictionary, index
 
     # download stop_words and glove
     stop_words, glove = download_resources()
@@ -119,11 +143,75 @@ def create_model(json_in):
     index = SoftCosineSimilarity(
             tfidf[[dictionary.doc2bow(document) for document in corpus]],
             similarity_matrix)
+    
+    # save index and dictionary
+    storage_client = storage.Client()
 
-    return stop_words, dictionary, index, documents
+    # create a binary pickle representation
+    bin_tuple = pickle.dumps((dictionary, index))
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(video_id)
+
+    # save to storage
+    blob.upload_from_string(bin_tuple)
+
+    print("Success!!!")
+
+    return dictionary, index
 
 
-def query_phrase(query_string, json_in, threshold=0.2, n=8):
+# def query_phrase(query_string, json_in, threshold=0.2, n=8):
+#     """ Get the top `n` closest caption lines to a `query`
+
+#     Keywords arguments:
+#     query     -- an input query to search in the video
+#     json_in   -- json returned from the YouTube Captions API
+#     threshold -- the similarity threshold between a document
+#                  and a query
+#     n         -- the maximum number of elements to return
+
+#     Returns:
+#     An array of indices of the closest line number matches to
+#     the query in confidence sorted order
+
+#     ex:
+#     [0, 2, 5, 1, ...]
+#     """
+
+#     # Get the Soft Cosime similarity model and dictionary 
+#     stop_words, dictionary, index, documents = create_model(json_in)
+
+#     # Build the term dictionary, TF-idf model
+#     tfidf = TfidfModel(dictionary=dictionary)
+#     query = preprocess(query_string, stop_words)
+
+#     query_tf = tfidf[dictionary.doc2bow(query)]
+
+#     # index the model by the query
+#     doc_similarity_scores = index[query_tf]
+
+#     if doc_similarity_scores.ndim <= 0:
+#         print("No non-zero similarities")
+#         return []
+
+#     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
+
+#     # for diagnostics, print similarity scores
+#     if debug_messages:
+#         debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
+#         print("Doc similarity scores: \n{}".format(debug))
+
+#     # maybe threshold
+#     res = sorted_indexes.tolist()
+#     res = [el for el in res if doc_similarity_scores[el] > threshold]
+
+#     if len(res) > n:
+#         return res[:n]
+#     else:
+#         return res
+
+
+def query_phrase(storage_client, query_string, video_id, threshold=0.2, n=8):
     """ Get the top `n` closest caption lines to a `query`
 
     Keywords arguments:
@@ -141,35 +229,27 @@ def query_phrase(query_string, json_in, threshold=0.2, n=8):
     [0, 2, 5, 1, ...]
     """
 
+    # convert video to lowercase
+    video_id = video_id.lower()
+
+    # check if bucket exists
+    if blob_exists(storage_client, video_id):
+        # retrieve blob from bucket
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(video_id)    # The blob's name is the video ID
+
+        # download the storage pickle as a binary string
+        blob_str = blob.download_as_string()
+        dictionary, index = pickle.loads(blob_str)
+    else:
+        raise Exception("No blob {} exists!".format(video_id))
+
     # Get the Soft Cosime similarity model and dictionary 
-    stop_words, dictionary, index, documents = create_model(json_in)
-
-    print("About to send to db")
-    datastore_client = datastore.Client()
-
-    # The kind for the new entity
-    kind = 'Model'
-    # The name/ID for the new entity
-    name = 'model1'
-
-    # The Cloud Datastore key for the new entity
-    task_key = datastore_client.key(kind, name)
-    # Prepares the new entity
-    task = datastore.Entity(key=task_key)
-    
-    index = pickle.loads(pickle.dumps(index))
-    # index = pickle.loads(binary_model)
-
-    # task['model'] = binary_model
-    # datastore_client.put(task)
-
-    # print('Saved {}: {}'.format(task.key.name, task['model']))
-
-    # return index
+    # stop_words, dictionary, _index, documents = create_model(json_in)
 
     # Build the term dictionary, TF-idf model
     tfidf = TfidfModel(dictionary=dictionary)
-    query = preprocess(query_string, stop_words)
+    query = preprocess(query_string, set())
 
     query_tf = tfidf[dictionary.doc2bow(query)]
 
