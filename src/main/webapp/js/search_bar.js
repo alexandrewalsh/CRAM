@@ -336,6 +336,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-toggle-button').addClass('active-tab');
             $('#bookmarks-output ul li').show();
             $('#entity-search-form').attr('onsubmit', 'return false;');
+            $('#bookmarks-output').css('display', 'inline-block');
             break;
     }
 
