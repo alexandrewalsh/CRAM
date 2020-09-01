@@ -10,8 +10,6 @@
  */
 async function postGensim(url, v_id, data, callback=handleGensimResponse) {
     console.log("POST gesim request to " + url + "...")
-    console.log(v_id);
-    console.log(data);
     try {
         const response = await fetch(url, {
             method: 'POST',
