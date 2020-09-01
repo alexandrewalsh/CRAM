@@ -1,5 +1,18 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from re import sub
-from gensim.utils import simple_preprocess
 import gensim.downloader as api
 from gensim.models import KeyedVectors
 from gensim.corpora import Dictionary
@@ -14,16 +27,13 @@ from gensim.models import Word2Vec
 import lemmatizer
 import pickle
 import os
-from google.cloud import datastore, storage
+from google.cloud import storage
 
 
 # flag that toggles debug messages
-debug_messages = False
+debug_messages = True
 bucket_name = 'lecture-buddy-287518.appspot.com'
 
-
-def save_model(model):
-    binary_model = pickle.dumps(model)
 
 def processInput(json_in):
     """ format input JSON to a document format
@@ -34,7 +44,6 @@ def processInput(json_in):
     Returns:
     An array of caption strings
     """
-    # print(lemmatizer.lemmatize_sentence("Try lemmitizing this sentence if you can"))
 
     json_processed = json_in if isinstance(json_in, dict) else json.loads(json_in)
 
@@ -89,6 +98,17 @@ def download_resources():
 
 
 def blob_exists(storage_client, blob_name):
+    """ Check whether a blob exists in a bucket in Storage
+
+    Keywords arguments:
+    storage_client -- a Storage instance
+    blob_name      -- the name of the blob (model) 
+
+    Returns:
+    - True if the blob `blob_name` exists in `bucket_name`,
+      and false otherwise
+    """
+
     blobs = storage_client.list_blobs(bucket_name)
     for blob in blobs:
         if blob.name == blob_name:
@@ -100,7 +120,9 @@ def create_model(storage_client, json_in, video_id):
     """ Create soft cosine similarity model
 
     Keywords arguments:
-    json_in -- json returned from the YouTube Captions API
+    storage_client -- a Storage instance
+    json_in        -- json returned from the YouTube Captions API
+    video_id       -- the Youtube video_id
 
     Returns:
     - A Soft Cosine Measure model
@@ -143,7 +165,7 @@ def create_model(storage_client, json_in, video_id):
     index = SoftCosineSimilarity(
             tfidf[[dictionary.doc2bow(document) for document in corpus]],
             similarity_matrix)
-    
+
     # save index and dictionary
     storage_client = storage.Client()
 
@@ -155,71 +177,22 @@ def create_model(storage_client, json_in, video_id):
     # save to storage
     blob.upload_from_string(bin_tuple)
 
-    print("Success!!!")
+    if debug_messages:
+        print("Binary model with name {} and dictionary uploaded.".format(video_id))
 
     return dictionary, index
-
-
-# def query_phrase(query_string, json_in, threshold=0.2, n=8):
-#     """ Get the top `n` closest caption lines to a `query`
-
-#     Keywords arguments:
-#     query     -- an input query to search in the video
-#     json_in   -- json returned from the YouTube Captions API
-#     threshold -- the similarity threshold between a document
-#                  and a query
-#     n         -- the maximum number of elements to return
-
-#     Returns:
-#     An array of indices of the closest line number matches to
-#     the query in confidence sorted order
-
-#     ex:
-#     [0, 2, 5, 1, ...]
-#     """
-
-#     # Get the Soft Cosime similarity model and dictionary 
-#     stop_words, dictionary, index, documents = create_model(json_in)
-
-#     # Build the term dictionary, TF-idf model
-#     tfidf = TfidfModel(dictionary=dictionary)
-#     query = preprocess(query_string, stop_words)
-
-#     query_tf = tfidf[dictionary.doc2bow(query)]
-
-#     # index the model by the query
-#     doc_similarity_scores = index[query_tf]
-
-#     if doc_similarity_scores.ndim <= 0:
-#         print("No non-zero similarities")
-#         return []
-
-#     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
-
-#     # for diagnostics, print similarity scores
-#     if debug_messages:
-#         debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
-#         print("Doc similarity scores: \n{}".format(debug))
-
-#     # maybe threshold
-#     res = sorted_indexes.tolist()
-#     res = [el for el in res if doc_similarity_scores[el] > threshold]
-
-#     if len(res) > n:
-#         return res[:n]
-#     else:
-#         return res
 
 
 def query_phrase(storage_client, query_string, video_id, threshold=0.2, n=8):
     """ Get the top `n` closest caption lines to a `query`
 
     Keywords arguments:
-    query     -- an input query to search in the video
-    json_in   -- json returned from the YouTube Captions API
-    threshold -- the similarity threshold between a document
-                 and a query
-    n         -- the maximum number of elements to return
+    storage_client -- a Storage instance
+    query_string   -- an input query to search in the video
+    video_id       -- the YouTube video ID
+    threshold      -- the similarity threshold between a document
+                      and a query
+    n              -- the maximum number of elements to return
 
     Returns:
     An array of indices of the closest line number matches to
@@ -231,6 +204,7 @@ def query_phrase(storage_client, query_string, video_id, threshold=0.2, n=8):
 
     # convert video to lowercase
     video_id = video_id.lower()
+    dictionary = set()
 
     # check if bucket exists
     if blob_exists(storage_client, video_id):
@@ -244,9 +218,6 @@ def query_phrase(storage_client, query_string, video_id, threshold=0.2, n=8):
     else:
         raise Exception("No blob {} exists!".format(video_id))
 
-    # Get the Soft Cosime similarity model and dictionary 
-    # stop_words, dictionary, _index, documents = create_model(json_in)
-
     # Build the term dictionary, TF-idf model
     tfidf = TfidfModel(dictionary=dictionary)
     query = preprocess(query_string, set())
@@ -257,17 +228,13 @@ def query_phrase(storage_client, query_string, video_id, threshold=0.2, n=8):
     doc_similarity_scores = index[query_tf]
 
     if doc_similarity_scores.ndim <= 0:
-        print("No non-zero similarities")
+        if debug_messages:
+            print("No non-zero similarities")
         return []
 
     sorted_indexes = np.argsort(doc_similarity_scores)[::-1]
 
-    # for diagnostics, print similarity scores
-    if debug_messages:
-        debug = [(doc_similarity_scores[el], documents[el]) for el in sorted_indexes]
-        print("Doc similarity scores: \n{}".format(debug))
-
-    # maybe threshold
+    # filter results by threshold
     res = sorted_indexes.tolist()
     res = [el for el in res if doc_similarity_scores[el] > threshold]
 

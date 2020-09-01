@@ -382,10 +382,10 @@ function showSelectedSection(selected) {
         // try to print error
         try {
             res.json().then(obj => {
-                console.err(obj);
+                console.error(obj);
             })
         } catch(err) {
-            console.err("Unhandled error from gensim response");
+            console.error("Unhandled error from gensim response: " + err.toString());
         } finally {
             return;
         }

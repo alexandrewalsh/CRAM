@@ -126,10 +126,25 @@ function execute(url) {
                     });
             }
 
+            // show loading text
+            $('#loading-text').show();
+
             // send the gensim POST request
-            postGensim(PYTHON_SERVER, videoId, ytCaptions, ()=>{
-                // show loading text
-                $('#loading-text').show();
+            postGensim(PYTHON_SERVER, videoId, ytCaptions, (response) => {
+                // these requests should be done in parallel, TODO
+                
+                if (response.status != 200) {
+                    // try to print error
+                    try {
+                        response.json().then(obj => {
+                            console.error(obj);
+                        });
+                    } catch(err) {
+                        console.error("Unhandled error from gensim POST response: " + err.toString());
+                    } finally {
+                        return;
+                    }
+                }
 
                 // checks to see if captions already exist in the database
                 fetch('/caption?id=' + videoId, {

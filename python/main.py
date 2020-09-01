@@ -16,9 +16,6 @@ from flask import Flask, request, jsonify, make_response
 from gensim_req import query_phrase, create_model
 from google.cloud import storage
 import os
-import pickle
-from google.cloud import datastore
-import traceback
 
 
 app = Flask(__name__)
@@ -29,17 +26,22 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'static/resources/lecture-buddy-s
 def root():
 
     if request.method == 'GET':
-        # get url params: request.args.get(KEY)
+        try:
+            # create a storage client
+            storage_client = storage.Client()
 
-        storage_client = storage.Client()
+            # make sure these keys are present 
+            query = request.headers.get("query")
+            v_id = request.headers.get("vid")
 
-        # make sure these keys are present 
-        query = request.headers.get("query")
-        v_id = request.headers.get("vid")
-        print("v_id: {}\nquery: {}".format(v_id, query))
+            if query is None or v_id is None:
+                raise Exception("query({}) or v_id({}) are null!".format(query, v_id))
 
-        indices = query_phrase(storage_client, query, v_id)
-        return _corsify_actual_response(jsonify({"indices": indices}))
+            indices = query_phrase(storage_client, query, v_id)
+            return _corsify_actual_response(jsonify({"indices": indices}))
+
+        except Exception as e:
+            return _corsify_actual_response(jsonify({'error': str(e)})), 500, {'ContentType':'application/json'}
 
     if request.method == 'POST':
         storage_client = storage.Client()
@@ -51,6 +53,7 @@ def root():
             v_id = request_json['v_id']
             create_model(storage_client, json_in, v_id)
             return _corsify_actual_response(jsonify("Success"))
+
         except Exception as e:
             return _corsify_actual_response(jsonify({'error': str(e)})), 500, {'ContentType':'application/json'}
 

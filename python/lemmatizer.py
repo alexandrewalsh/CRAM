@@ -1,3 +1,17 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from nltk.corpus import wordnet as wn
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tag import PerceptronTagger
@@ -24,6 +38,16 @@ def lemmatize(ambiguous_word, pos=None, neverstem=True,
     wordnet then try and convert surface word into its stem.
     This is to handle the case where users input a surface word as an ambiguous 
     word and the surface word is a not a lemma.
+
+    Keyword arguments:
+    ambiguous_word -- a word to lemmatize
+    pos            -- a part of speech tag 
+    neverstem      -- a flag indicating whether to never stem
+    lemmatizer     -- a model to lemmatize words
+    stemmer        -- a model to stem words
+
+    Returns:
+    - The lemma for a word, or stem if lemma doesn't exist
     """
 
     if pos:
@@ -43,13 +67,21 @@ def lemmatize(ambiguous_word, pos=None, neverstem=True,
     else:
         return lemma
 
+
 def penn2morphy(penntag, returnNone=False):
     """
     Get the POS (Part of Speech) tag for a word
+
+    Keyword arguments:
+    penntag    -- a Penn Treebank POS code
+    returnNone -- whether to return no tag
+
+    Returns:
+    - a Morphy POS tag
     """
 
-    morphy_tag = {'NN':wn.NOUN, 'JJ':wn.ADJ,
-                  'VB':wn.VERB, 'RB':wn.ADV}
+    morphy_tag = {'NN': wn.NOUN, 'JJ': wn.ADJ,
+                  'VB': wn.VERB, 'RB': wn.ADV}
     try:
         return morphy_tag[penntag[:2]]
     except:
@@ -57,6 +89,16 @@ def penn2morphy(penntag, returnNone=False):
 
 
 def word_tokenize(text):
+    """
+    Get a tokenized list of a sentence
+
+    Keyword arguments:
+    text -- a string to tokenize
+
+    Returns:
+    - a list of tokenized word
+    """
+
     return text.split()
 
 
@@ -64,9 +106,24 @@ def lemmatize_sentence(sentence, neverstem=False, keepWordPOS=False,
                        tokenizer=word_tokenize, postagger=pos_tag, 
                        lemmatizer=wnl, stemmer=porter):
     """
-    Get a list of tokenized, lemmitized words
+    Get a list of tokenized, lemmitized words. Entry point for
+    this file.
+
+    Keywords arguments:
+    sentence       --  a sentence to lemmatize
+    neverstem      -- a boolean indicating whether to never
+                      generate word stems
+    keepWordPOS    -- boolean indicating whether to keep word
+                      part of speech elements
+    tokenizer      -- a function for tokenizing words
+    postagger      -- a POS (Part of Speech) categorizer
+    lemmatizer     -- a model to lemmatize words
+    stemmer        -- a model to get word stems
+
+    Returns:
+    - a list of lemmatized words
     """
-    
+
     words, lemmas, poss = [], [], []
     for word, pos in postagger(tokenizer(sentence)):
         pos = penn2morphy(pos)
@@ -80,5 +137,4 @@ def lemmatize_sentence(sentence, neverstem=False, keepWordPOS=False,
 
 
 if __name__ == '__main__':
-    lemmas = lemmatize_sentence("I am hearing that many doubted me in my past")
-    print(lemmas)
+    pass
