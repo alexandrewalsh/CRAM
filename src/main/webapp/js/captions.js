@@ -134,6 +134,11 @@ function execute(url) {
         });
 }
 
+/**
+ * Calls the gensim server to set up the current video id and captions for processing
+ * @param video_id the string id of the YouTube video
+ * @param yt_captions the list of yt_captions
+ */
 function callGensim(video_id, yt_captions) {
 
             // show loading text
@@ -177,6 +182,11 @@ function callGensim(video_id, yt_captions) {
 }
 
 
+/**
+ * Gets the full text from a list of TimeRangedText objects
+ * @param timeRangedText the list of TimeRangedText objects
+ * @return the string of the full captions text
+ */
 function getFullCaptionsText(timeRangedText) {
     var text = '';
     timeRangedText.forEach((item, index) => {
@@ -630,6 +640,9 @@ function clearBookmarkForm() {
     player.playVideo();
 }
 
+/**
+ * Sets all user interaction buttons below the video <iframe>
+ */
 function setAllButtons(entity) {
     setBookmarkButton();
     setCaptionsButton();
