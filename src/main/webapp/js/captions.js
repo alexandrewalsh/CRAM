@@ -104,6 +104,7 @@ function execute(url) {
     // launch yt captions request (needed for gensim in no-db model)
     ytCaptions = "";
     fullCaptions = "";
+    hasCaptions = false;
     fetch('/fullcaption?id=' + videoId, {
             method: 'GET',
         }).then((response) => response.json()).then(json => {
@@ -113,8 +114,10 @@ function execute(url) {
                     json[index].text = item.text.replace(/\[.*?\]/g, '');
                 });
                 ytCaptions = JSON.stringify({'captions': json});
+                hasCaptions = true;
                 documents = createDocuments(ytCaptions);
                 console.log("Got ytCaptions from DB")
+                callGensim(videoId, ytCaptions);
             } else {
                 console.log("Got ytCaptions from YT API")
                 getTrackId(videoId)
@@ -123,14 +126,19 @@ function execute(url) {
                     .then(parsed_captions => {
                         ytCaptions = parsed_captions;
                         documents = createDocuments(parsed_captions);
+                        callGensim(videoId, ytCaptions);
                     });
             }
+        });
+}
+
+function callGensim(video_id, yt_captions) {
 
             // show loading text
             $('#loading-text').show();
 
             // send the gensim POST request
-            postGensim(PYTHON_SERVER, videoId, ytCaptions, (response) => {
+            postGensim(PYTHON_SERVER, video_id, yt_captions, (response) => {
                 // these requests should be done in parallel, TODO
                 
                 if (response.status != 200) {
@@ -147,7 +155,7 @@ function execute(url) {
                 }
 
                 // checks to see if captions already exist in the database
-                fetch('/caption?id=' + videoId, {
+                fetch('/caption?id=' + video_id, {
                     method: 'GET',
                 }).then((response) => response.json()).then((json) => {
                     if (Object.keys(json).length > 0) {
@@ -156,15 +164,14 @@ function execute(url) {
                         console.log("Fetching captions from database...");
                     } else {
                         // video id not found in db, fetching from Youtube API
-                        getTrackId(videoId)
+                        getTrackId(video_id)
                         .then(trackId => getYTCaptions(trackId))
-                        .then(captions => parseCaptionsIntoJson(captions, url))
+                        .then(captions => parseCaptionsIntoJson(captions, $('#search-wrapper input').val()))
                         .then(parsed_captions => sendJsonForm(parsed_captions))
                         .then(nlp_json => successfulDisplay(nlp_json));
                     }
                 });
             });
-        });
 }
 
 
