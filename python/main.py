@@ -45,11 +45,9 @@ def root():
         bucket_name = 'lecture-buddy-287518.appspot.com'
         destination_blob_name = 'Nathan_Test'
 
-        storage_client = storage.Client()
+        storage_client = storage.Client().from_service_account_json('static/resources/lecture-buddy-service.json')
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(destination_blob_name)
-        blob.upload_from_string('tsldkfjsl asdlkfjaskldf slfkdjsladkfj lksfdlkasdfj klsfjalksadjflk kasjlksdjflkasf safksjdafl ksdfjalsdfjlksaf aksldfjslakdfj')
-
 
         # query = 'unrelated'
         # while True:
@@ -57,10 +55,13 @@ def root():
         print("about to query")
         res = query_phrase('hello', json_in)
         print("DONEEE")
-        #     print()
-        #     binary_model = pickle.dumps(res)
-        #     task['description'] = binary_model
+        
+        binary_model = pickle.dumps(res)
+        #task['description'] = binary_model
         #     print('Saved {}: {}'.format(task.key.name, task['description']))
+        blob.upload_from_string(binary_model)
+
+        print("TEST")
 
         return jsonify({"indices": [0, 0, 0]})
 
