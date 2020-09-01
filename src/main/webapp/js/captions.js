@@ -16,9 +16,11 @@
  * fetchBookmarks
  * displayBookmarks
  * clearBookmarkForm
- * setButtons
+ * setAllButtons
  * setBookmarkButton
  * setCaptionsButton
+ * setKwToQueryButton
+ * addBookmarkToDatabase
  * document.ready
  */
 
@@ -259,8 +261,9 @@ function displayVideo(videoId) {
         player.loadVideoByUrl("http://www.youtube.com/v/"+videoId+"?version=3");
     }
 
-    // append bookmark button
-    setButtons();
+    // append side buttons
+    setBookmarkButton();
+    setCaptionsButton();
 }
 
 
@@ -476,8 +479,8 @@ function setClickableEntities() {
         // delete all children
         $("#timestamp-timeline").empty();
 
-        // append bookmark button
-        setButtons();
+        // append side buttons
+        setAllButtons(entity);
 
         // query json
         $("#timestamp-timeline").append("<p>"+entity+" appears at </p>");
@@ -567,7 +570,7 @@ function addContentBookmarkListeners() {
         } else {
             $('.content').css('maxHeight', '0px');
             contentDiv.style.maxHeight = contentDiv.scrollHeight + "px";
-            var bookmarkId = $(this).next().val();
+            var bookmarkId = $(this).next().next().val();
             player.seekTo(bookmarks[bookmarkId].timestamp, true);
         } 
     });
@@ -586,6 +589,7 @@ function displayBookmarks(list) {
     for (bookmark of list) {
         bookmarks[bookmark.id] = {'title': bookmark.title, 'timestamp': bookmark.timestamp, 'content': bookmark.content};
         output += '<li><span  class="bookmark collapsible">' + bookmark.title + '</span>';
+        output += '<span class="bookmark-timestamp">' + epochToTimestamp(bookmark.timestamp) + '</span>';
         output += '<button class="remove-bookmark" value="' + bookmark.id + '">&times;</button></li>'; 
         output += '<div class="content"><pre>' + bookmark.content + '</pre></div>'
     }
@@ -608,6 +612,7 @@ function styleBookmarksFromList(list) {
     var output = '<ul>';
     for (bookmark of list) {
         output += '<li><span  class="bookmark collapsible">' + bookmarks[bookmark].title + '</span>';
+        output += '<span class="bookmark-timestamp">' + epochToTimestamp(bookmarks[bookmark].timestamp) + '</span>';
         output += '<button class="remove-bookmark" value="' + bookmark + '">&times;</button></li>'; 
         output += '<div class="content"><pre>' + bookmarks[bookmark].content + '</pre></div>'
     }
@@ -625,9 +630,10 @@ function clearBookmarkForm() {
     player.playVideo();
 }
 
-function setButtons() {
+function setAllButtons(entity) {
     setBookmarkButton();
     setCaptionsButton();
+    setKwToQueryButton(entity);
 }
 
 /**
@@ -662,6 +668,9 @@ function setBookmarkButton() {
     });
 }
 
+/**
+ * Adds button to display full captions and listeners
+ */
 function setCaptionsButton() {
     // append full-captions button
     $("#timestamp-timeline").append('<button id="fullcap-button"><i style="font-size:24px" class="fa fa-cc"></i></button>');
@@ -694,6 +703,21 @@ function setCaptionsButton() {
         } else {
             $('#FullCap').empty();
         }
+    });
+}
+
+/**
+ * Adds button to create query search and listeners
+ * @param entity        keyword to search up in the query tab
+ */
+function setKwToQueryButton(entity) {
+    // append keyword-to-query button
+    $("#timestamp-timeline").append('<button id="keywordquery-button"><i style="font-size:24px" class="fa fa-search"></i></button>');
+
+    $('#keywordquery-button').click(function() {
+        document.getElementById("query-toggle-button").click();
+        document.getElementById("entity-searchbar").value = entity;
+        document.getElementById("entity-searchbar-button").click();
     });
 }
 
