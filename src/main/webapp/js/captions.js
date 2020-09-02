@@ -32,6 +32,8 @@ var bookmarks;
 /* global variable for holding the full captions */
 var documents;
 var ytCaptions;
+var fullCaptions;
+var global_vid;
 
 /**
  * Event handler for search bar query, entry point
@@ -81,6 +83,9 @@ function execute(url) {
         return;
     }
 
+    // create a global reference for the video ID
+    global_vid = videoId;
+
     // displays the video in the front end
     displayVideo(videoId);
 
@@ -100,34 +105,94 @@ function execute(url) {
 
     // launch yt captions request (needed for gensim in no-db model)
     ytCaptions = "";
-    getTrackId(videoId)
-        .then(trackId => getYTCaptions(trackId))
-        .then(captions => parseCaptionsIntoJson(captions))
-        .then(parsed_captions => {
-            ytCaptions = parsed_captions;
-            documents = createDocuments(parsed_captions);
+    fullCaptions = "";
+    hasCaptions = false;
+    fetch('/fullcaption?id=' + videoId, {
+            method: 'GET',
+        }).then((response) => response.json()).then(json => {
+            if (Array.isArray(json) && json.length > 0) {
+                fullCaptions = getFullCaptionsFromTimeRangedText(json);
+                json.forEach((item, index) => {
+                    json[index].text = item.text.replace(/\[.*?\]/g, '');
+                });
+                ytCaptions = JSON.stringify({'captions': json});
+                hasCaptions = true;
+                documents = createDocuments(ytCaptions);
+                console.log("Got ytCaptions from DB")
+                processVideoOnGensim(videoId, ytCaptions);
+            } else {
+                console.log("Got ytCaptions from YT API")
+                getTrackId(videoId)
+                    .then(trackId => getYTCaptions(trackId))
+                    .then(captions => parseCaptionsIntoJson(captions))
+                    .then(parsed_captions => {
+                        ytCaptions = parsed_captions;
+                        documents = createDocuments(parsed_captions);
+                        processVideoOnGensim(videoId, ytCaptions);
+                    });
+            }
         });
+}
 
-    // show loading text
-    $('#loading-text').show();
+/**
+ * Calls the gensim server to set up the current video id and captions for processing
+ * @param video_id the string id of the YouTube video
+ * @param yt_captions the list of yt_captions
+ */
+function processVideoOnGensim(video_id, yt_captions) {
 
-    // checks to see if captions already exist in the database
-    fetch('/caption?id=' + videoId, {
-        method: 'GET',
-    }).then((response) => response.json()).then((json) => {
-        if (Object.keys(json).length > 0) {
-            // Sets the results table
-            successfulDisplay(json);
-            console.log("Fetching captions from database...");
-        } else {
-            // video id not found in db, fetching from Youtube API
-            getTrackId(videoId)
-            .then(trackId => getYTCaptions(trackId))
-            .then(captions => parseCaptionsIntoJson(captions, url))
-            .then(parsed_captions => sendJsonForm(parsed_captions))
-            .then(nlp_json => successfulDisplay(nlp_json));
-        }
+            // show loading text
+            $('#loading-text').show();
+
+            // send the gensim POST request
+            postGensim(PYTHON_SERVER, video_id, yt_captions, (response) => {
+                // these requests should be done in parallel, TODO
+                
+                if (response.status != 200) {
+                    // try to print error
+                    try {
+                        response.json().then(obj => {
+                            console.error(obj);
+                        });
+                    } catch(err) {
+                        console.error("Unhandled error from gensim POST response: " + err.toString());
+                    } finally {
+                        return;
+                    }
+                }
+
+                // checks to see if captions already exist in the database
+                fetch('/caption?id=' + video_id, {
+                    method: 'GET',
+                }).then((response) => response.json()).then((json) => {
+                    if (Object.keys(json).length > 0) {
+                        // Sets the results table
+                        successfulDisplay(json);
+                        console.log("Fetching captions from database...");
+                    } else {
+                        // video id not found in db, fetching from Youtube API
+                        getTrackId(video_id)
+                        .then(trackId => getYTCaptions(trackId))
+                        .then(captions => parseCaptionsIntoJson(captions, $('#search-wrapper input').val()))
+                        .then(parsed_captions => sendJsonForm(parsed_captions))
+                        .then(nlp_json => successfulDisplay(nlp_json));
+                    }
+                });
+            });
+}
+
+
+/**
+ * Gets the full text from a list of TimeRangedText objects
+ * @param timeRangedText the list of TimeRangedText objects
+ * @return the string of the full captions text
+ */
+function getFullCaptionsFromTimeRangedText(timeRangedText) {
+    var text = '';
+    timeRangedText.forEach((item, index) => {
+        text += item.text + ' ';
     });
+    return text;
 }
 
 /**
@@ -215,6 +280,7 @@ function displayVideo(videoId) {
 /**
  * Get a trackID for a given videoID
  * @param videoId - the Youtube video id
+ * @returns a Promise yielding a trackId
  */
 function getTrackId(videoId) {
     return new Promise((resolve, reject) => {
@@ -270,7 +336,7 @@ function getYTCaptions(trackId) {
  * @param response - a String in SBV format representing the captions
  *                   and their respective timestamps
  * @param url - the url of the YouTube video
- * @returns a promise which upon success returns a JSON 
+ * @returns a Promise which upon success returns a JSON 
  *          string encoding the captions and timestamps 
  */
 function parseCaptionsIntoJson(response, url){
@@ -574,6 +640,9 @@ function clearBookmarkForm() {
     player.playVideo();
 }
 
+/**
+ * Sets all user interaction buttons below the video <iframe>
+ */
 function setAllButtons(entity) {
     setBookmarkButton();
     setCaptionsButton();
@@ -612,6 +681,27 @@ function setBookmarkButton() {
     });
 }
 
+
+/**
+ * Fetches the full captions from the database
+ */
+function fetchFullCaptions() {
+    fetch('/fullcaption?id=' + currentVideoID, {method: 'GET',})
+        .then((response) => response.json())
+        .then((list) => {
+                if (list != null) {
+                    // Creates the text from a list of time ranged texts
+                    var text = '';
+                    list.forEach((item, index) => {
+                        text += item.text + ' ';
+                    });
+                    // Sets the results table
+                    document.getElementById("FullCap").innerText = text.replace(/\[.*?\] /g, '');
+                }
+            })
+        .catch(err => renderError(err));
+}
+
 /**
  * Adds button to display full captions and listeners
  */
@@ -624,17 +714,11 @@ function setCaptionsButton() {
     $('#fullcap-button').click(function() {
         // checks to see if captions already exist in the database
         if ($('#FullCap').is(':empty')) {
-            fetch('/fullcaption?id=' + currentVideoID, {
-                method: 'GET',
-            })
-            .then((response) => response.text())
-            .then ((text) => {
-                if (text != null && text.trim() != '') {
-                    // Sets the results table
-                    document.getElementById("FullCap").innerHTML = text;
-                }
-            })
-            .catch(err => renderError(err));
+            if (fullCaptions == '') {
+                fetchFullCaptions();
+            } else {
+                $('#FullCap').text(fullCaptions.replace(/\[.*?\] /g, ''));
+            }
         } else {
             $('#FullCap').empty();
         }

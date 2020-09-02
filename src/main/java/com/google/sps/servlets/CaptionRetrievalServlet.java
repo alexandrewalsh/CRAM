@@ -62,10 +62,7 @@ public class CaptionRetrievalServlet extends HttpServlet {
                 return;
             }
             List<TimeRangedText> full_captions = dbi.getFullCaptions(videoID);
-            for (TimeRangedText trt : full_captions) {
-                captionText += " " + trt.getText();
-            }
-            response.getWriter().println(captionText);
+            response.getWriter().println(gson.toJson(full_captions));
         } catch (CaptionStorageException e) {
             String exceptionString = EXCEPTION_JSON_START + e.getReason().toString() + EXCEPTION_JSON_END;
             response.getWriter().println(exceptionString);

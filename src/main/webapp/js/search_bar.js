@@ -315,6 +315,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-toggle-button').removeClass('active-tab');
             $('#keywords-output table tr').show();
             $('.content').css('maxHeight', '0px');
+            $('#entity-search-form').attr('onsubmit', 'return false;');
             break;
         case 'query':
             $('#keywords-output').hide();
@@ -324,6 +325,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-output').hide();
             $('#bookmarks-toggle-button').removeClass('active-tab');
             $('.content').css('maxHeight', '0px');
+            $('#entity-search-form').attr('onsubmit', 'getSearchResults(this, event);');
             break;
         case 'bookmarks':
             $('#keywords-output').hide();
@@ -333,6 +335,7 @@ function showSelectedSection(selected) {
             $('#bookmarks-output').show();
             $('#bookmarks-toggle-button').addClass('active-tab');
             $('#bookmarks-output ul li').show();
+            $('#entity-search-form').attr('onsubmit', 'return false;');
             $('#bookmarks-output').css('display', 'inline-block');
             break;
     }
@@ -348,19 +351,25 @@ function showSelectedSection(selected) {
  */
  function getSearchResults(obj, evt) {
     evt.preventDefault();
-    $('#query-output').empty();
+    $('#query-output table').remove();
+    $('#query-loading-text').show();
 
     const query = $(obj).find('input').val();
 
     if (ytCaptions == "") {
-        console.log("YT Captions not yet set!");
-        return;
+        console.error("YT Captions not yet set!");
+        return false;
     }
 
-    // Here goes the post request
-    postGensim(PYTHON_SERVER,
-               ytCaptions,
+    if (global_vid == "") {
+        console.error("YT VID not set!");
+        return false;
+    }
+
+    // Here goes the GET request
+    getGensim(PYTHON_SERVER,
                query,
+               global_vid,
                gensim_callback)
  }
 
@@ -370,24 +379,44 @@ function showSelectedSection(selected) {
  * @param res - the response JSON returned by the python server
  */
  function gensim_callback(res) {
-
     if (res.status != 200) {
-        alert("gensim response failed!");
-        return;
+        // try to print error
+        try {
+            res.json().then(obj => {
+                console.error(obj);
+            })
+        } catch(err) {
+            console.error("Unhandled error from gensim response: " + err.toString());
+        } finally {
+            return;
+        }
     }
 
     res.json().then(obj => {
-        console.log(obj);
         var output = '<table id="query-table">';
-        obj['indices'].forEach(index => {
-            // access global documents property
-            const line = documents[index].text;
-            const time = documents[index].timestamp;
-            output += "<tr><td><span class='query' data-time='" + time + "'>" 
-                        + line + "</span></td></tr>";
-        });
 
-        $('#query-output').html(output);
+        if (obj['indices'].length == 0) {
+            output += "<tr><td>No results found</tr></td>";
+        } else {
+            obj['indices'].forEach(index => {
+                // access global documents property
+                // get 3 lines of context
+                const lines = documents.slice(index,
+                    Math.min(documents.length, index+LINES_OF_QUERY_CONTEXT)).map(el => el.text);
+                
+                // get the timestamp of the first line
+                const time = documents[index].timestamp;
+                output += "<tr><td><span class='query' data-time='" + time + "'>" 
+                            + lines.join(' ') + "</span></td></tr>";
+            });
+        }
+
+        output += "</table>";
+
+        // keep the loading text, but hide it
+        $('#query-loading-text').hide();
+
+        $('#query-output').append(output);
         setClickableQueries();
     });
  }

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Player</title>
+        <link rel="icon" type="image/png" href="/bookcirclecrop.png"/>
+        <title>Lecture Buddy</title>
         <script src="js/jquery-3.5.1.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
@@ -29,7 +30,6 @@
         <script defer src="js/captions.js"></script>
     </head>
     <body>
-
         <!-- The Modal -->
         <div id="myModal" class="modal">
             <!-- Modal content -->
@@ -48,7 +48,6 @@
 
             </div>
         </div>        
-
         <div id="heading-div" class="container">
             <div id="heading-flex">
                 <h1>Lecture Buddy</h1>
@@ -60,7 +59,7 @@
         </div>
         <div id="searchbar-div" class="container top-5">
                 <!-- search bar -->
-                <form onsubmit="submitFn(this, event);">
+                <form onsubmit="return submitFn(this, event);">
                     <div id="search-wrapper" class="search-wrapper container-row active">
                         <div class="input-holder">
                             <input type="text" class="search-input" placeholder="Insert YouTube video URL" />
@@ -110,6 +109,17 @@
                 <div id="output">
                     <div id="keywords-output"></div>
                     <div id="query-output"></div>
+                        <div id="query-loading-text" class="hide">
+                            <div id="inTurnFadingTextG">
+                                <div id="inTurnFadingTextG_1" class="inTurnFadingTextG">L</div>
+                                <div id="inTurnFadingTextG_2" class="inTurnFadingTextG">o</div>
+                                <div id="inTurnFadingTextG_3" class="inTurnFadingTextG">a</div>
+                                <div id="inTurnFadingTextG_4" class="inTurnFadingTextG">d</div>
+                                <div id="inTurnFadingTextG_5" class="inTurnFadingTextG">i</div>
+                                <div id="inTurnFadingTextG_6" class="inTurnFadingTextG">n</div>
+                                <div id="inTurnFadingTextG_7" class="inTurnFadingTextG">g</div>
+                            </div>
+                        </div>
                     <div id="bookmarks-output"></div>
                 </div>
             </div>

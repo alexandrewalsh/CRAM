@@ -13,35 +13,49 @@
 # limitations under the License.
 
 from flask import Flask, request, jsonify, make_response
-from gensim_req import query_phrase
+from gensim_req import query_phrase, create_model
+from google.cloud import storage
+import os
 
 
 app = Flask(__name__)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'static/resources/lecture-buddy-service.json'
 
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def root():
 
     if request.method == 'GET':
-        # get url params: request.args.get(KEY)
-        # This request is currently not being used
+        try:
+            # create a storage client
+            storage_client = storage.Client()
 
-        query = 'hello'
-        json_in = '{"captions": [{"text": "hello, world"}, {"text": "forget me"}]}'
-        res = query_phrase(query, json_in)
-        print("RES: " + str(res))
-        return jsonify({"indices": res})
+            # make sure these keys are present 
+            query = request.headers.get("query")
+            v_id = request.headers.get("vid")
+
+            if query is None or v_id is None:
+                raise Exception("query({}) or v_id({}) are null!".format(query, v_id))
+
+            indices = query_phrase(storage_client, query, v_id)
+            return _corsify_actual_response(jsonify({"indices": indices}))
+
+        except Exception as e:
+            return _corsify_actual_response(jsonify({'error': str(e)})), 500, {'ContentType':'application/json'}
 
     if request.method == 'POST':
-        # get params from post: request.form[KEY]
-        request_json = request.json
-        query = request_json['query']
-        json_in = request_json['ytCaptions']
+        storage_client = storage.Client()
 
-        indices = query_phrase(query, json_in)
-        ret = {"indices": indices} 
+        try:
+            # get params from post: request.form[KEY]
+            request_json = request.json
+            json_in = request_json['data']
+            v_id = request_json['v_id']
+            create_model(storage_client, json_in, v_id)
+            return _corsify_actual_response(jsonify("Success"))
 
-        return _corsify_actual_response(jsonify(ret))
+        except Exception as e:
+            return _corsify_actual_response(jsonify({'error': str(e)})), 500, {'ContentType':'application/json'}
 
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
