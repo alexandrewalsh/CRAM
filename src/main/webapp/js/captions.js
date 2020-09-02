@@ -111,7 +111,7 @@ function execute(url) {
             method: 'GET',
         }).then((response) => response.json()).then(json => {
             if (Array.isArray(json) && json.length > 0) {
-                fullCaptions = getFullCaptionsText(json);
+                fullCaptions = getFullCaptionsFromTimeRangedText(json);
                 json.forEach((item, index) => {
                     json[index].text = item.text.replace(/\[.*?\]/g, '');
                 });
@@ -119,7 +119,7 @@ function execute(url) {
                 hasCaptions = true;
                 documents = createDocuments(ytCaptions);
                 console.log("Got ytCaptions from DB")
-                callGensim(videoId, ytCaptions);
+                processVideoOnGensim(videoId, ytCaptions);
             } else {
                 console.log("Got ytCaptions from YT API")
                 getTrackId(videoId)
@@ -128,7 +128,7 @@ function execute(url) {
                     .then(parsed_captions => {
                         ytCaptions = parsed_captions;
                         documents = createDocuments(parsed_captions);
-                        callGensim(videoId, ytCaptions);
+                        processVideoOnGensim(videoId, ytCaptions);
                     });
             }
         });
@@ -139,7 +139,7 @@ function execute(url) {
  * @param video_id the string id of the YouTube video
  * @param yt_captions the list of yt_captions
  */
-function callGensim(video_id, yt_captions) {
+function processVideoOnGensim(video_id, yt_captions) {
 
             // show loading text
             $('#loading-text').show();
@@ -187,7 +187,7 @@ function callGensim(video_id, yt_captions) {
  * @param timeRangedText the list of TimeRangedText objects
  * @return the string of the full captions text
  */
-function getFullCaptionsText(timeRangedText) {
+function getFullCaptionsFromTimeRangedText(timeRangedText) {
     var text = '';
     timeRangedText.forEach((item, index) => {
         text += item.text + ' ';
@@ -681,6 +681,27 @@ function setBookmarkButton() {
     });
 }
 
+
+/**
+ * Fetches the full captions from the database
+ */
+function fetchFullCaptions() {
+    fetch('/fullcaption?id=' + currentVideoID, {method: 'GET',})
+        .then((response) => response.json())
+        .then((list) => {
+                if (list != null) {
+                    // Creates the text from a list of time ranged texts
+                    var text = '';
+                    list.forEach((item, index) => {
+                        text += item.text + ' ';
+                    });
+                    // Sets the results table
+                    document.getElementById("FullCap").innerText = text.replace(/\[.*?\] /g, '');
+                }
+            })
+        .catch(err => renderError(err));
+}
+
 /**
  * Adds button to display full captions and listeners
  */
@@ -694,22 +715,7 @@ function setCaptionsButton() {
         // checks to see if captions already exist in the database
         if ($('#FullCap').is(':empty')) {
             if (fullCaptions == '') {
-                fetch('/fullcaption?id=' + currentVideoID, {
-                    method: 'GET',
-                })
-                    .then((response) => response.json())
-                    .then ((list) => {
-                    if (list != null) {
-                        // Creates the text from a list of time ranged texts
-                        var text = '';
-                        list.forEach((item, index) => {
-                            text += item.text + ' ';
-                        });
-                        // Sets the results table
-                        document.getElementById("FullCap").innerText = text.replace(/\[.*?\] /g, '');
-                    }
-                })
-                .catch(err => renderError(err));
+                fetchFullCaptions();
             } else {
                 $('#FullCap').text(fullCaptions.replace(/\[.*?\] /g, ''));
             }
