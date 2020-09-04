@@ -1,4 +1,5 @@
-This Repo is meant for the STEP 2020 Internship Capstone Project. Very cash money.
+Welcome to Lecture Buddy!
+This Repo is meant for the STEP 2020 Internship Capstone Project.
 
 Principle authors:
 Nathan Zhao
