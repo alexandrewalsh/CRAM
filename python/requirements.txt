@@ -4,6 +4,7 @@ nltk
 pickle-mixin
 google-api-python-client
 google-cloud-datastore
+google
 grpcio
 google-cloud
 google-cloud-storage

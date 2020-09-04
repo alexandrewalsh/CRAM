@@ -103,6 +103,9 @@ function execute(url) {
         return;
     }
 
+    // show loading text
+    $('#loading-text').show();
+
     // launch yt captions request (needed for gensim in no-db model)
     ytCaptions = "";
     fullCaptions = "";
@@ -140,45 +143,41 @@ function execute(url) {
  * @param yt_captions the list of yt_captions
  */
 function processVideoOnGensim(video_id, yt_captions) {
-
-            // show loading text
-            $('#loading-text').show();
-
-            // send the gensim POST request
-            postGensim(PYTHON_SERVER, video_id, yt_captions, (response) => {
-                // these requests should be done in parallel, TODO
-                
-                if (response.status != 200) {
-                    // try to print error
-                    try {
-                        response.json().then(obj => {
-                            console.error(obj);
-                        });
-                    } catch(err) {
-                        console.error("Unhandled error from gensim POST response: " + err.toString());
-                    } finally {
-                        return;
-                    }
-                }
-
-                // checks to see if captions already exist in the database
-                fetch('/caption?id=' + video_id, {
-                    method: 'GET',
-                }).then((response) => response.json()).then((json) => {
-                    if (Object.keys(json).length > 0) {
-                        // Sets the results table
-                        successfulDisplay(json);
-                        console.log("Fetching captions from database...");
-                    } else {
-                        // video id not found in db, fetching from Youtube API
-                        getTrackId(video_id)
-                        .then(trackId => getYTCaptions(trackId))
-                        .then(captions => parseCaptionsIntoJson(captions, $('#search-wrapper input').val()))
-                        .then(parsed_captions => sendJsonForm(parsed_captions))
-                        .then(nlp_json => successfulDisplay(nlp_json));
-                    }
+    // send the gensim POST request
+    postGensim(PYTHON_SERVER, video_id, yt_captions, (response) => {
+        // these requests should be done in parallel, TODO
+        
+        if (response.status != 200) {
+            // try to print error
+            try {
+                response.json().then(obj => {
+                    console.error(obj);
                 });
-            });
+            } catch(err) {
+                console.error("Unhandled error from gensim POST response: " + err.toString());
+            } finally {
+                return;
+            }
+        }
+
+        // checks to see if captions already exist in the database
+        fetch('/caption?id=' + video_id, {
+            method: 'GET',
+        }).then((response) => response.json()).then((json) => {
+            if (Object.keys(json).length > 0) {
+                // Sets the results table
+                successfulDisplay(json);
+                console.log("Fetching captions from database...");
+            } else {
+                // video id not found in db, fetching from Youtube API
+                getTrackId(video_id)
+                .then(trackId => getYTCaptions(trackId))
+                .then(captions => parseCaptionsIntoJson(captions, $('#search-wrapper input').val()))
+                .then(parsed_captions => sendJsonForm(parsed_captions))
+                .then(nlp_json => successfulDisplay(nlp_json));
+            }
+        });
+    });
 }
 
 
