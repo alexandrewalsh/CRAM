@@ -1,4 +1,4 @@
-This Repo is meant for the STEP 2020 Internship Capstone Project. Very cash money.
+Welcome to Lecture Buddy. This Repo is meant for the STEP 2020 Internship Capstone Project.
 
 Principle authors:
 Nathan Zhao
@@ -8,6 +8,8 @@ Alexandre Walsh
 Hosts:
 Cassie Han
 Jiashen Wang
+
+Clone this repo and install the requirements by navigating to `CRAM/python` and running `pip3 install -r requirements.txt`.
 
 To deploy this project to a new GCP project:
 Create the Project:
